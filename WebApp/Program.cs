@@ -18,6 +18,12 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    await SeedData.Initializer(services, app.Configuration);
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -50,3 +56,5 @@ app.UseEndpoints(endpoints =>
 app.MapRazorPages();
 
 app.Run();
+
+
