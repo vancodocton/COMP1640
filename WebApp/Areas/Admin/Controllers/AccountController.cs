@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using WebApp.Areas.Identity.Pages.Account;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
@@ -79,6 +80,51 @@ namespace WebApp.Areas.Admin.Controllers
             model.Roles = new SelectList(_roleManager.Roles, "Id", "Name").ToList();
             return View(model);
         }
+
+        [HttpGet]
+        public ActionResult ResetPwd(string? id)
+        {
+            var model = new RegisterModel.InputModel();
+
+            if (!string.IsNullOrEmpty(id))
+                model.Email = id;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPwd(RegisterModel.InputModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user == null)
+                    ModelState.AddModelError("Email", "User does not exist.");
+                else if (await _userManager.IsInRoleAsync(user, Role.Admin))
+                {
+                    ModelState.AddModelError("", "Permission denies. Cannot reset this account password");
+                }
+                else
+                {
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                    var resetPwdResult = await _userManager.ResetPasswordAsync(user, code, model.Password);
+
+                    if (resetPwdResult.Succeeded)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                        AddErrors(resetPwdResult.Errors);
+                }
+
+            }
+
+            return View(model);
+        }
+
 
         private void AddErrors(IEnumerable<IdentityError> errors)
         {
