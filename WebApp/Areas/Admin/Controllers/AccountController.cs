@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Areas.Identity.Pages.Account;
 using WebApp.Data;
 using WebApp.Models;
@@ -16,11 +17,13 @@ namespace WebApp.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
-        public AccountController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AccountController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         // GET: AccountController
@@ -30,13 +33,13 @@ namespace WebApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
             var model = new AccountCreateViewModel()
             {
-                Roles = new SelectList(_roleManager.Roles, "Name").ToList()
+                Roles = new SelectList(_roleManager.Roles, "Name").ToList(),
+                Departments = new SelectList(await _context.Department.ToListAsync(), "Id", "Name").ToList()
             };
-
             return View(model);
         }
 

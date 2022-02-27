@@ -39,9 +39,18 @@
         <span asp-validation-for="BirthDate" class="text-danger"></span>
     </div>
     <div class="form-floating">
-        <select asp-for="Role" asp-items="@Model.Roles" class="form-select"></select>
+        <select asp-for="Role" asp-items="@Model.Roles" class="form-select" required>
+            <option></option>
+        </select>
         <label asp-for="Role"></label>
         <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+    <div class="form-floating">
+        <select asp-for="DepartmentId" asp-items="@Model.Departments" class="form-select">
+            <option></option>
+        </select>
+        <label asp-for="DepartmentId"></label>
+        <span asp-validation-for="DepartmentId" class="text-danger"></span>
     </div>
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>

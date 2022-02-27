@@ -24,5 +24,10 @@ namespace WebApp.ViewModels
 
         [ValidateNever]
         public List<SelectListItem>? Roles { get; set; }
+
+        [Display(Name = "Department")]
+        public int? DepartmentId { get; set; }
+        [ValidateNever]
+        public List<SelectListItem>? Departments { get; set; }
     }
 }
