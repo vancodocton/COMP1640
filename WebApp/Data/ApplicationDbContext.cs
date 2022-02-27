@@ -10,5 +10,18 @@ namespace WebApp.Data
             : base(options)
         {
         }
+
+        public DbSet<QA_Coordinator> QA_Coordinators { get; set; }
+
+        public DbSet<Department> Department { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Department>()
+                .HasIndex(u => u.Name)
+                .IsUnique();
+        }
     }
 }
