@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApp.ViewModels
 {
     public class IdeaViewModel
     {
-        public int Id { get; set; }
-
         [Required]
         public string? Title { get; set; }
 
@@ -20,6 +20,7 @@ namespace WebApp.ViewModels
         public int CategoryId { get; set; }
 
         [ValidateNever]
+        [NotMapped]
         public List<SelectListItem>? Categories { get; set; }
     }
 }
