@@ -39,8 +39,8 @@ namespace WebApp.Controllers
                 Categories = await context
                 .Category.Select(c => new SelectListItem()
                 {
-                    Text = c.Id.ToString(),
-                    Value = c.Name
+                    Value = c.Id.ToString(),
+                    Text = c.Name
                 })
                 .ToListAsync(),
             };
@@ -72,12 +72,12 @@ namespace WebApp.Controllers
             model.Categories = await context
                 .Category.Select(c => new SelectListItem()
                 {
-                    Text = c.Id.ToString(),
-                    Value = c.Name
+                    Value = c.Id.ToString(),
+                    Text = c.Name
                 })
                 .ToListAsync();
 
             return View(model);
+        }
     }
-}
 }
