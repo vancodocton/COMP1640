@@ -32,17 +32,18 @@ namespace WebApp.Areas.Admin.Controllers
         // GET: AccountController
         public async Task<ActionResult> Index()
         {
-            _userManager.Users
+            var model = await _userManager.Users
                 .Select(u => new UserViewModel()
                 {
+                    Id = u.Id,
                     UserName = u.UserName,
                     Email = u.Email,
                     FullName = u.FullName,
                     Roles = _userManager.GetRolesAsync(u).Result
-                });
+                })
+                .ToListAsync();
 
-            var a = await _userManager.GetRolesAsync(new ApplicationUser());
-            return View();
+            return View(model);
         }
 
         [HttpGet]
@@ -95,7 +96,10 @@ namespace WebApp.Areas.Admin.Controllers
                 }
             }
 
-            model.Roles = new SelectList(_roleManager.Roles, "Id", "Name").ToList();
+            model.Roles = new SelectList(_createdRoles).ToList();
+            model.Departments = new SelectList(await _context
+                .Department
+                .ToListAsync(), "Id", "Name").ToList();
             return View(model);
         }
 
