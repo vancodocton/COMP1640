@@ -19,16 +19,29 @@ namespace WebApp.Areas.Admin.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
 
+        private List<string> _createdRoles;
         public AccountController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+
+            _createdRoles = new List<string>() { Role.Coordinator, Role.Staff };
         }
 
         // GET: AccountController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
+            _userManager.Users
+                .Select(u => new UserViewModel()
+                {
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    FullName = u.FullName,
+                    Roles = _userManager.GetRolesAsync(u).Result
+                });
+
+            var a = await _userManager.GetRolesAsync(new ApplicationUser());
             return View();
         }
 
@@ -37,7 +50,7 @@ namespace WebApp.Areas.Admin.Controllers
         {
             var model = new AccountCreateViewModel()
             {
-                Roles = new SelectList(_roleManager.Roles, "Name").ToList(),
+                Roles = new SelectList(_createdRoles).ToList(),
                 Departments = new SelectList(await _context.Department.ToListAsync(), "Id", "Name").ToList()
             };
             return View(model);
@@ -48,36 +61,38 @@ namespace WebApp.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AccountCreateViewModel model)
         {
-            if (!await _roleManager.RoleExistsAsync(model.Role))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Invalid account role");
-            }
-            else if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser()
+                if (!_createdRoles.Contains(model.Role))
+                    ModelState.AddModelError("Role", "Cannot create accout with role" + model.Role);
+                else
                 {
-                    UserName = model.Input.Email,
-                    Email = model.Input.Email,
-                    Address = model.Address,
-                    BirthDate = model.BirthDate,
-                    EmailConfirmed = true
-                };
-
-                var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
-
-                if (createAccountResult.Succeeded)
-                {
-                    var addAccountRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
-
-                    if (addAccountRoleResult.Succeeded)
+                    var user = new ApplicationUser()
                     {
-                        return RedirectToAction(nameof(Index));
+                        UserName = model.Input.Email,
+                        Email = model.Input.Email,
+                        Address = model.Address,
+                        BirthDate = model.BirthDate,
+                        EmailConfirmed = true,
+                    };
+
+                    var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
+
+
+                    if (createAccountResult.Succeeded)
+                    {
+                        var addAccountRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
+
+                        if (addAccountRoleResult.Succeeded)
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                            AddErrors(addAccountRoleResult.Errors);
                     }
                     else
-                        AddErrors(addAccountRoleResult.Errors);
+                        AddErrors(createAccountResult.Errors);
                 }
-                else
-                    AddErrors(createAccountResult.Errors);
             }
 
             model.Roles = new SelectList(_roleManager.Roles, "Id", "Name").ToList();
