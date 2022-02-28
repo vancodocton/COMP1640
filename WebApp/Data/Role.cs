@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using WebApp.Models;
-
-namespace WebApp.Data
+﻿namespace WebApp.Data
 {
     public class Role
     {
