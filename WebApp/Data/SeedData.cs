@@ -88,7 +88,15 @@ namespace WebApp.Data
         {
             var categorys = new List<Category>()
             {
-                new Category() { Name="Category" },
+                new Category() { Name="Things You Get in the Mail" },
+                new Category() { Name="Things You Do Every Day" },
+                new Category() { Name="Things You Store Items In" },
+                new Category() { Name="Things to Do on a Date" },
+                new Category() { Name="Things You Buy for Kids" },
+                new Category() { Name="Things That Can Kill You" },
+                new Category() { Name="Things You Make" },
+                new Category() { Name="Things at a Carnival" },
+                new Category() { Name="Things You Shouldn’t Touch" },
             };
 
             foreach (var category in categorys)
