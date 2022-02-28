@@ -13,6 +13,7 @@ namespace WebApp.Data
             await SeedDefaultAccountData(serviceProvider.GetRequiredService<UserManager<ApplicationUser>>());
 
             await SeedDepartmentData(serviceProvider.GetRequiredService<ApplicationDbContext>());
+            await SeedCategoryData(serviceProvider.GetRequiredService<ApplicationDbContext>());
         }
 
         private static async Task SeedRoleData(RoleManager<IdentityRole> roleManager)
@@ -83,6 +84,20 @@ namespace WebApp.Data
             await context.SaveChangesAsync();
         }
 
+        private static async Task SeedCategoryData(ApplicationDbContext context)
+        {
+            var categorys = new List<Category>()
+            {
+                new Category() { Name="Category" },
+            };
+
+            foreach (var category in categorys)
+            {
+                if (!await context.Category.AnyAsync(d => d.Name == category.Name)) 
+                    await context.Category.AddAsync(category);
+            }
+            await context.SaveChangesAsync();
+        }
 
     }
 }
