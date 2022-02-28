@@ -46,12 +46,14 @@ app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllerRoute(
-      name: "default",
-      pattern: "{controller=Home}/{action=Index}/{id?}");
+    // In general, routes with areas should be placed earlier in the route table
+    // as they're more specific than routes without an area.
     endpoints.MapControllerRoute(
            name: "areas",
            pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapControllerRoute(
+      name: "default",
+      pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 app.MapRazorPages();
 
