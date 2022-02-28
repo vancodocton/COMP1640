@@ -13,7 +13,6 @@ namespace WebApp.Models
 
         public string? Description { get; set; }
 
-        public string? UserId { get; set; }
-        public QA_Coordinator? QA_Coordinator { get; set; }
+        public IEnumerable<ApplicationUser>? Users { get; set; }
     }
 }

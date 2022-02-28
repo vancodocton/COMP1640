@@ -11,8 +11,6 @@ namespace WebApp.Data
         {
         }
 
-        public DbSet<QA_Coordinator> QA_Coordinators { get; set; }
-
         public DbSet<Department> Department { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

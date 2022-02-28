@@ -4,7 +4,7 @@
 
 namespace WebApp.Data.Migrations
 {
-    public partial class CreateDepartmentQaCoorTables : Migration
+    public partial class CreateDepartmentTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,13 +14,6 @@ namespace WebApp.Data.Migrations
                 type: "int",
                 nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "Discriminator",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
             migrationBuilder.CreateTable(
                 name: "Department",
                 columns: table => new
@@ -28,8 +21,7 @@ namespace WebApp.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -39,9 +31,7 @@ namespace WebApp.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_DepartmentId",
                 table: "AspNetUsers",
-                column: "DepartmentId",
-                unique: true,
-                filter: "[DepartmentId] IS NOT NULL");
+                column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Department_Name",
@@ -72,10 +62,6 @@ namespace WebApp.Data.Migrations
 
             migrationBuilder.DropColumn(
                 name: "DepartmentId",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "Discriminator",
                 table: "AspNetUsers");
         }
     }

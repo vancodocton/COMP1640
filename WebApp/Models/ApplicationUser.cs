@@ -13,5 +13,8 @@ namespace WebApp.Models
 
         [StringLength(80)]
         public string? Address { get; set; }
+
+        public int? DepartmentId { get; set; }
+        public Department? Department { get; set; }
     }
 }

@@ -178,9 +178,8 @@ namespace WebApp.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -228,6 +227,8 @@ namespace WebApp.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -237,8 +238,6 @@ namespace WebApp.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
                 });
 
             modelBuilder.Entity("WebApp.Models.Department", b =>
@@ -256,29 +255,12 @@ namespace WebApp.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Department");
-                });
-
-            modelBuilder.Entity("WebApp.Models.QA_Coordinator", b =>
-                {
-                    b.HasBaseType("WebApp.Models.ApplicationUser");
-
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("DepartmentId")
-                        .IsUnique()
-                        .HasFilter("[DepartmentId] IS NOT NULL");
-
-                    b.HasDiscriminator().HasValue("QA_Coordinator");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -332,18 +314,18 @@ namespace WebApp.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApp.Models.QA_Coordinator", b =>
+            modelBuilder.Entity("WebApp.Models.ApplicationUser", b =>
                 {
                     b.HasOne("WebApp.Models.Department", "Department")
-                        .WithOne("QA_Coordinator")
-                        .HasForeignKey("WebApp.Models.QA_Coordinator", "DepartmentId");
+                        .WithMany("Users")
+                        .HasForeignKey("DepartmentId");
 
                     b.Navigation("Department");
                 });
 
             modelBuilder.Entity("WebApp.Models.Department", b =>
                 {
-                    b.Navigation("QA_Coordinator");
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
