@@ -8,9 +8,11 @@ using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApp.Controllers
 {
+    [Authorize(Roles = Role.Staff + "," + Role.Coordinator)]
     public class ForumController : Controller
     {
         private readonly ApplicationDbContext context;
