@@ -38,7 +38,7 @@ namespace WebApp.Areas.Admin.Controllers
                     UserName = u.UserName,
                     Email = u.Email,
                     FullName = u.FullName,
-                    Roles = _userManager.GetRolesAsync(u).Result
+                    //Roles = _userManager.GetRolesAsync(u).Result
                 })
                 .ToListAsync();
 
@@ -72,6 +72,7 @@ namespace WebApp.Areas.Admin.Controllers
                         UserName = model.Input.Email,
                         Email = model.Input.Email,
                         Address = model.Address,
+                        FullName = model.FullName,
                         BirthDate = model.BirthDate,
                         EmailConfirmed = true,
                     };
