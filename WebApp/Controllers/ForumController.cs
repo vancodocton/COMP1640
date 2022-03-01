@@ -27,10 +27,12 @@ namespace WebApp.Controllers
             this.userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<ActionResult> Index()
         {
 
-            return View();
+            var model = await context.Idea
+                .Include(x => x.Category).ToListAsync();
+            return View(model);
         }
 
         [HttpGet]
