@@ -260,7 +260,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.Department", b =>
@@ -283,7 +283,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Department");
+                    b.ToTable("Department", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.Idea", b =>
@@ -315,7 +315,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Idea");
+                    b.ToTable("Idea", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
