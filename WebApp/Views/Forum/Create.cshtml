@@ -29,15 +29,15 @@
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create Idea" class="btn btn-primary mb1 black bg-yellow" />  
             </div>
         </form>
     </div>
 </div>
+    <p>
+        <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
+    </p>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
