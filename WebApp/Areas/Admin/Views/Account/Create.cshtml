@@ -3,11 +3,11 @@
     ViewData["Title"] = "Create";
 }
 <div class="body-background">
-<button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Return index page</a></button>
 
 <form asp-area="Admin" asp-controller="Account" asp-action="Create" method="post">
+    <button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Home</a></button>
     <div class="container-fluid d-flex justify-content-center align-items-center h-100">
-        <div class="card p-3 text-center py-4">  
+        <div class="card p-3 text-center py-4" style="margin-bottom: 80px">  
             <h4>Enter Employee's Information</h4>
             <div class="form-floating">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />

@@ -14,8 +14,7 @@ html {
 }
 
 body {
-    margin-bottom: 60px;
-    padding-bottom: 20px;
+    margin-bottom: 300px;
     background-image: url("~/img/Colorful.png");
     background-size: cover;
     background-position: center center;
@@ -24,13 +23,20 @@ body {
 }
 
 .body-background {
-    height: 100vh;
-    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8)
+    height: auto;
+    width: 100%;
+    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);
+    margin-bottom: 60px;
 }
 
 .card {
-    width: 1000px;
+    width: 700px;
     border: none
+}
+
+.form-floating {
+    display: block;
+    margin-bottom: 20px;
 }
 
 .form-control {
