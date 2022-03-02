@@ -18,9 +18,4 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <Folder Include="wwwroot\css\NewFolder\" />
-  </ItemGroup>
-
 </Project>
