@@ -3,9 +3,9 @@
     ViewData["Title"] = "ResetPwd";
 }
 
-<h1>ResetPwd</h1>
-<a asp-area="Admin" asp-controller="Account" asp-action="Index">Return index page</a>
-
+<h1>Reset Password</h1>
+<button type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Return index page</a></button>
+<br><br>
 <form id="resetPwdForm" asp-area="Admin" asp-action="ResetPwd" method="post">
     <h2>Reset user account password</h2>
     <hr />

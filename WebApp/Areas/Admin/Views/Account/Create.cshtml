@@ -2,11 +2,10 @@
 @{
     ViewData["Title"] = "Create";
 }
+<div class="body-background">
+<button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Return index page</a></button>
 
-<h1>Create</h1>
-<a asp-area="Admin" asp-controller="Account" asp-action="Index">Return index page</a>
-
-<form class="body-background" asp-area="Admin" asp-controller="Account" asp-action="Create" method="post">
+<form asp-area="Admin" asp-controller="Account" asp-action="Create" method="post">
     <div class="container-fluid d-flex justify-content-center align-items-center h-100">
         <div class="card p-3 text-center py-4">  
             <h4>Enter Employee's Information</h4>
@@ -59,6 +58,7 @@
         </div>
     </div>
 </form>
+</div>
 
 @section Scripts {
 <partial name="_ValidationScriptsPartial" />
