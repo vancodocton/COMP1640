@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using WebApp.Data;
 using WebApp.Models;
 
 namespace WebApp.Controllers
@@ -15,6 +16,17 @@ namespace WebApp.Controllers
 
         public IActionResult Index()
         {
+            if (User.IsInRole(Role.Staff))
+            {
+                return RedirectToAction("Index", "Forum");
+            }
+
+            if (User.IsInRole(Role.Admin))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
+
+
             return View();
         }
 
