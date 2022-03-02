@@ -50,3 +50,11 @@ body {
     text-decoration: none;
     color: white;
 }
+    padding-top: 50px;
+    padding-bottom: 20px;
+    background-image: url("~/img/Colorful.png");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    margin: auto;
+}
