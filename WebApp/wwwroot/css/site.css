@@ -1,18 +1,52 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.body-background {
+    height: 100vh;
+    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8)
+}
+
+.card {
+    width: 1000px;
+    border: none
+}
+
+.form-control {
+    height: 45px;
+    border-radius: 10px
+}
+
+    .form-control:focus {
+        box-shadow: none
+    }
+
+.btn-signup {
+    height: 50px;
+    border-radius: 10px
+}
+
+#add-button, #reset-pwd-button {
+    text-decoration: none;
+    color: white;
+}
+
+#return-index-button {
+    text-decoration: none;
+    color: white;
 }
