@@ -16,7 +16,7 @@ namespace WebApp.Controllers
     public class ForumController : Controller
     {
         private readonly ApplicationDbContext context;
-        private UserManager<ApplicationUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
         public ForumController(
             ApplicationDbContext context,
@@ -27,11 +27,17 @@ namespace WebApp.Controllers
             this.userManager = userManager;
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? cid)
         {
+            var categories = await context.Category.ToListAsync();
 
-            var model = await context.Idea
-                .Include(x => x.Category).ToListAsync();
+            var ideas = context.Idea.Include(x => x.Category).AsQueryable();
+
+            if (cid != null)
+                ideas = ideas.Where(i => i.CategoryId == cid);
+
+            var model = new ForumViewModel(await ideas.ToListAsync(), categories);
+
             return View(model);
         }
 

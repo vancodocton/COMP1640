@@ -1,42 +1,53 @@
-﻿@model IEnumerable<WebApp.Models.Idea>
+﻿@model WebApp.ViewModels.ForumViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Forum";
 }
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="row">
+    <div class="col-lg-3">
+        <a asp-action="Create" asp-controller="Forum" class="btn btn-primary">Create New Idea</a>
+        <hr />
+        <div class="list-group list-group-flush">
+            <a id="cid-null" class="list-group-item" asp-action="Index">All ideas</a>
+            @foreach (var category in Model.Categories)
+            {
+                <a id="cid-@category.Id" class="list-group-item" asp-action="Index" asp-route-cid="@category.Id">@category.Name</a>
+            }
+        </div>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-        </tr>
+    <div class="col-lg-9">
+        @foreach (var idea in Model.Ideas)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <a asp-action="Index" asp-route-cid="@idea.CategoryId">@idea.Category.Name</a>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @Html.DisplayFor(modelItem => idea.Title)
+                    </h5>
+                    <p class="card-text">
+                        @Html.DisplayFor(modelItem => idea.Content)
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <span>Comment: 1</span>
+                    <button class="btn btn-primary">Thumb Up</button>
+                    <button class="btn btn-danger">Thumb Down</button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+<script type='text/javascript'>
+    const params = new URLSearchParams(window.location.search);
+
+    const category = "#cid-" + params.get("cid");        
+
+    $(category).addClass("active");
+</script>
 }
-    </tbody>
-</table>
