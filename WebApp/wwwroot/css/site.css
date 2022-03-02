@@ -14,5 +14,11 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    padding-top: 50px;
+    padding-bottom: 20px;
+    background-image: url('../css/Images/Colorful.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    margin: auto;
 }
