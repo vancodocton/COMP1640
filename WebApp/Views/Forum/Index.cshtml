@@ -34,7 +34,10 @@
                 </div>
                 <div class="card-footer">
                     <span>Comment: 1</span>
-                    <button class="btn btn-primary">Thumb Up</button>
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-user"></i>
+                        Thumb Up
+                    </button>
                     <button class="btn btn-danger">Thumb Down</button>
                 </div>
             </div>
@@ -46,7 +49,7 @@
 <script type='text/javascript'>
     const params = new URLSearchParams(window.location.search);
 
-    const category = "#cid-" + params.get("cid");        
+    const category = "#cid-" + params.get("cid");
 
     $(category).addClass("active");
 </script>
