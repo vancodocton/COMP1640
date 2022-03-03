@@ -39,6 +39,12 @@
                                     Actions
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@j">
+                                    <a class="dropdown-item text-success" asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@user.Email">
+                                        Edit
+                                    </a>
+                                     <a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="Delete" asp-route-id="@user.Email">
+                                        Delete
+                                    </a>
                                     <a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" asp-route-id="@user.Email">
                                         Reset Password
                                     </a>
