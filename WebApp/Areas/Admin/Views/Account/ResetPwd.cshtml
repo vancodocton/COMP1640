@@ -3,13 +3,14 @@
     ViewData["Title"] = "ResetPwd";
 }
 
-<h1>Reset Password</h1>
-<button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Return index page</a></button>
+<button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Home</a></button>
 
 <form id="resetPwdForm" asp-area="Admin" asp-action="ResetPwd" method="post">
-    <h2>Reset user account password</h2>
+    <h2 style="text-align: center">Reset user account password</h2>
     <hr />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+        <div class="card p-3 text-center py-4" style="margin-bottom: 80px"> 
     <div class="form-floating">
         <input asp-for="Email" value="@Model.Email" class="form-control" autocomplete="username" aria-required="true" />
         <label asp-for="Email"></label>
@@ -25,7 +26,8 @@
         <label asp-for="ConfirmPassword">Confirm New Password</label>
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
-    <button id="resetPwdSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Reset</button>
+    <button id="resetPwdSubmit" type="submit" class="w-100 btn btn-lg btn-danger">Reset</button>
+    </div></div>
 </form>
 
 @section Scripts {
