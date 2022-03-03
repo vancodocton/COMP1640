@@ -27,7 +27,7 @@ namespace WebApp.Controllers
             this.userManager = userManager;
         }
 
-        public async Task<ActionResult> Index(int? cid)
+        public async Task<ActionResult> Index(int? cid, string? order)
         {
             var categories = await context.Category.ToListAsync();
 
@@ -35,6 +35,21 @@ namespace WebApp.Controllers
 
             if (cid != null)
                 ideas = ideas.Where(i => i.CategoryId == cid);
+
+            switch (order)
+            {
+                case null:
+                case "lastest":
+                        ideas = ideas.OrderByDescending(i => i.Id);
+                    break;
+                case "popular":
+                    break;
+                case "topview":
+                    break;
+                default:
+                    return BadRequest("Invalid order option");
+            }
+
 
             var model = new ForumViewModel(await ideas.ToListAsync(), categories);
 

@@ -33,12 +33,18 @@
                     </p>
                 </div>
                 <div class="card-footer">
-                    <span>Comment: 1</span>
-                    <button class="btn btn-primary">
-                        <i class="fa-solid fa-user"></i>
-                        Thumb Up
-                    </button>
-                    <button class="btn btn-danger">Thumb Down</button>
+                    <span><i class="fa-regular fa-comments"></i> 1</span>
+                    <form id="react-idea-@idea.Id" class="btn-group" role="group" aria-label="React button group @idea.Id">
+                        <input type="radio" class="btn-check" name="btnradio-@idea.Id" id="thumbupbtn-@idea.Id" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="thumbupbtn-@idea.Id">
+                            <i class="fa-regular fa-thumbs-up"></i> Thumb Up
+                        </label>
+
+                        <input type="radio" class="btn-check" name="btnradio-@idea.Id" id="thumbdownbtn-@idea.Id" autocomplete="off">
+                        <label class="btn btn-outline-danger" for="thumbdownbtn-@idea.Id">
+                            <i class="fa-regular fa-thumbs-down"></i> Thumb Down
+                        </label>
+                    </form>
                 </div>
             </div>
         }
@@ -52,5 +58,10 @@
     const category = "#cid-" + params.get("cid");
 
     $(category).addClass("active");
+
+    function reactIdea(IdeaId, react)
+    {
+
+    }
 </script>
 }
