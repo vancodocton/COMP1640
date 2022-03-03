@@ -29,9 +29,8 @@ body {
     margin-bottom: 60px;
 }
 
-.card {
+.form-input {
     width: 700px;
-    border: none
 }
 
 .form-floating {
