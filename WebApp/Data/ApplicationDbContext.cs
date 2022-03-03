@@ -19,6 +19,8 @@ namespace WebApp.Data
 
         public DbSet<Idea> Idea { get; set; }
 
+        public DbSet<React> React { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
