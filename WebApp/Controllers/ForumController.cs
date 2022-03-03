@@ -34,13 +34,16 @@ namespace WebApp.Controllers
             var ideas = context.Idea.Include(x => x.Category).AsQueryable();
 
             if (cid != null)
+            {
                 ideas = ideas.Where(i => i.CategoryId == cid);
+                ViewData["cid"] = cid;
+            }
 
             switch (order)
             {
                 case null:
                 case "lastest":
-                        ideas = ideas.OrderByDescending(i => i.Id);
+                    ideas = ideas.OrderByDescending(i => i.Id);
                     break;
                 case "popular":
                     break;
@@ -103,6 +106,14 @@ namespace WebApp.Controllers
                 .ToListAsync();
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Idea(int? id)
+        {
+            if (id == null)
+                return BadRequest();
+
+            return View();
         }
     }
 }

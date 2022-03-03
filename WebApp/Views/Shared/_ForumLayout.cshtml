@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row">
+    <div class="col-lg-3 col-md-4 bg-dark">
+        <nav class="navbar navbar-expand-md navbar-dark">
+            <div class="container-fluid flex-md-column">
+                <div class="d-sm-flex d-md-block">
+                    <div class="nav-item pb-2 pe-2">
+                        <a asp-action="Create" asp-controller="Forum" class="btn btn-outline-primary">
+                            <span>Add New Idea</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </div>
+                    <div class="nav-item pb-2">
+                        <a id="cid-" class="btn btn-outline-primary" asp-action="Index">All ideas</a>
+                    </div>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarleft"
+                        aria-controls="navbarleft" aria-expanded="false" aria-label="Toggle navigation">
+                    Category <span class="navbar-toggler-icon"></span>
+                </button>
+                <aside class="collapse navbar-collapse mt-3" id="navbarleft">
+                    <ul class="navbar-nav nav-pills flex-column">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <li class="nav-item">
+                                <a id="cid-@category.Id" class="nav-link" asp-action="Index" asp-route-cid="@category.Id">@category.Name</a>
+                            </li>
+                        }
+                    </ul>
+                </aside>
+            </div>
+        </nav>
+    </div>
+
+    <div class="col-lg-9 col-md-8">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts{
+<script type="text/javascript">
+    //const params = new URLSearchParams(window.location.search);
+
+    const category = '#cid-' + '@ViewData["cid"]';
+    $(category).addClass("active");
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+}
