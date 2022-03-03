@@ -4,4 +4,29 @@
     ViewData["Title"] = "Idea";
 }
 
-<h1>Idea</h1>
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">
+            <a asp-action="Model" asp-route-id="@Model.Id">
+                @Html.DisplayFor(modelItem => Model.Title)
+            </a>
+        </h5>
+        <p class="card-text">
+            @Html.DisplayFor(modelItem => Model.Content)
+        </p>
+    </div>
+    <div class="card-footer">
+        <span><i class="fa-regular fa-comments"></i> 1</span>
+        <form id="react-Model-@Model.Id" class="btn-group" role="group" aria-label="React button group @Model.Id">
+            <input type="radio" class="btn-check" name="btnradio-@Model.Id" id="thumbupbtn-@Model.Id" autocomplete="off">
+            <label class="btn btn-outline-primary" for="thumbupbtn-@Model.Id">
+                <i class="fa-regular fa-thumbs-up"></i> Thumb Up
+            </label>
+
+            <input type="radio" class="btn-check" name="btnradio-@Model.Id" id="thumbdownbtn-@Model.Id" autocomplete="off">
+            <label class="btn btn-outline-danger" for="thumbdownbtn-@Model.Id">
+                <i class="fa-regular fa-thumbs-down"></i> Thumb Down
+            </label>
+        </form>
+    </div>
+</div>
