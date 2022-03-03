@@ -47,9 +47,9 @@ body {
     border-radius: 10px
 }
 
-    .form-control:focus {
+.form-control:focus {
         box-shadow: none
-    }
+}
 
 .btn-signup {
     height: 50px;
@@ -65,4 +65,3 @@ body {
     text-decoration: none;
     color: white;
 }
-
