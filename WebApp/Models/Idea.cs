@@ -21,5 +21,10 @@ namespace WebApp.Models
         public Category? Category { get; set; }
 
         public ICollection<React> Reacts { get; set; }
+
+        public int ThumbUp { get; set; } = 0;
+
+        public int ThumbDown { get; set; } = 0;
+
     }
 }
