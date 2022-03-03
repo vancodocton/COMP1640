@@ -65,7 +65,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<ActionResult> Create()
         {
-            var model = new IdeaViewModel()
+            var model = new CreateIdeaViewModel()
             {
                 Categories = await context
                 .Category.Select(c => new SelectListItem()
@@ -81,7 +81,7 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(IdeaViewModel model)
+        public async Task<ActionResult> Create(CreateIdeaViewModel model)
         {
             if (ModelState.IsValid)
             {

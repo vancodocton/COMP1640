@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApp.ViewModels
 {
-    public class IdeaViewModel
+    public class CreateIdeaViewModel
     {
         [Required]
         public string? Title { get; set; }
