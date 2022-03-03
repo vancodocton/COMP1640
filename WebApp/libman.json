@@ -6,5 +6,55 @@
       "library": "fontawesome-iconpicker@3.2.0",
       "destination": "wwwroot/lib/fontawesome-iconpicker/"
     }
+  ,
+{
+  "provider": "jsdelivr",
+  "library": "@fortawesome/fontawesome-free@6.0.0",
+  "destination": "wwwroot/lib/fortawesome/fontawesome-free/",
+  "files": [
+    "package.json",
+    "LICENSE.txt",
+    "attribution.min.js",
+    "attribution.js",
+    "css/all.css",
+    "js/all.js",
+    "js/all.min.js",
+    "js/brands.js",
+    "js/brands.min.js",
+    "js/conflict-detection.js",
+    "js/conflict-detection.min.js",
+    "js/fontawesome.js",
+    "js/fontawesome.min.js",
+    "js/regular.js",
+    "js/regular.min.js",
+    "js/solid.js",
+    "js/solid.min.js",
+    "js/v4-shims.js",
+    "js/v4-shims.min.js",
+    "css/all.min.css",
+    "css/brands.css",
+    "css/brands.min.css",
+    "css/fontawesome.css",
+    "css/fontawesome.min.css",
+    "css/regular.css",
+    "css/regular.min.css",
+    "css/solid.css",
+    "css/solid.min.css",
+    "css/svg-with-js.css",
+    "css/svg-with-js.min.css",
+    "css/v4-font-face.css",
+    "css/v4-font-face.min.css",
+    "css/v4-shims.css",
+    "css/v4-shims.min.css",
+    "css/v5-font-face.css",
+    "css/v5-font-face.min.css"
   ]
+}
+,
+{
+  "provider": "jsdelivr",
+  "library": "@fortawesome/fontawesome-free@6.0.0",
+  "destination": "wwwroot/lib/fortawesome/fontawesome-free/"
+}
+]
 }
