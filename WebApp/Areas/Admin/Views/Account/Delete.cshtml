@@ -1,0 +1,39 @@
+﻿@model WebApp.Models.ApplicationUser
+@{
+	ViewData["Title"] = "Delete";
+}
+
+<div class="container shadow p-5">
+	<div class="row pb-2">
+		<h2>Delete Employee</h2>
+	</div>
+
+	<form method="post" asp-action="Delete">
+		<input asp-for="Id" hidden />
+		<div asp-validation-summary="All"></div>
+
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				<label asp-for="FullName">Fullname</label>
+				<input type="text" class="form-control mb-3" asp-for="FullName" disabled>
+				<span asp-validation-for="FullName" class=" alert-danger"></span>
+			</div>
+
+			<div class="form-group col-md-6">
+				<label asp-for="Email">Email</label>
+				<input type="text" class="form-control mb-3" asp-for="Email" disabled>
+				<span asp-validation-for="Email" class=" alert-danger"></span>
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-lg btn-danger p-2"><i class="bi bi-trash-fill"></i>Delete</button>
+		<a asp-controller="Account" asp-action="Index" class="btn btn-lg btn-success p-2">Back To List</a>
+	</form>
+
+</div>
+
+@section Scripts{
+    @{
+	<partial name="_ValidationScriptsPartial" />
+    }
+}

@@ -147,6 +147,54 @@ namespace WebApp.Areas.Admin.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public ActionResult Delete(string? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var user = _context.Users.Find(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user); ;
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Delete(ApplicationUser model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.Id);
+
+                if (user == null)
+                    ModelState.AddModelError("Id", "User does not exist.");
+                else if (await _userManager.IsInRoleAsync(user, Role.Admin))
+                {
+                    ModelState.AddModelError("", "Permission denies. Cannot delete this account password");
+                }
+                else
+                {
+                    var code = await _userManager.DeleteAsync(user);
+
+
+                    if (code.Succeeded)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                        AddErrors(code.Errors);
+                }
+
+            }
+
+            return View(model);
+        }
+
 
         private void AddErrors(IEnumerable<IdentityError> errors)
         {
