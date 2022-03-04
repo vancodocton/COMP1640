@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
+using WebApp.Hubs;
 using WebApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +17,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -55,7 +59,9 @@ app.UseEndpoints(endpoints =>
       name: "default",
       pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
 app.MapRazorPages();
+app.MapHub<IdeaReactHub>("/ideaReactHub");
 
 app.Run();
 
