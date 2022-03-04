@@ -61,8 +61,6 @@ app.UseEndpoints(endpoints =>
 });
 
 app.MapRazorPages();
-app.MapHub<IdeaReactHub>("/ideaReactHub");
-
 app.Run();
 
 
