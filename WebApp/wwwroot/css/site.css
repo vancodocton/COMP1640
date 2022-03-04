@@ -17,7 +17,7 @@ html {
 body {
     height: 100%;
     /*margin-bottom: 300px;
-/*    background-image: url("~/img/Colorful.png");
+/*  background-image: url("~/img/Colorful.png");
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;*/
@@ -36,7 +36,12 @@ body {
 .form-input {
     width: 700px;
 }
-
+.form-login{
+    display:block;
+    width: 500px;
+    height:100px;
+    margin:auto;
+}
 .form-floating {
     display: block;
     margin-bottom: 20px;
