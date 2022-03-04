@@ -1,12 +1,11 @@
-﻿@model WebApp.ViewModels.IdeaViewModel
+﻿@model WebApp.ViewModels.CreateIdeaViewModel
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>IdeaViewModel</h4>
+     <h1>Create</h1>
+     <h4>IdeaViewModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -37,7 +36,6 @@
     <p>
         <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
     </p>
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

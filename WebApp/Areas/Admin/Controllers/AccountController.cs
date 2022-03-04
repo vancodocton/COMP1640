@@ -31,6 +31,8 @@ namespace WebApp.Areas.Admin.Controllers
         // GET: AccountController
         public async Task<ActionResult> Index()
         {
+            var idea = await _context.Idea.FirstOrDefaultAsync(i => i.Id == 1);
+
             var model = await _userManager.Users
                 .Select(u => new UserViewModel()
                 {

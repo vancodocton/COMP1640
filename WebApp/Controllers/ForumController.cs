@@ -31,16 +31,22 @@ namespace WebApp.Controllers
         {
             var categories = await context.Category.ToListAsync();
 
-            var ideas = context.Idea.Include(x => x.Category).AsQueryable();
+            var ideas = context.Idea
+                .Include(x => x.Category)
+                .Include(x => x.User)
+                .AsQueryable();
 
             if (cid != null)
+            {
                 ideas = ideas.Where(i => i.CategoryId == cid);
+                ViewData["cid"] = cid;
+            }
 
             switch (order)
             {
                 case null:
                 case "lastest":
-                        ideas = ideas.OrderByDescending(i => i.Id);
+                    ideas = ideas.OrderByDescending(i => i.Id);
                     break;
                 case "popular":
                     break;
@@ -59,7 +65,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<ActionResult> Create()
         {
-            var model = new IdeaViewModel()
+            var model = new CreateIdeaViewModel()
             {
                 Categories = await context
                 .Category.Select(c => new SelectListItem()
@@ -75,7 +81,7 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(IdeaViewModel model)
+        public async Task<ActionResult> Create(CreateIdeaViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -101,6 +107,19 @@ namespace WebApp.Controllers
                     Text = c.Name
                 })
                 .ToListAsync();
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Idea(int? id)
+        {
+            if (id == null) return BadRequest();
+
+            var model = await context.Idea
+                .Include(i => i.Category)
+                .Include(i => i.User)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            if (model == null) return BadRequest();            
 
             return View(model);
         }

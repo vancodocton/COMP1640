@@ -12,8 +12,7 @@ namespace WebApp.ViewModels
 
         public List<Idea> Ideas { get; set; }
 
+        public int? CategoryId { get; set; }
         public List<Category> Categories { get; set; }
-
-
     }
 }
