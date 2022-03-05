@@ -1,0 +1,55 @@
+﻿@model WebApp.ViewModels.AccountUpdateViewModel
+@{
+    ViewData["Title"] = "Update";
+}
+
+<div>
+<form asp-area="Admin" asp-controller="Account" asp-action="Update" method="post">
+    <button style="margin: 20px" type="button" class="btn btn-success"><a asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Home</a></button>
+    <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+        <div class="form-input p-3 text-center py-4" style="margin-bottom: 80px">  
+            <h4>Enter Employee's Information</h4>
+            <div class="form-floating">
+                 <input asp-for="Email" value="@Model.Email" class="form-control" autocomplete="username" aria-required="true" />
+                 <label asp-for="Email"></label>
+                 <span asp-validation-for="Email" class="text-danger"></span>
+             </div>
+            <div class="form-floating">
+                <input asp-for="FullName" value="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="FullName"></label>
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="BirthDate" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="BirthDate"></label>
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input asp-for="Address" class="form-control" autocomplete="on" aria-required="true" />
+                <label asp-for="Address"></label>
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <select asp-for="Role" asp-items="@Model.Roles" class="form-select" required>
+                    <option></option>
+                </select>
+                <label asp-for="Role"></label>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <select asp-for="DepartmentId" asp-items="@Model.Departments" class="form-select">
+                    <option></option>
+                </select>
+                <label asp-for="DepartmentId"></label>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="submit" class="w-100 btn btn-lg btn-primary" />
+        </div>
+    </div>
+</form>
+</div>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}
