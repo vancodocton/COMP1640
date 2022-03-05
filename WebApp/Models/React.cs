@@ -5,14 +5,15 @@ namespace WebApp.Models
 {
     public class React
     {
-        //[Key]
         public int Id { get; set; }
 
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        [Required]
+        public string? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
 
-        public int? IdeaId { get; set; }
-        public Idea Idea { get; set; }
+        [Required]
+        public int IdeaId { get; set; }
+        public Idea? Idea { get; set; }
 
         [Required]
         public ReactType Type { get; set; }
