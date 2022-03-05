@@ -17,6 +17,6 @@ namespace WebApp.Models
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; }
 
-        public ICollection<React> Reacts { get; set; }
+        /*public ICollection<React> Reacts { get; set; }*/
     }
 }

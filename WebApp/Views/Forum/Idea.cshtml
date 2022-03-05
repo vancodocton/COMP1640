@@ -17,16 +17,106 @@
     </div>
     <div class="card-footer">
         <span><i class="fa-regular fa-comments"></i> 1</span>
-        <form id="react-Model-@Model.Id" class="btn-group" role="group" aria-label="React button group @Model.Id">
-            <input type="radio" class="btn-check" name="btnradio-@Model.Id" id="thumbupbtn-@Model.Id" autocomplete="off">
-            <label class="btn btn-outline-primary" for="thumbupbtn-@Model.Id">
-                <i class="fa-regular fa-thumbs-up"></i> Thumb Up
+        <div id="react-Model" class="btn-group" role="group" aria-label="React button group @Model.Id">
+            <input type="radio" class="btn-check" name="btnradio" id="thumbupbtn" autocomplete="off">
+            <label class="btn btn-outline-primary" for="thumbupbtn">
+                <i class="fa-regular fa-thumbs-up"></i>
+                <span id="thumbupstatus">Thumb Up</span>
             </label>
 
-            <input type="radio" class="btn-check" name="btnradio-@Model.Id" id="thumbdownbtn-@Model.Id" autocomplete="off">
-            <label class="btn btn-outline-danger" for="thumbdownbtn-@Model.Id">
-                <i class="fa-regular fa-thumbs-down"></i> Thumb Down
+            <input type="radio" class="btn-check" name="btnradio" id="thumbdownbtn" autocomplete="off">
+            <label class="btn btn-outline-danger" for="thumbdownbtn">
+                <i class="fa-regular fa-thumbs-down"></i>
+                <span id="thumbdownstatus">Thumb Down</span>
             </label>
-        </form>
+        </div>
     </div>
 </div>
+
+@section Scripts{
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+@*<script src="~/js/idea_react.js"></script>*@
+<script type="text/javascript">
+    // disable button. enable it untils the connection is started.
+    document.getElementById("thumbupbtn").disabled = true;
+    document.getElementById("thumbdownbtn").disabled = true;
+
+    // initial connection with IdeaReactHub
+    var connection = new signalR.HubConnectionBuilder().withUrl("/ideaReactHub").build();
+
+    connection.on("ThumbUp", function (message) {
+        console.log(message);
+        $('#thumbupstatus').html('Thumbed Up');
+    });
+    connection.on("ThumbDown", function (message) {
+        console.log(message);
+        $('#thumbdownstatus').html('Thumbed Down');
+    });
+    connection.on("RemoveReact", function (message) {
+        console.log(message);
+        $('#thumbdownstatus').html('Thumb Down');
+        $('#thumbdownbtn').prop('checked', false);
+
+        $('#thumbupstatus').html('Thumb Up');
+        $('#thumbupbtn').prop('checked', false);
+    });
+
+    connection.start().then(function (){
+        // enable buttons after the connection is started.
+        document.getElementById("thumbupbtn").disabled = false;
+        document.getElementById("thumbdownbtn").disabled = false;
+    });
+
+    $('#thumbupbtn').click(function () {
+        console.log('clicked thumb up button');
+
+        if ($('#thumbupstatus').html() == "Thumb Up") {
+             $('#thumbupstatus').html('Thumbing Up');
+             $('#thumbdownstatus').html('Thumb Down');
+
+             connection.invoke("ThumbUp", @Model.Id)
+             .catch(function (err) {
+                 return console.error(err.toString());
+             });
+             return;
+        }
+        if ($('#thumbupstatus').html() == "Thumbed Up")
+        {
+            $('#thumbupstatus').html('Remove Thumb Up');
+
+            connection.invoke("RemoveReact", @Model.Id)
+             .catch(function (err) {
+                 return console.error(err.toString());
+             });
+             event.preventDefault();
+             return;
+        }
+    });
+
+     $('#thumbdownbtn').click(function () {
+        console.log('clicked thumb down button');
+
+        if ($('#thumbdownstatus').html() == "Thumb Down") {
+            $('#thumbdownstatus').html('Thumbing Down');
+            $('#thumbupstatus').html('Thumb Up');
+
+            connection.invoke("ThumbDown", @Model.Id)
+            .catch(function (err) {
+                return console.error(err.toString());
+            });
+            return;
+        }
+
+        if ($('#thumbdownstatus').html() == "Thumbed Down") {
+            $('#thumbdownstatus').html('Remove Thumb Down');
+
+            connection.invoke("RemoveReact", @Model.Id)
+             .catch(function (err) {
+                 return console.error(err.toString());
+             });
+             event.preventDefault();
+             return;
+        }
+    });
+</script>
+}

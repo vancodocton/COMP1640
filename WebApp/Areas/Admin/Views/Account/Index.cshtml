@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<WebApp.ViewModels.UserViewModel>
 
 @{
-    ViewData["Title"] = "Index";
-    int i = 0, j = 0;
+	ViewData["Title"] = "Index";
+	int i = 0, j = 0;
 }
 
 <h1>Index Page</h1>
@@ -10,50 +10,51 @@
 <button type="button" class="btn btn-danger"><a asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" id="reset-pwd-button">Reset Password</a></button>
 
 <div>
-    <div class="container-fluid d-flex justify-content-center align-items-center h-100">
-        <div class="form-input p-3 text-center py-4"> 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Full Name</th>
-@*                        <th scope="col">Roles</th>
-*@                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in Model)
-                    {
-                        { i++; j++; }
-                        <tr>
-                            <th scope="row">@i</th>
-                            <td>@user.UserName</td>
-                            <td>@user.FullName</td>
-@*                            <td>
-                                @string.Join(", ", user.Roles)
-                            </td>*@
-                            <td class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
-                                    Actions
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@j">
-                                    <a class="dropdown-item text-success" asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@user.Email">
-                                        Edit
-                                    </a>
-                                     <a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="Delete" asp-route-id="@user.Email">
-                                        Delete
-                                    </a>
-                                    <a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" asp-route-id="@user.Email">
-                                        Reset Password
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
+	<div class="container-fluid d-flex justify-content-center align-items-center h-100">
+		<div class="form-input p-3 text-center py-4">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Username</th>
+						<th scope="col">Full Name</th>
+						@*                        <th scope="col">Roles</th>
+						*@
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var user in Model)
+					{
+						{ i++; j++; }
+						<tr>
+							<th scope="row">@i</th>
+							<td>@user.UserName</td>
+							<td>@user.FullName</td>
+							@*                            <td>
+								@string.Join(", ", user.Roles)
+								</td>*@
+							<td class="dropdown">
+								<button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="false">
+									Actions
+								</button>
+								<div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@j">
+									<a class="dropdown-item text-success" asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@user.Email">
+										Edit
+									</a>
+									<a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="Delete" asp-route-id="@user.Id">
+										Delete
+									</a>
+									<a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" asp-route-id="@user.Email">
+										Reset Password
+									</a>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
