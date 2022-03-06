@@ -151,6 +151,71 @@ namespace WebApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Update(string? id)
+        {
+            if (id == null)
+                return BadRequest();
+
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+                return BadRequest();
+
+            if (await _userManager.IsInRoleAsync(user, Role.Admin) || await _userManager.IsInRoleAsync(user, Role.Manager))
+                return Forbid();
+
+            var model = new AccountUpdateViewModel()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Address = user.Address,
+                DepartmentId = user.DepartmentId,
+                Roles = new SelectList(_createdRoles).ToList(),
+                Departments = new SelectList(await _context.Department.ToListAsync(), "Id", "Name").ToList()
+            };
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            model.Role = roles[0];
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(AccountUpdateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.Id);
+
+                if (user == null)
+                    return BadRequest();
+
+                user.Email = model.Email;
+                user.FullName = model.FullName;
+                user.BirthDate = model.BirthDate;
+                user.Address = model.Address;
+                user.DepartmentId = model.DepartmentId;
+
+                await _userManager.UpdateAsync(user);
+
+                var currentRole = (await _userManager.GetRolesAsync(user))[0];
+
+                await _userManager.RemoveFromRoleAsync(user, currentRole);
+
+                await _userManager.AddToRoleAsync(user, model.Role);
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+
+        [HttpGet]
         public ActionResult Delete(string? id)
         {
             if (id == null)
@@ -176,7 +241,7 @@ namespace WebApp.Areas.Admin.Controllers
 
                 if (user == null)
                     ModelState.AddModelError("Id", "User does not exist.");
-                else if (await _userManager.IsInRoleAsync(user, Role.Admin))
+                else if (await _userManager.IsInRoleAsync(user, Role.Admin) || await _userManager.IsInRoleAsync(user, Role.Manager))
                 {
                     ModelState.AddModelError("", "Permission denies. Cannot delete this account password");
                 }
