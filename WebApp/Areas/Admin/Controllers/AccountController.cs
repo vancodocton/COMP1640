@@ -77,6 +77,7 @@ namespace WebApp.Areas.Admin.Controllers
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
                         EmailConfirmed = true,
+                        DepartmentId = model.DepartmentId,
                     };
 
                     var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
@@ -104,9 +105,56 @@ namespace WebApp.Areas.Admin.Controllers
                 .ToListAsync(), "Id", "Name").ToList();
             return View(model);
         }
+        [HttpGet]
+        public async Task<IActionResult> Update(String? id)
+        {
+            if (id == null)
+                return View();
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (await _userManager.IsInRoleAsync(user, Role.Admin))
+                return Forbid();
+            var model = new AccountUpdateViewModel()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Address = user.Address,
+                DepartmentId = user.DepartmentId,
+                Roles = new SelectList(_createdRoles).ToList(),
+            };
+            var roles = await _userManager.GetRolesAsync(user);
+            model.Role = roles[0];
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Update(AccountUpdateViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                    return BadRequest();
+
+                user.Email = model.Email;
+                user.FullName = model.FullName;
+                user.BirthDate = model.BirthDate;
+                user.Address = model.Address;
+                user.DepartmentId = model.DepartmentId;
+
+                await _userManager.UpdateAsync(user);
+                var currentRole = (await _userManager.GetRolesAsync(user))[0];
+
+                await _userManager.RemoveFromRoleAsync(user, currentRole);
+                await _userManager.AddToRoleAsync(user, model.Role);
+                return RedirectToAction("Index");
+            }
 
         [HttpGet]
-        public ActionResult ResetPwd(string? id)
+        public async ActionResult ResetPwd(string? id)
         {
             var model = new RegisterModel.InputModel();
 
