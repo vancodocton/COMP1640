@@ -7,7 +7,10 @@ namespace WebApp.ViewModels
 {
     public class AccountUpdateViewModel
     {
-        public RegisterModel.InputModel Input { get; set; } = new();
+        public string? Id { get; set; }
+
+        [Required]
+        public string? Email { get; set; }
 
         [StringLength(50)]
         [Required]

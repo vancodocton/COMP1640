@@ -77,6 +77,7 @@ namespace WebApp.Areas.Admin.Controllers
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
                         EmailConfirmed = true,
+                        DepartmentId = model.DepartmentId
                     };
 
                     var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
@@ -104,8 +105,6 @@ namespace WebApp.Areas.Admin.Controllers
                 .ToListAsync(), "Id", "Name").ToList();
             return View(model);
         }
-        
-            
 
         [HttpGet]
         public ActionResult ResetPwd(string? id)
