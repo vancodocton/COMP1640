@@ -241,7 +241,7 @@ namespace WebApp.Areas.Admin.Controllers
 
                 if (user == null)
                     ModelState.AddModelError("Id", "User does not exist.");
-                else if (await _userManager.IsInRoleAsync(user, Role.Admin))
+                else if (await _userManager.IsInRoleAsync(user, Role.Admin) || await _userManager.IsInRoleAsync(user, Role.Manager))
                 {
                     ModelState.AddModelError("", "Permission denies. Cannot delete this account password");
                 }
