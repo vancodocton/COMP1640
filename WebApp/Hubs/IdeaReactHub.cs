@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
@@ -6,128 +7,186 @@ using WebApp.Models;
 
 namespace WebApp.Hubs
 {
-    public class IdeaReactHub : Hub
+    [Authorize]
+    public partial class IdeaReactHub : Hub
     {
+
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly ILogger<React> logger;
+        private readonly ILogger<IdeaReactHub> logger;
 
-
-        public IdeaReactHub(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, ILogger<React> logger)
+        public IdeaReactHub(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, ILogger<IdeaReactHub> logger)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
             this.logger = logger;
         }
 
-        public async Task<Task> ThumbUp(int ideaId)
+        public async Task ReactIdea(IdeaReactRequest request)
         {
-            var idea = await dbContext.Idea.FirstOrDefaultAsync(i => i.Id == ideaId);
+            if (request.Type == null || request.IdeaId == null)
+                throw new HubException("Request type cannot be null");
 
-            var user = await userManager.GetUserAsync(Context.User);
+            Idea idea = await dbContext.Idea.FirstAsync(i => i.Id == request.IdeaId);
 
-            var react = await dbContext.React.FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
+            ApplicationUser? user = await userManager.GetUserAsync(Context.User);
 
-            if (react == null)
+            React? react = await dbContext.React
+                .FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == request.IdeaId);
+
+            try
             {
-                react = new React()
+                switch (request.Type.ToLower())
                 {
-                    IdeaId = ideaId,
-                    UserId = user.Id,
-                    Type = ReactType.ThumbUp
-                };
-
-                idea.ThumbUp++;
-
-                dbContext.React.Add(react);
+                    case "create":
+                        if (react == null)
+                            await AddReact(idea, request);
+                        else
+                            await UpdateReact(react, idea, request);
+                        break;
+                    case "update":
+                        if (react == null)
+                            await AddReact(idea, request);
+                        else
+                            await UpdateReact(react, idea, request);
+                        break;
+                    case "delete":
+                        if (react != null)
+                            await RemoveReact(react, idea, request);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid reqest type");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                idea.ThumbUp++;
-                idea.ThumbDown--;
-
-                react.Type = ReactType.ThumbUp;
-                dbContext.React.Attach(react);
+                throw new HubException("", ex);
             }
 
-            dbContext.Idea.Attach(idea);
+            //var row = await dbContext.SaveChangesAsync();
+            var response = new IdeaReactReponse()
+            {
+                IdeaId = request.IdeaId,
+                React = request.NewReact
+            };
 
-            var row = await dbContext.SaveChangesAsync();
-
-            return Clients.All.SendAsync("ThumbUp", "Thumbed up idea! " + ideaId + " " + user.Id);
+            await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
+            await PushIdeaReactStatus(idea.Id);
         }
 
-        public async Task<Task> ThumbDown(int ideaId)
+        public async Task RegisterIdeaReactStatus(int ideaId)
         {
-            var idea = await dbContext.Idea.FirstOrDefaultAsync(i => i.Id == ideaId);
+            var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
 
             var user = await userManager.GetUserAsync(Context.User);
 
-            var react = await dbContext.React.FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
+            var react = await dbContext.React
+                .FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
 
-            if (react == null)
+            await Groups.AddToGroupAsync(Context.ConnectionId, ideaId.ToString());
+
+            var response = new IdeaReactReponse()
             {
-                react = new React()
-                {
-                    IdeaId = ideaId,
-                    UserId = user.Id,
-                    Type = ReactType.ThumbDown
-                };
+                IdeaId = ideaId,
+            };
 
-                idea.ThumbDown++;
-
-                dbContext.React.Add(react);
-            }
-            else
+            if (react != null)
             {
-                idea.ThumbDown++;
-                idea.ThumbUp--;
-
-                react.Type = ReactType.ThumbDown;
-                dbContext.React.Attach(react);
+                response.React = react.Type.ToString();
             }
 
-            dbContext.Idea.Attach(idea);
-
-            var row = await dbContext.SaveChangesAsync();
-
-            return Clients.All.SendAsync("ThumbDown", "Thumbed down idea! " + ideaId + " " + user.Id);
+            await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
+            await PushIdeaReactStatus(ideaId);
         }
 
-        public async Task<Task> RemoveReact(int ideaId)
+        private async Task PushIdeaReactStatus(int ideaId)
         {
-            var idea = await dbContext.Idea.FirstOrDefaultAsync(i => i.Id == ideaId);
+            var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
 
-            var user = await userManager.GetUserAsync(Context.User);
-
-            var react = await dbContext.React.FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
-
-            if (react == null)
+            var response = new IdeaReactStatus()
             {
-                //react = new React()
-                //{
-                //    IdeaId = ideaId,
-                //    UserId = user.Id,
-                //    Type = ReactType.ThumbDown
-                //};
-                //_ = await dbContext.React.AddAsync(react);
+                IdeaId = idea.Id,
+                ThumbUp = idea.ThumbUp,
+                ThumbDown = idea.ThumbDown
+            };
+
+            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaReactStatus", response);
+        }
+
+        private async Task AddReact(Idea idea, IdeaReactRequest request)
+        {
+            if (request.NewReact == null)
+                throw new ArgumentNullException(nameof(request.NewReact));
+
+            ApplicationUser? user = await userManager.GetUserAsync(Context.User);
+
+            var newReact = new React()
+            {
+                IdeaId = idea.Id,
+                UserId = user.Id,
+                Type = (ReactType)Enum.Parse(typeof(ReactType), request.NewReact)
+            };
+
+            idea = CountNewReact(idea, newReact.Type);
+
+            dbContext.React.Add(newReact);
+            dbContext.Idea.Append(idea);
+            await dbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdateReact(React react, Idea idea, IdeaReactRequest request)
+        {
+            if (request.NewReact == null)
+                throw new ArgumentNullException(nameof(request.NewReact));
+
+            var oldReactType = react.Type;
+            var newReactType = (ReactType)Enum.Parse(typeof(ReactType), request.NewReact);
+
+            react.Type = newReactType;
+
+            idea = CountNewReact(idea, newReactType);
+            idea = CountOldReact(idea, oldReactType);
+
+            dbContext.React.Append(react);
+            dbContext.Idea.Append(idea);
+            await dbContext.SaveChangesAsync();
+        }
+
+        private async Task RemoveReact(React react, Idea idea, IdeaReactRequest request)
+        {
+            idea = CountOldReact(idea, react.Type);
+
+            dbContext.React.Remove(react);
+            dbContext.Idea.Attach(idea);
+            await dbContext.SaveChangesAsync();
+        }
+
+        private Idea CountNewReact(Idea idea, ReactType reactType)
+        {
+            switch (reactType)
+            {
+                case ReactType.ThumbUp:
+                    idea.ThumbUp++;
+                    break;
+                case ReactType.ThumbDown:
+                    idea.ThumbDown++;
+                    break;
             }
-            else
+            return idea;
+        }
+
+        private Idea CountOldReact(Idea idea, ReactType reactType)
+        {
+            switch (reactType)
             {
-                if (react.Type == ReactType.ThumbUp)
+                case ReactType.ThumbUp:
                     idea.ThumbUp--;
-                else
+                    break;
+                case ReactType.ThumbDown:
                     idea.ThumbDown--;
-
-
-                dbContext.React.Remove(react);
+                    break;
             }
-
-            dbContext.Idea.Attach(idea);
-
-            var row = await dbContext.SaveChangesAsync();
-
-            return Clients.All.SendAsync("RemoveReact", "Remove react  idea! " + ideaId + " " + user.Id);
+            return idea;
         }
     }
 }
