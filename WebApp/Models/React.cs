@@ -11,8 +11,11 @@ namespace WebApp.Models
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
 
-        [Required]
-        public int IdeaId { get; set; }
+        /*
+         * In fact IdeaId is required but if it is set to be reqired, 
+         * it may cause cycles or mutiple cascade paths. 
+         */
+        public int? IdeaId { get; set; }
         public Idea? Idea { get; set; }
 
         [Required]
