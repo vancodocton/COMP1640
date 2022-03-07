@@ -21,6 +21,8 @@ namespace WebApp.Data
 
         public DbSet<React> React { get; set; }
 
+        public DbSet<Comment> Comment { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

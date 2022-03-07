@@ -6,8 +6,9 @@ using WebApp.Areas.Identity.Pages.Account;
 namespace WebApp.ViewModels
 {
     public class AccountUpdateViewModel
-    {   
-        public string? Id {get; set;}
+    {
+        public string? Id { get; set; }
+
         [Required]
         public string? Email { get; set; }
 
