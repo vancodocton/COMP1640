@@ -22,5 +22,17 @@ namespace WebApp.ViewModels
         [ValidateNever]
         [NotMapped]
         public List<SelectListItem>? Categories { get; set; }
+
+        [BooleanMustBeTrue(ErrorMessage = "You must Agree for Term and Conditions")]
+        [Display(Name = "Term and Condition")]
+        public bool IsCheckTerm { get; set; }
+    }
+
+    public class BooleanMustBeTrue : ValidationAttribute
+    {
+        public override bool IsValid(object value)
+        {
+            return value is bool boolean && boolean;
+        }
     }
 }
