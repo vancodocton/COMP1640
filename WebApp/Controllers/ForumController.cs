@@ -9,6 +9,10 @@ using WebApp.Models;
 using WebApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using WebApp.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace WebApp.Controllers
 {
@@ -17,14 +21,17 @@ namespace WebApp.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IEmailSender sender;
 
         public ForumController(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IEmailSender sender
             )
         {
             this.context = context;
             this.userManager = userManager;
+            this.sender = sender;
         }
 
         public async Task<ActionResult> Index(int? cid, string? order)
@@ -85,17 +92,30 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userId = (await userManager.GetUserAsync(HttpContext.User)).Id;
+                var user = await userManager.GetUserAsync(HttpContext.User);
+
                 var idea = new Idea()
                 {
                     Title = model.Title,
                     Content = model.Content,
                     CategoryId = model.CategoryId,
-                    UserId = userId,
+                    UserId = user.Id,
                 };
 
                 await context.Idea.AddAsync(idea);
                 var count = await context.SaveChangesAsync();
+
+                var coors = (await userManager.GetUsersInRoleAsync(Role.Coordinator))
+                    .Where(c => c.DepartmentId == user.DepartmentId)
+                    .ToList();
+
+                var url = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
+
+                foreach (var coor in coors)
+                {
+                    await sender.SendEmailAsync(coor.Email, "New Idea is created by your department staff", $"<a href={HtmlEncoder.Default.Encode(url)}>Idea</a>");
+
+                }
 
                 return RedirectToAction(nameof(Index));
             }
@@ -107,7 +127,7 @@ namespace WebApp.Controllers
                     Text = c.Name
                 })
                 .ToListAsync();
-
+            
             return View(model);
         }
 
@@ -119,7 +139,7 @@ namespace WebApp.Controllers
                 .Include(i => i.Category)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(i => i.Id == id);
-            if (model == null) return BadRequest();            
+            if (model == null) return BadRequest();
 
             return View(model);
         }
