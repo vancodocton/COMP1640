@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApp.Models
 {
-    public class React
+    public class Comment
     {
         public int Id { get; set; }
 
@@ -19,12 +19,6 @@ namespace WebApp.Models
         public Idea? Idea { get; set; }
 
         [Required]
-        public ReactType Type { get; set; }
-    }
-
-    public enum ReactType
-    {
-        ThumbUp,
-        ThumbDown,
+        public string? Content { get; set; }
     }
 }

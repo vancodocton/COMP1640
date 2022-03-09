@@ -77,7 +77,7 @@ namespace WebApp.Areas.Admin.Controllers
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
                         EmailConfirmed = true,
-                        DepartmentId = model.DepartmentId
+                        DepartmentId = model.DepartmentId,
                     };
 
                     var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
