@@ -3,76 +3,76 @@
 @{
     ViewData["Title"] = "Create";
 }
-    <h1>Create</h1>
-    <h4>IdeaViewModel</h4>
-    <hr />
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Title" class="control-label"></label>
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Content" class="control-label"></label>
-                    <textarea asp-for="Content" class="form-control"></textarea>
-                    <span asp-validation-for="Content" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="CategoryId" class="control-label"></label>
-                    <select asp-for="CategoryId" asp-items=@Model.Categories class="form-select">
-                    </select>
-                    <span asp-validation-for="CategoryId" class="text-danger"></span>
-                </div>
+<h1>Create</h1>
+<h4>IdeaViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" asp-items=@Model.Categories class="form-select">
+                    <option></option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
 
-                <div class="form-group">
-                    <input type="checkbox" asp-for="IsCheckTerm" />
-@*                    <label asp-for="IsCheckTerm" class="control-label"></label>*@
-                 <b> To create idea, you must agree with </b>
-                 <a href ="#"  class="Pe-auto" data-bs-toggle="modal" data-bs-target="#Modal">
-                    Term and Condition 
-                    
-                </a>
+            <div class="form-check">
+                <label asp-for="IsCheckTerm" class="form-check-label">
+                    <b>
+                        By checking this box, you are agreeing to
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#Modal">
+                            Terms and Conditions
+                        </a>
+                        to create new idea.
+                    </b>
+                </label>
+                <input asp-for="IsCheckTerm " type="checkbox" class="form-check-input" required title="You must agree to Terms and Conditions" />
+                <span asp-validation-for="IsCheckTerm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create Idea" class="btn btn-primary mb1 black bg-yellow" />
+                <a asp-controller="Forum" asp-action="Index" type="button" class="btn btn-primary">Back to list</a>
+            </div>
+        </form>
 
-                 <div>
-                     <span asp-validation-for="IsCheckTerm" class="text-danger"></span>
-                 </div>                 
-                </div>
-                <!-- Modal -->
-                <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="ModalLabel">Modal title</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              <p> 1. Ai có thể sử dụng dịch vụ</p> 
-                              <p> 2. Quyền riêng tư</p> 
-                              <p> 3. Nội dung trên dịch vụ</p>   
-                              <p> 4. Sử dụng dịch vụ</p>  
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Create Idea" class="btn btn-primary mb1 black bg-yellow" />
-                    <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
-                </div>
-            </form>
-
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p> 1. Ai có thể sử dụng dịch vụ</p>
+                <p> 2. Quyền riêng tư</p>
+                <p> 3. Nội dung trên dịch vụ</p>
+                <p> 4. Sử dụng dịch vụ</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
         </div>
     </div>
-    @* <p>
-        <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
-        </p> *@
+</div>
+@* <p>
+    <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
+    </p> *@
 @section Scripts {
     @{
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
