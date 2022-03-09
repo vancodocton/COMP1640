@@ -18,5 +18,8 @@ namespace WebApp.Models
         public Department? Department { get; set; }
 
         public ICollection<React>? Reacts { get; set; }
+
+        [Required]
+        public bool TermConfirmed { get; set; } = false;
     }
 }
