@@ -178,7 +178,7 @@ namespace WebApp.Areas.Admin.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            model.Role = roles[0];
+            model.Role = roles.FirstOrDefault();
 
             return View(model);
         }
@@ -202,9 +202,10 @@ namespace WebApp.Areas.Admin.Controllers
 
                 await _userManager.UpdateAsync(user);
 
-                var currentRole = (await _userManager.GetRolesAsync(user))[0];
+                var currentRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
-                await _userManager.RemoveFromRoleAsync(user, currentRole);
+                if (currentRole != null)
+                    await _userManager.RemoveFromRoleAsync(user, currentRole);
 
                 await _userManager.AddToRoleAsync(user, model.Role);
 
