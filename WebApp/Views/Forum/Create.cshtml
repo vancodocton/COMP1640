@@ -30,10 +30,15 @@
                 <div class="form-group">
                     <input type="checkbox" asp-for="IsCheckTerm" />
 @*                    <label asp-for="IsCheckTerm" class="control-label"></label>*@
-                <a  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
-                    Term and Condition
+                 <b> To create idea, you must agree with </b>
+                 <a href ="#"  class="Pe-auto" data-bs-toggle="modal" data-bs-target="#Modal">
+                    Term and Condition 
+                    
                 </a>
-                    <span asp-validation-for="IsCheckTerm" class="text-danger"></span>
+
+                 <div>
+                     <span asp-validation-for="IsCheckTerm" class="text-danger"></span>
+                 </div>                 
                 </div>
                 <!-- Modal -->
                 <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
@@ -44,7 +49,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                ...
+                              <p> 1. Ai có thể sử dụng dịch vụ</p> 
+                              <p> 2. Quyền riêng tư</p> 
+                              <p> 3. Nội dung trên dịch vụ</p>   
+                              <p> 4. Sử dụng dịch vụ</p>  
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
