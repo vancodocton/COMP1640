@@ -11,7 +11,7 @@
                 <h4>Enter Employee's Information</h4>
                 <input asp-for"Id" value="@Model.Id" hidden/>
                 <div class="form-floating">
-                    <input asp-for="Email" value="@Model.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <input asp-for="Email" value="@Model.Email" class="form-control" autocomplete="username" aria-required="true" disabled/>
                     <label asp-for="Email"></label>
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
