@@ -76,7 +76,7 @@ namespace WebApp.Areas.Admin.Controllers
                         Address = model.Address,
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
-                        EmailConfirmed = true,
+                        //EmailConfirmed = true,
                         DepartmentId = model.DepartmentId,
                     };
 
