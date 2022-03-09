@@ -3,13 +3,6 @@
 @{
     ViewData["Title"] = "Create";
 }
-<html>
-<head>
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="~/css/Idea.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Idea.css" asp-append-version="true" />
-</head>
-<body>
     <h1>Create</h1>
     <h4>IdeaViewModel</h4>
     <hr />
@@ -72,10 +65,8 @@
     @* <p>
         <button type="button" class="btn btn-primary"><a asp-area="Views" asp-controller="Forum" asp-action="Index" id="add-button"><i class="fa fa-plus-square-o"></i> Back to list</a></button>
         </p> *@
-</body>
 @section Scripts {
     @{
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 }
-</html>
