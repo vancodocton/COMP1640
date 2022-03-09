@@ -24,7 +24,7 @@ namespace WebApp.ViewModels
         public List<SelectListItem>? Categories { get; set; }
 
         [BooleanMustBeTrue(ErrorMessage = "You must Agree for Term and Conditions")]
-        [Display(Name = "Term and Condition")]
+        /*[Display(Name = "Term and Condition")]*/
         public bool IsCheckTerm { get; set; }
     }
 
