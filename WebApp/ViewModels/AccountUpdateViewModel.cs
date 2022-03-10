@@ -25,7 +25,7 @@ namespace WebApp.ViewModels
         public string? Address { get; set; }
 
         [Required]
-        public string Role { get; set; } = string.Empty;
+        public string? Role { get; set; } = string.Empty;
 
         [ValidateNever]
         public List<SelectListItem>? Roles { get; set; }

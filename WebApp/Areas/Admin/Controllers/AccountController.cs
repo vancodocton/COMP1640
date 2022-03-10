@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Encodings.Web;
 using WebApp.Areas.Identity.Pages.Account;
 using WebApp.Data;
 using WebApp.Models;
@@ -17,13 +21,20 @@ namespace WebApp.Areas.Admin.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
         private List<string> _createdRoles;
-        public AccountController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public AccountController(
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context,
+            IEmailSender emailSender
+            )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+            _emailSender = emailSender;
 
             _createdRoles = new List<string>() { Role.Coordinator, Role.Staff };
         }
@@ -76,7 +87,7 @@ namespace WebApp.Areas.Admin.Controllers
                         Address = model.Address,
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
-                        EmailConfirmed = true,
+                        //EmailConfirmed = true,
                         DepartmentId = model.DepartmentId,
                     };
 
@@ -85,10 +96,24 @@ namespace WebApp.Areas.Admin.Controllers
 
                     if (createAccountResult.Succeeded)
                     {
+
                         var addAccountRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
                         if (addAccountRoleResult.Succeeded)
                         {
+                            // sent confirmation email
+                            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                            var callbackUrl = Url.Action(
+                                action: "ConfirmEmail",
+                                controller: "Account",
+                                new { area = "Identity", userId = user.Id,  code, returnUrl = "/Identity/Account/Login" },
+                                protocol: "https");
+
+                            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
                             return RedirectToAction(nameof(Index));
                         }
                         else
@@ -178,7 +203,7 @@ namespace WebApp.Areas.Admin.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            model.Role = roles[0];
+            model.Role = roles.FirstOrDefault();
 
             return View(model);
         }
@@ -194,7 +219,8 @@ namespace WebApp.Areas.Admin.Controllers
                 if (user == null)
                     return BadRequest();
 
-                user.Email = model.Email;
+                // disable update email temporary
+                //user.Email = model.Email;
                 user.FullName = model.FullName;
                 user.BirthDate = model.BirthDate;
                 user.Address = model.Address;
@@ -202,9 +228,10 @@ namespace WebApp.Areas.Admin.Controllers
 
                 await _userManager.UpdateAsync(user);
 
-                var currentRole = (await _userManager.GetRolesAsync(user))[0];
+                var currentRole = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
-                await _userManager.RemoveFromRoleAsync(user, currentRole);
+                if (currentRole != null)
+                    await _userManager.RemoveFromRoleAsync(user, currentRole);
 
                 await _userManager.AddToRoleAsync(user, model.Role);
 

@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Hubs;
 using WebApp.Models;
+using WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +16,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//    //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+//    //options.Cookie.Name = "YourAppCookieName";
+//    options.Cookie.HttpOnly = true;
+//    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+//    options.LoginPath = "/Identity/Account/Login";
+//    // ReturnUrlParameter requires 
+//    //using Microsoft.AspNetCore.Authentication.Cookies;
+//    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+//    options.SlidingExpiration = true;
+//});
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSignalR();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();
 
@@ -58,10 +80,9 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllerRoute(
       name: "default",
       pattern: "{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapRazorPages();
+    endpoints.MapHub<IdeaReactHub>("/ideaReactHub");
 });
-
-app.MapRazorPages();
-app.MapHub<IdeaReactHub>("/ideaReactHub");
 
 app.Run();
 
