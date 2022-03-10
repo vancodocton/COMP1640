@@ -136,9 +136,11 @@ namespace WebApp.Controllers
             if (id == null) return BadRequest();
 
             var model = await context.Idea
+                .Include(i => i.Comments).ThenInclude(c => c.User)
                 .Include(i => i.Category)
                 .Include(i => i.User)
                 .FirstOrDefaultAsync(i => i.Id == id);
+
             if (model == null) return BadRequest();
 
             return View(model);

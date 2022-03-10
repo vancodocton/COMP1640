@@ -71,7 +71,48 @@ namespace WebApp.Hubs
             };
 
             await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
-            await PushIdeaReactStatus(idea.Id);
+            await ReponseIdeaStatus(idea.Id);
+        }
+
+        public async Task CommentIdea(IdeaCommentRequest request)
+        {
+            
+            if (request.IdeaId == null || string.IsNullOrWhiteSpace(request.Content))
+                throw new HubException("Request agruments cannot be null");
+
+            var user = await userManager.GetUserAsync(Context.User);
+
+            if (user == null)
+                throw new HubException("Refresh page pls");
+
+            var idea = await dbContext.Idea.FirstAsync(i => i.Id == request.IdeaId);
+
+            var comment = new Comment()
+            {
+                UserId = user.Id,
+                IdeaId = request.IdeaId,
+                Content = request.Content,
+            };
+
+            await dbContext.Comment.AddAsync(comment);
+            idea.NumComment++;
+            dbContext.Idea.Attach(idea);
+
+            var row = await dbContext.SaveChangesAsync();
+
+            logger.LogInformation(message: $"{row} affected");
+
+            var response = new IdeaCommentResponse()
+            {
+                IdeaId = idea.Id,
+                UserName = user.UserName,
+                CommentId = comment.Id,
+                Content = comment.Content
+            };
+
+            await Clients.Group(idea.Id.ToString()).SendAsync("ReceiveComment", response);
+
+            await ReponseIdeaStatus(idea.Id);
         }
 
         public async Task RegisterIdeaStatus(int ideaId)
@@ -96,18 +137,19 @@ namespace WebApp.Hubs
             }
 
             await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
-            await PushIdeaReactStatus(ideaId);
+            await ReponseIdeaStatus(ideaId);
         }
 
-        private async Task PushIdeaReactStatus(int ideaId)
+        private async Task ReponseIdeaStatus(int ideaId)
         {
             var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
 
-            var response = new IdeaReactStatus()
+            var response = new IdeaStatus()
             {
                 IdeaId = idea.Id,
                 ThumbUp = idea.ThumbUp,
-                ThumbDown = idea.ThumbDown
+                ThumbDown = idea.ThumbDown,
+                NumComment = idea.NumComment
             };
 
             await Clients.Groups(ideaId.ToString()).SendAsync("IdeaStatus", response);

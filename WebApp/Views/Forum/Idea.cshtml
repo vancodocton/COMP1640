@@ -7,7 +7,7 @@
 
 <a asp-action="Index">Forum Home</a>
 
-<div class="card mb-3">
+<div class="card mb-3" id="idea-@Model.Id">
     <div class="card-body">
         <h5 class="card-title">
             @Html.DisplayFor(modelItem => Model.Title)
@@ -52,6 +52,24 @@
             </div>
         </div>
     </div>
+    <hr />
+    <div class="container">
+        <div class="input-group">
+            <span class="input-group-text">Add Comment</span>
+            <input type="text" class="form-control" id="comment" aria-label="new comment" required>
+            <button type="submit" id="sendComment" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <ul id="commentsList">
+                @foreach (var cmt in Model.Comments)
+                {
+                    <li><b>@cmt.User.UserName</b>: @cmt.Content</li>
+                }
+            </ul>
+        </div>
+    </div>
 </div>
 
 @section Scripts{
@@ -60,18 +78,20 @@
 <script type="text/javascript">
     const ideaId = @Model.Id;
 
-    function disableReact(){
+    function disableInteract(){
         document.getElementById("ThumbUp").disabled = true;
         document.getElementById("ThumbDown").disabled = true;
+        document.getElementById("sendComment").disabled = true;
     }
 
-    function enableReact(){
+    function enableInteract(){
         document.getElementById("ThumbUp").disabled = false;
         document.getElementById("ThumbDown").disabled = false;
+        document.getElementById("sendComment").disabled = false;
     }
 
     // disable button. enable it untils the connection is started.
-    disableReact();
+    disableInteract();
 
     var connection = new signalR
     .HubConnectionBuilder()
@@ -83,6 +103,7 @@
     connection.on("IdeaStatus", (res) => {
         $('#countthumbup').html(res.thumbUp);
         $('#countthumbdown').html(res.thumbDown);
+        $('#countcomment').html(res.numComment);
     });
 
     connection.on("ReactIdeaResponse", (res) => {
@@ -106,20 +127,28 @@
         }
     });
 
-    connection.onreconnecting((er) => {
-        disableReact();
+    connection.on("ReceiveComment", (res) => {
+        var cmt = document.createElement('li');
+        cmt.innerHTML = `<li><b>${res.userName}</b>: ${res.content}</li>`;
+
+        $('#commentsList').append(cmt);
     });
 
+    connection.onreconnecting((er) => {
+        console.log(er);
+        disableInteract();
+    });
     connection.onreconnected((er) => {
-        enableReact();
+        console.log(er);
+        enableInteract();
     });
 
     connection.start().then(function () {
-        enableReact();
-
+        enableInteract();
         connection.invoke("RegisterIdeaStatus", ideaId);
+    }).catch(function (er) {
+        console.log(er);
     });
-
 
     $('#react-Model input').click(function(event) {
         console.log(event.target.id);
@@ -148,6 +177,17 @@
             });
         }
         $(`label[for=${event.target.id}] span`).html('Loading...');
+    });
+
+    $('#sendComment').click(function(event) {
+        var comment = $('#comment').val();
+
+        $('#comment').val("");
+
+        connection.invoke("CommentIdea", {
+            ideaId: ideaId,
+            content: comment
+        });
     });
 </script>
 }

@@ -22,6 +22,8 @@ namespace WebApp.Models
 
         public ICollection<React>? Reacts { get; set; }
 
+        public ICollection<Comment>? Comments { get; set; }
+
         public int ThumbUp { get; set; } = 0;
 
         public int ThumbDown { get; set; } = 0;
