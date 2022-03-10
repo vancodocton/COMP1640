@@ -3,40 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
-using WebApp.ViewModels;
 
-namespace WebApp.Areas.Category.Controllers
+namespace WebApp.Controllers
 {
-    public class CategoryController : Controller
+    public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<ActionResult> Index()
+        // GET: Categories
+        public async Task<IActionResult> Index()
         {
-            var category = await _context.Category.FirstOrDefaultAsync(c => c.Id == 1);
-            var model = await _context.Category
-                .Select(C => new UserViewCategory()
-                {
-                    Id = C.Id,  
-                    Name = C.Name,
-                    Description = C.Description,
-                })
-                .ToListAsync();
-            return View(model);
+            return View(await _context.Category.ToListAsync());
         }
 
-        public async Task<ActionResult> Details(int? id)
+        // GET: Categories/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -53,14 +44,16 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-        public async Task<ActionResult> Create()
+        // GET: Categories/Create
+        public IActionResult Create()
         {
             return View();
         }
 
+        // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserViewCategory category)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -71,8 +64,8 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-
-        public async Task<IActionResult> Edit(string? id)
+        // GET: Categories/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -87,9 +80,10 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
+        // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, UserViewCategory category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Category category)
         {
             if (id != category.Id)
             {
@@ -119,7 +113,7 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-
+        // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,10 +131,10 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-
+        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Category.FindAsync(id);
             _context.Category.Remove(category);
