@@ -13,8 +13,6 @@ using WebApp.ViewModels;
 
 namespace WebApp.Areas.Category.Controllers
 {
-    [Authorize(Roles = Role.Staff)]
-    [Area("Category")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,14 +22,20 @@ namespace WebApp.Areas.Category.Controllers
             _context = context;
         }
 
-        
-        public async Task<ActionResult> Index(int? id)
+        public async Task<ActionResult> Index()
         {
-            var category = await _context.Category.FirstOrDefaultAsync(c => c.Id == id);
-            return View(category);
+            var category = await _context.Category.FirstOrDefaultAsync(c => c.Id == 1);
+            var model = await _context.Category
+                .Select(C => new UserViewCategory()
+                {
+                    Id = C.Id,  
+                    Name = C.Name,
+                    Description = C.Description,
+                })
+                .ToListAsync();
+            return View(model);
         }
 
-        
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -67,7 +71,7 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-        
+
         public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
@@ -115,7 +119,7 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-        
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,7 +137,7 @@ namespace WebApp.Areas.Category.Controllers
             return View(category);
         }
 
-        
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)

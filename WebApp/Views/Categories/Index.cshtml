@@ -1,0 +1,59 @@
+﻿@model IEnumerable<WebApp.ViewModels.UserViewCategory>
+
+@{
+    ViewData["Title"] = "Index";
+    int i = 0, j = 0;
+}
+
+<h1>Index Page</h1>
+<button type="button" class="btn btn-primary"><a asp-controller="Categories" asp-action="Create" id="add-button"><i class="fa fa-plus-square-o"></i> Create New Category</a></button>
+
+<div>
+	<div class="container-fluid d-flex justify-content-center align-items-center h-100">
+		<div class="form-input p-3 text-center py-4">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">Category Name</th>
+						<th scope="col">Description</th>
+						@*                        
+						*@
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var category in Model)
+					{
+						{ i++; j++; }
+						<tr>
+							<th scope="row">@i</th>
+							<td>@category.Name</td>
+							<td>@category.Description</td>
+							@*                            <td>
+								@string.Join(", ", user.Roles)
+								</td>*@
+							<td class="dropdown">
+								<button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="false">
+									Actions
+								</button>
+								<div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@j">
+									<a class="dropdown-item text-success"  asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id">
+										Details
+									</a>
+									<a class="dropdown-item text-success"  asp-controller="Categories" asp-action="Update" asp-route-id="@category.Id">
+										Edit
+									</a>
+									<a class="dropdown-item text-danger"  asp-controller="Categories" asp-action="Delete" asp-route-id="@category.Id">
+										Delete
+									</a>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
