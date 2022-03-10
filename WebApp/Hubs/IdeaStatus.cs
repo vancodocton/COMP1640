@@ -2,7 +2,7 @@
 {
     public partial class IdeaInteractHub
     {
-        public class IdeaReactStatus
+        public class IdeaStatus
         {
             public int? IdeaId { get; set; }
 
