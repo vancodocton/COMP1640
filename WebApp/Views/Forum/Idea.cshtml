@@ -37,12 +37,12 @@
             <div class="d-inline-flex col-sm justify-content-end align-items-center">
                 <div class="px-2">
                     <i class="fa-solid fa-thumbs-up text-primary"></i>
-                    <span id="countthumbup"></span>
+                    <span id="countthumbup">NaN</span>
                 </div>
 
                 <div class="px-2">
                     <i class="fa-solid fa-thumbs-down text-danger"></i>
-                    <span id="countthumbdown"></span>
+                    <span id="countthumbdown">NaN</span>
                 </div>
 
                 <div class="px-2">
@@ -77,10 +77,10 @@
     .HubConnectionBuilder()
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
-    .withUrl("/ideaReactHub")
+    .withUrl("/ideaInteractHub")
     .build();
 
-    connection.on("IdeaReactStatus", (res) => {
+    connection.on("IdeaStatus", (res) => {
         $('#countthumbup').html(res.thumbUp);
         $('#countthumbdown').html(res.thumbDown);
     });
@@ -117,7 +117,7 @@
     connection.start().then(function () {
         enableReact();
 
-        connection.invoke("RegisterIdeaReactStatus", ideaId);
+        connection.invoke("RegisterIdeaStatus", ideaId);
     });
 
 

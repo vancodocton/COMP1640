@@ -81,7 +81,7 @@ app.UseEndpoints(endpoints =>
       name: "default",
       pattern: "{controller=Home}/{action=Index}/{id?}");
     endpoints.MapRazorPages();
-    endpoints.MapHub<IdeaReactHub>("/ideaReactHub");
+    endpoints.MapHub<IdeaInteractHub>("/ideaInteractHub");
 });
 
 app.Run();

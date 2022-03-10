@@ -8,14 +8,14 @@ using WebApp.Models;
 namespace WebApp.Hubs
 {
     [Authorize]
-    public partial class IdeaReactHub : Hub
+    public partial class IdeaInteractHub : Hub
     {
 
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly ILogger<IdeaReactHub> logger;
+        private readonly ILogger<IdeaInteractHub> logger;
 
-        public IdeaReactHub(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, ILogger<IdeaReactHub> logger)
+        public IdeaInteractHub(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, ILogger<IdeaInteractHub> logger)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
@@ -74,7 +74,7 @@ namespace WebApp.Hubs
             await PushIdeaReactStatus(idea.Id);
         }
 
-        public async Task RegisterIdeaReactStatus(int ideaId)
+        public async Task RegisterIdeaStatus(int ideaId)
         {
             var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
 
@@ -110,7 +110,7 @@ namespace WebApp.Hubs
                 ThumbDown = idea.ThumbDown
             };
 
-            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaReactStatus", response);
+            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaStatus", response);
         }
 
         private async Task AddReact(Idea idea, IdeaReactRequest request)

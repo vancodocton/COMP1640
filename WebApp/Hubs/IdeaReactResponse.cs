@@ -1,6 +1,6 @@
 ﻿namespace WebApp.Hubs
 {
-    public partial class IdeaReactHub
+    public partial class IdeaInteractHub
     {
         public class IdeaReactReponse
         {
