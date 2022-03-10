@@ -26,5 +26,8 @@ namespace WebApp.Models
 
         public int ThumbDown { get; set; } = 0;
 
+        public int NumComment { get; set; } = 0;
+
+        public int NumView { get; set; } = 0;
     }
 }
