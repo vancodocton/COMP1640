@@ -55,17 +55,29 @@
     <hr />
     <div class="container">
         <div class="input-group">
-            <span class="input-group-text">Add Comment</span>
-            <input type="text" class="form-control" id="comment" aria-label="new comment" required>
+            <span class="input-group-text">COMMENT</span>
+            <input placeholder="Type comment..." type="text" class="form-control" id="comment" aria-label="new comment" required>
             <button type="submit" id="sendComment" class="btn btn-primary">Send</button>
         </div>
     </div>
     <div class="row">
         <div class="col-6">
             <ul id="commentsList">
+                <br><h5>List of previous comments</h5><br>
                 @foreach (var cmt in Model.Comments)
                 {
-                    <li><b>@cmt.User.UserName</b>: @cmt.Content</li>
+                    <div class="card" style="width:75rem;">
+                      <div class="card-body bg-light">
+                        <p>"@cmt.Content"</p>
+                        <div class="d-flex justify-content-between">
+                          <div class="d-flex flex-row align-items-center">
+                            <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
+                            <p class="small mb-0 ms-2"><b>@cmt.User.UserName</b></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br>
                 }
             </ul>
         </div>
