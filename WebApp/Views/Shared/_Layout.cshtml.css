@@ -41,12 +41,15 @@ button.accept-policy {
 
 .footer {
     vertical-align: bottom;
-    display: block;
-    position: fixed;
+/*  display: block;*/
+    background-color:grey;
     height: auto;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-  border: 1px solid red;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    color:white;
+    }
+.footer .content{
+    color: white;
 }
