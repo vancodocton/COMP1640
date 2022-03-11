@@ -12,7 +12,7 @@ using WebApp.Models;
 
 namespace WebApp.Controllers
 {
-    [Authorize(Roles = Role.Coordinator)]
+    [Authorize(Roles = Role.Manager)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
