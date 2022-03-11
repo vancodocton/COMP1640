@@ -5,9 +5,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit Page</h1>
-
-<h4>Category</h4>
+<h1>Edit Category</h1>
+<div>
+    <button class="btn btn-success"><a class="text-white text-decoration-none" asp-action="Index">Home</a></button>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,15 +25,12 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+            <br>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
