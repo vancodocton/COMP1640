@@ -74,7 +74,7 @@ namespace WebApp.Hubs
             await ReponseIdeaStatus(idea.Id);
         }
 
-        public async Task CommentIdea(IdeaCommentRequest request)
+        private async Task CommentIdea(IdeaCommentRequest request)
         {
             
             if (request.IdeaId == null || string.IsNullOrWhiteSpace(request.Content))

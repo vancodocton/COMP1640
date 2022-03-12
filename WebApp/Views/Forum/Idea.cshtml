@@ -5,8 +5,9 @@
     //Layout = "~/Views/Shared/_ForumLayout.cshtml";
 }
 
-<button class = "btn btn-success"><a class="text-decoration-none text-white" asp-action="Index">Home</a></button>
-<br><br>
+<button class="btn btn-success"><a class="text-decoration-none text-white" asp-action="Index">Home</a></button>
+<br>
+<br>
 
 <div class="card mb-3" id="idea-@Model.Id">
     <div class="card-body">
@@ -20,7 +21,7 @@
     <div class="card-footer">
         <div class="row">
             <div class="col-sm">
-                <div id="react-Model" class="btn-group" role="group" aria-label="React button group @Model.Id">
+                <form id="react-Model" class="btn-group" role="group" aria-label="React button group @Model.Id">
                     <input type="checkbox" class="btn-check" name="radio1" id="ThumbUp" autocomplete="off" data-checked="Thumbed Up" data-unchecked="Thumb Up" data-loading-text="Loading">
                     <label class="btn btn-outline-primary" for="ThumbUp">
                         <i class="fa-regular fa-thumbs-up"></i>
@@ -32,7 +33,7 @@
                         <i class="fa-regular fa-thumbs-down"></i>
                         <span id="thumbdownstatus">Thumb Down</span>
                     </label>
-                </div>
+                </form>
             </div>
 
             <div class="d-inline-flex col-sm justify-content-end align-items-center">
@@ -54,34 +55,36 @@
         </div>
     </div>
     <hr />
-    <div class="container">
+    <form class="container" id="comment-form">
         <div class="input-group">
+            <input asp-for="Id" name="IdeaId" hidden />
             <span class="input-group-text">COMMENT</span>
             <input placeholder="Type comment..." type="text" class="form-control" id="comment" aria-label="new comment" required>
             <button type="submit" id="sendComment" class="btn btn-primary">Send</button>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
-            <ul id="commentsList">
-                <br><h5>List of previous comments</h5><br>
-                @foreach (var cmt in Model.Comments)
-                {
-                    <div class="card" style="width:75rem;">
-                      <div class="card-body bg-light">
+    </form>
+    <div>
+        <ul id="commentsList">
+            <li class="h5">List of previous comments</li>
+            @if (Model.Comments == null)
+            {
+                <li class="text-danger">Comments isn't loaded</li>
+            }
+            else foreach (var cmt in Model.Comments)
+            {
+                <li class="card mb-1">
+                    <div class="card-body bg-light">
                         <p>"@cmt.Content"</p>
                         <div class="d-flex justify-content-between">
-                          <div class="d-flex flex-row align-items-center">
-                            <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
-                            <p class="small mb-0 ms-2"><b>@cmt.User.UserName</b></p>
-                          </div>
+                            <div class="d-flex flex-row align-items-center">
+                                <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
+                                <p class="small mb-0 ms-2"><b>@cmt.User.UserName</b></p>
+                            </div>
                         </div>
-                      </div>
                     </div>
-                    <br>
-                }
-            </ul>
-        </div>
+                </li>
+            }
+        </ul>
     </div>
 </div>
 
@@ -141,8 +144,21 @@
     });
 
     connection.on("ReceiveComment", (res) => {
-        var cmt = document.createElement('li');
-        cmt.innerHTML = `<li><b>${res.userName}</b>: ${res.content}</li>`;
+        var cmt =
+        `
+        <li class="card mb-1">
+            <div class="card-body bg-light">
+                <p>${res.content}</p>
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex flex-row align-items-center">
+                            <span class="fst-italic">Written by &nbsp;</span>
+                            <i class="fa-solid fa-user"></i>
+                            <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
+                        </div>
+                    </div>
+            </div>
+         </li>
+        `;
 
         $('#commentsList').append(cmt);
     });
@@ -192,15 +208,28 @@
         $(`label[for=${event.target.id}] span`).html('Loading...');
     });
 
-    $('#sendComment').click(function(event) {
+    $('#comment-form').submit(function(event) {
         var comment = $('#comment').val();
 
-        $('#comment').val("");
+        //$('#comment').val("");
 
-        connection.invoke("CommentIdea", {
+        var comment = {
             ideaId: ideaId,
             content: comment
+        }
+        fetch("/Comment/Add", {
+            method:"POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(comment)
+        }).then(response => response.text())
+        .then((data) => {
+            console.log(`commented. id = ${data}`);
         });
+        $('#comment-form')[0].reset();
+
+        event.preventDefault();
     });
 </script>
 }
