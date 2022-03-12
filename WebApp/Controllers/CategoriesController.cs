@@ -139,9 +139,20 @@ namespace WebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Category.FindAsync(id);
-            _context.Category.Remove(category);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            var idea = await _context.Idea.FirstOrDefaultAsync(i => i.CategoryId == category.Id);
+
+            if (idea == null)
+            {
+                _context.Category.Remove(category);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            else
+                ModelState.AddModelError("", "Category contains idea(s), cannot delete it!");
+
+            return View(category); 
         }
 
         private bool CategoryExists(int id)
