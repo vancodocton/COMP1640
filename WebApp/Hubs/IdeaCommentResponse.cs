@@ -1,6 +1,6 @@
 ﻿namespace WebApp.Hubs
 {
-    internal class IdeaCommentResponse
+    public class IdeaCommentResponse
     {
         public int IdeaId { get; set; }
 
