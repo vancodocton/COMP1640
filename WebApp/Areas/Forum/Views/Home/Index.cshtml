@@ -1,4 +1,4 @@
-﻿@model WebApp.ViewModels.ForumViewModel
+﻿@model ForumViewModel
 
 @{
     ViewData["Title"] = "Forum";
@@ -9,7 +9,7 @@
 {
     <div class="card mb-3">
         <div class="card-header">
-            <a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId">@idea.Category.Name</a>
+            <a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId">@idea.Category?.Name</a>
         </div>
         <div class="card-body">
             <h5 class="card-title">
@@ -23,10 +23,12 @@
         </div>
         <div class="card-footer d-inline-flex justify-content-end">
             <span class="px-2">
-                <i class="fa-solid fa-user"></i>@idea.User.Email
+                <i class="fa-solid fa-user"></i>@idea.User?.Email
             </span>
             <span class="px-2">
-                <i class="fa-regular fa-comments"></i> 0
+                <i class="fa-regular fa-comments"></i> @idea.NumComment
+            </span> <span class="px-2">
+                <i class="fa-solid fa-eye"></i> @idea.NumView
             </span>
             <span class="px-2">
                 <i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp

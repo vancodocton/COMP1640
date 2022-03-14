@@ -6,22 +6,20 @@ namespace WebApp.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
             : base(options)
         {
         }
 
-        public DbSet<Department> Department { get; set; }
+        public DbSet<Department> Department { get; set; } = null!;
 
-        public DbSet<Category> Category { get; set; }
+        public DbSet<Category> Category { get; set; } = null!;
 
-        public DbSet<Idea> Idea { get; set; }
+        public DbSet<Idea> Idea { get; set; } = null!;
 
-        public DbSet<React> React { get; set; }
+        public DbSet<React> React { get; set; } = null!;
 
-        public DbSet<Comment> Comment { get; set; }
+        public DbSet<Comment> Comment { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
