@@ -10,8 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
 
-namespace WebApp.Controllers
+namespace WebApp.Areas.Forum.Controllers
 {
+    [Area("Forum")]
     [Authorize(Roles = Role.Manager)]
     public class CategoriesController : Controller
     {
@@ -152,7 +153,7 @@ namespace WebApp.Controllers
             else
                 ModelState.AddModelError("", "Category contains idea(s), cannot delete it!");
 
-            return View(category); 
+            return View(category);
         }
 
         private bool CategoryExists(int id)
