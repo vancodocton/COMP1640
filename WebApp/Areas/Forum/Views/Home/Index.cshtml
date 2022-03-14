@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
             <h5 class="card-title">
-                <a class="text-decoration-none" asp-action="Idea" asp-route-id="@idea.Id">
+                <a class="text-decoration-none" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
                     @Html.DisplayFor(modelItem => idea.Title)
                 </a>
             </h5>
