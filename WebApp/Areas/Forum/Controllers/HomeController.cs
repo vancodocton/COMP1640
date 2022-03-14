@@ -1,18 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using WebApp.Services;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace WebApp.Areas.Forum.Controllers
 {
@@ -23,6 +16,7 @@ namespace WebApp.Areas.Forum.Controllers
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender sender;
+        private readonly int pageSize = 5;
 
         public HomeController(
             ApplicationDbContext context,
@@ -35,10 +29,8 @@ namespace WebApp.Areas.Forum.Controllers
             this.sender = sender;
         }
 
-        public async Task<ActionResult> Index(int? cid, string? order)
+        public async Task<ActionResult> Index(int? cid, string? sort, int page = 1)
         {
-            var categories = await context.Category.ToListAsync();
-
             var ideas = context.Idea
                 .Include(x => x.Category)
                 .Include(x => x.User)
@@ -50,24 +42,37 @@ namespace WebApp.Areas.Forum.Controllers
                 ViewData["cid"] = cid;
             }
 
-            switch (order)
+            switch (sort)
             {
                 case null:
+                case "":
                 case "lastest":
+                default:
                     ideas = ideas.OrderByDescending(i => i.Id);
                     break;
                 case "popular":
+                    ideas = ideas
+                        .OrderByDescending(i => i.ThumbUp - i.ThumbDown)
+                        .ThenByDescending(i => i.ThumbUp)
+                        .ThenByDescending(i => i.Id);
                     break;
                 case "topview":
+                    ideas = ideas
+                        .OrderByDescending(i => i.NumView)
+                        .ThenByDescending(i => i.Id);
                     break;
-                default:
-                    return BadRequest("Invalid order option");
             }
 
+            var model = new ForumViewModel();
 
-            var model = new ForumViewModel(await ideas.ToListAsync(), categories);
+            model.Ideas = await PaginatedList<Idea>.CreateAsync(ideas, page, pageSize);
+
+            model.Categories = await context.Category.ToListAsync();
+            model.Page = page;
+            model.Sort = sort ?? "";
+            model.CategoryId = cid;
 
             return View(model);
-        }         
+        }
     }
 }
