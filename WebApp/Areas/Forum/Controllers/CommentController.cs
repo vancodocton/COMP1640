@@ -10,10 +10,11 @@ using WebApp.Data;
 using WebApp.Hubs;
 using WebApp.Models;
 
-namespace WebApp.Controllers
+namespace WebApp.Areas.Forum.Controllers
 {
     //[ApiController]
     //[Route("[controller]")]
+    [Area("Forum")]
     [Authorize]
     public class CommentController : Controller
     {
