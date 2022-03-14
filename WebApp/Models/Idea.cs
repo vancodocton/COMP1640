@@ -20,9 +20,9 @@ namespace WebApp.Models
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
 
-        public ICollection<React>? Reacts { get; set; }
+        public ICollection<React> Reacts { get; set; } = null!;
 
-        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Comment> Comments { get; set; } = null!;
 
         public int ThumbUp { get; set; } = 0;
 

@@ -11,7 +11,7 @@ namespace WebApp.Data
         {
         }
 
-        public DbSet<Department> Department { get; set; } = null!;
+        public DbSet<Department> Department => Set<Department>();
 
         public DbSet<Category> Category { get; set; } = null!;
 
