@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebApp.Models
@@ -17,6 +18,7 @@ namespace WebApp.Models
         public int? DepartmentId { get; set; }
         public Department? Department { get; set; }
 
+        [ValidateNever]
         public ICollection<React> Reacts { get; set; } = null!;
 
         [Required]

@@ -25,5 +25,6 @@ namespace WebApp.Models
     {
         ThumbUp,
         ThumbDown,
+        Viewed
     }
 }
