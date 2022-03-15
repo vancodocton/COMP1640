@@ -71,7 +71,7 @@
             </div>
             <div class="card-footer d-inline-flex justify-content-end">
                 <span class="px-2">
-                    <i class="fa-solid fa-user"></i> @idea.User?.Email
+                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.Email : "Anonymous user")
                 </span>
                 <span class="px-2">
                     <i class="fa-regular fa-comments"></i> @idea.NumComment

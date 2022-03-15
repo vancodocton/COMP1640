@@ -25,8 +25,8 @@ namespace WebApp.ViewModels
 
         [BooleanMustBeTrue(ErrorMessage = "You must Agree for Term and Conditions")]
         public bool IsCheckTerm { get; set; }
-        
-        [Display(Name ="Make my idea incognito")]
+
+        [Display(Name = "Make my idea incognito")]
         [Required]
         public bool IsIncognito { get; set; }
     }

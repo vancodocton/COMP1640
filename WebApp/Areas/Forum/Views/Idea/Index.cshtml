@@ -39,7 +39,7 @@
 
             <div class="col-sm d-inline-flex justify-content-end align-items-center">
                 <div class="px-2">
-                    <i class="fa-solid fa-user"></i>@Model.User?.Email
+                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.Email : "Anonymous user")                     
                 </div>
 
                 <div class="px-2">
@@ -88,7 +88,7 @@
                             <div class="d-flex justify-content-between">
                                 <div class="d-flex flex-row align-items-center">
                                     <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
-                                    <p class="small mb-0 ms-2"><b>@cmt.User!.UserName</b></p>
+                                    <p class="small mb-0 ms-2"><b>@(cmt.User?.UserName ?? "Deleted_User")</b></p>
                                 </div>
                             </div>
                         </div>

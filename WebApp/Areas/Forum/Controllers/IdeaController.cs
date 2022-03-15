@@ -63,6 +63,7 @@ namespace WebApp.Areas.Forum.Controllers
                     Content = model.Content,
                     CategoryId = model.CategoryId,
                     UserId = user.Id,
+                    IsIncognito = model.IsIncognito,
                 };
 
                 await context.Idea.AddAsync(idea);
