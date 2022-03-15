@@ -10,7 +10,7 @@ using WebApp.ViewModels;
 namespace WebApp.Areas.Forum.Controllers
 {
     [Area("Forum")]
-    [Authorize(Roles = Role.Staff + "," + Role.Coordinator)]
+    [Authorize(Roles = $"{Role.Staff},{Role.Coordinator},{Role.Manager}")]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext context;
