@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -12,8 +13,8 @@ using WebApp.Models;
 
 namespace WebApp.Areas.Forum.Controllers
 {
-    //[ApiController]
-    //[Route("[controller]")]
+    [ApiController]
+    [Route("Forum/[controller]/[action]")]
     [Area("Forum")]
     [Authorize]
     public class CommentController : Controller
@@ -41,6 +42,9 @@ namespace WebApp.Areas.Forum.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Add([FromBody] IdeaCommentRequest request)
         {
+            if (!User.IsInRole(Role.Staff))
+                return StatusCode(StatusCodes.Status401Unauthorized);
+
             if (request.IdeaId == null || string.IsNullOrWhiteSpace(request.Content))
                 return BadRequest();
 
