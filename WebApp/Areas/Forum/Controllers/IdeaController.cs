@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +12,7 @@ using WebApp.ViewModels;
 namespace WebApp.Areas.Forum.Controllers
 {
     [Area("Forum")]
+    [Authorize]
     public class IdeaController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -27,6 +29,8 @@ namespace WebApp.Areas.Forum.Controllers
             this.userManager = userManager;
             this.sender = sender;
         }
+
+        [Authorize(Roles = Role.Staff)]
         [HttpGet]
         public async Task<ActionResult> Create()
         {
@@ -44,6 +48,7 @@ namespace WebApp.Areas.Forum.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = Role.Staff)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateIdeaViewModel model)
