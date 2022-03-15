@@ -45,13 +45,16 @@ namespace WebApp.Areas.Forum.Controllers
             if (!User.IsInRole(Role.Staff))
                 return StatusCode(StatusCodes.Status401Unauthorized);
 
-            if (request.IdeaId == null || string.IsNullOrWhiteSpace(request.Content))
-                return BadRequest();
+            if (request.IdeaId == null)
+                return StatusCode(StatusCodes.Status400BadRequest);
+
+            if (string.IsNullOrWhiteSpace(request.Content))
+                return StatusCode(StatusCodes.Status400BadRequest);
 
             var user = await userManager.GetUserAsync(User);
 
             if (user == null)
-                return BadRequest();
+                return StatusCode(StatusCodes.Status400BadRequest);
 
             var idea = await dbContext.Idea
                 .Include(i => i.User)
@@ -59,7 +62,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var comment = new Comment()
             {
-                IdeaId = request.IdeaId,
+                IdeaId = (int) request.IdeaId,
                 UserId = user.Id,
                 Content = request.Content,
             };
