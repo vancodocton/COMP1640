@@ -36,11 +36,11 @@ namespace WebApp.Areas.Coordinator.Controllers
             var ideas = context.Idea
                 .Include(x => x.Category)
                 .Include(x => x.User)
-                .Where(x => x.User.DepartmentId == coors)
                 .Include(x => x.Comments
                     .OrderByDescending(i => i.Id)
                     .Take(2)
                     .OrderBy(i => i.Id))
+                .Where(x => x.User.DepartmentId == coors)
                 .AsQueryable();
 
             if (cid != null)
