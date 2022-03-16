@@ -69,22 +69,44 @@
                     @Html.DisplayFor(modelItem => idea.Content)
                 </p>
             </div>
-            <div class="card-footer d-inline-flex justify-content-end">
-                <span class="px-2">
-                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.Email : "Anonymous user")
-                </span>
-                <span class="px-2">
-                    <i class="fa-regular fa-comments"></i> @idea.NumComment
-                </span>
-                <span class="px-2">
-                    <i class="fa-solid fa-eye"></i> @idea.NumView
-                </span>
-                <span class="px-2">
-                    <i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp
-                </span>
-                <span class="px-2">
-                    <i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
-                </span>
+            <div class="card-footer">
+                <div class="d-flex justify-content-end">
+                    @if (User.Identity?.Name == idea.User?.UserName)
+                    {
+                        <button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                            <i class="fa-solid fa-trash"></i> Remove your idea
+                        </button>
+                    }
+
+                    <span class="px-2">
+                        <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.Email : "Anonymous user")
+                    </span>
+                    <span class="px-2">
+                        <i class="fa-regular fa-comments"></i> @idea.NumComment
+                    </span>
+                    <span class="px-2">
+                        <i class="fa-solid fa-eye"></i> @idea.NumView
+                    </span>
+                    <span class="px-2">
+                        <i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp
+                    </span>
+                    <span class="px-2">
+                        <i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
+                    </span>
+                </div>
+                <div class="container">
+                    @if (idea.Comments.Count != 0)
+                    {
+                        <h6>Last comments</h6>
+                        foreach (var cmt in idea.Comments)
+                        {
+                            <div>
+                                <b>@(cmt.User?.UserName ?? "Deleted_User"): </b>
+                                @cmt.Content
+                            </div>
+                        }
+                    }
+                </div>
             </div>
         </div>
     }
