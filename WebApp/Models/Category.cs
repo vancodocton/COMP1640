@@ -12,5 +12,9 @@ namespace WebApp.Models
         public string? Description { get; set; }
 
         public IEnumerable<Idea>? Ideas { get; set; }
+
+        public DateTime? DueDate { get; set; }
+
+        public DateTime? FinalDueDate { get; set; }
     }
 }
