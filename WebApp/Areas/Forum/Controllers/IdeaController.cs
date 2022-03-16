@@ -109,40 +109,5 @@ namespace WebApp.Areas.Forum.Controllers
 
             return View(model);
         }
-
-        [HttpGet]       
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var idea = await context.Idea
-                .Include(i => i.Category)
-                .Include(i => i.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (idea == null)
-            {
-                return NotFound();
-            }
-
-            return View(idea);
-        }
-
-        
-        [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = Role.Coordinator)]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var idea = await context.Idea.FindAsync(id);
-                context.Idea.Remove(idea);
-                await context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index), "Home");
-        }
-
-
     }
 }
