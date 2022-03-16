@@ -1,0 +1,139 @@
+﻿@model WebApp.ViewModels.ForumViewModel
+
+@{
+	ViewData["Title"] = "Coordinator";
+	Layout = "_ForumLayout";
+}
+
+@section Aside{
+<nav class="navbar navbar-expand-md navbar-dark">
+	<div class="container-fluid flex-md-column">
+		<div class="d-sm-flex d-md-block">
+			<div class="nav-item pb-2">
+				<a id="cid-" class="btn btn-outline-primary" asp-action="Index" asp-route-sort="@Model.Sort">All ideas</a>
+			</div>
+		</div>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarleft"
+				aria-controls="navbarleft" aria-expanded="false" aria-label="Toggle navigation">
+			Category <span class="navbar-toggler-icon"></span>
+		</button>
+		<aside class="collapse navbar-collapse mt-3" id="navbarleft">
+			<ul class="navbar-nav nav-pills flex-column">
+				@foreach (var category in Model.Categories)
+				{
+				<li class="nav-item">
+					<a id="cid-@category.Id" class="nav-link" asp-action="Index" asp-route-cid="@category.Id" asp-route-sort="@Model.Sort">@category.Name</a>
+				</li>
+				}
+			</ul>
+		</aside>
+	</div>
+</nav>
+}
+
+<nav class="pb-2">
+	<form asp-action="Index" method="get" id="sort-form">
+		<input id="cid" name="cid" value="@Model.CategoryId" type="hidden" />
+		<div class="d-inline-flex">
+			<select class="form-select" aria-label="Select to sort by" asp-for="Sort">
+				<option value="lastest">Lastest</option>
+				<option value="popular">Popular</option>
+				<option value="topview">Top View</option>
+			</select>
+			<a type="reset" class="btn btn-danger" asp-action="Index">Reset</a>
+		</div>
+	</form>
+</nav>
+
+@if (Model.Ideas.Count != 0)
+{
+	foreach (var idea in Model.Ideas)
+	{
+		<div class="card mb-3">
+			<div class="card-header">
+				<a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId" asp-route-sort="@Model.Sort">@idea.Category?.Name</a>
+			</div>
+			<div class="card-body">
+				<h5 class="card-title">
+					<a class="text-decoration-none" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
+						@Html.DisplayFor(modelItem => idea.Title)
+					</a>
+				</h5>
+				<p class="card-text">
+					@Html.DisplayFor(modelItem => idea.Content)
+				</p>
+			</div>
+			<div class="card-footer">
+				<div class="d-flex justify-content-end">
+					<button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+						<i class="fa-solid fa-trash"></i> Remove this idea
+					</button>
+					<span class="px-2">
+						<i class="fa-solid fa-user"></i>@idea.User?.Email
+					</span>
+					<span class="px-2">
+						<i class="fa-regular fa-comments"></i> @idea.NumComment
+					</span>
+					<span class="px-2">
+						<i class="fa-solid fa-eye"></i> @idea.NumView
+					</span>
+					<span class="px-2">
+						<i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp
+					</span>
+					<span class="px-2">
+						<i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
+					</span>
+				</div>
+				<div class="container">
+					@if (idea.Comments.Count != 0)
+					{
+						<h6>Last comments</h6>
+						foreach (var cmt in idea.Comments)
+						{
+							<div>
+								<b>@(cmt.User?.UserName ?? "Other_User"): </b>
+								@cmt.Content
+							</div>
+						}
+					}
+				</div>
+			</div>
+		</div>
+	}
+
+	var prevDisabled = !Model.Ideas.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !Model.Ideas.HasNextPage ? "disabled" : "";
+
+	<div aria-label="Page navigation">
+		<ul class="pagination justify-content-center">
+			<li class="page-item @prevDisabled">
+				<a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Previous</a>
+			</li>
+			<li class="page-item @nextDisabled">
+				<a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Next</a>
+			</li>
+			@*<form asp-action="Index" method="get" id="page" asp-route-sort="@Model.Sort" asp-route-cid="@Model.CategoryId">
+				<div class="page-item input-group">
+				<label class="input-group-text" asp-for="Page"></label>
+				<input class="form-control" style="flex: 0 1 4rem;" asp-for="Page" />
+				</div>
+				</form>*@
+		</ul>
+	</div>
+}
+else
+{
+	<span class="text-danger">No idea in this category</span>
+}
+
+@section Scripts{
+<partial name="_ValidationScriptsPartial" />
+
+<script type='text/javascript'>
+	$('#sort-form').change(function(event) {
+	   document.forms['sort-form'].submit();
+	});
+
+	//$('#page').sumbit()
+</script>
+}
