@@ -1,13 +1,12 @@
-﻿@model WebApp.Models.Category
+﻿@model CategoryViewModel
 
 @{
-    ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Create new category";
 }
 
 <h1>Create a new Category</h1>
 <div>
-    <a class="btn btn-success text-white text-decoration-none" asp-action="Index">Home</a>
+    <a class="btn btn-success" asp-action="Index">Home</a>
 </div>
 <hr />
 
@@ -16,23 +15,40 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="form-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
+                <label asp-for="Description" class="form-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="DueDate" class="form-label"></label>
+                <input asp-for="DueDate" class="form-control" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FinalDueDate" class="form-label"></label>
+                <input asp-for="FinalDueDate" class="form-control" />
+                <span asp-validation-for="FinalDueDate" class="text-danger"></span>
+            </div>
+
             <br>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="reset" value="Reset" class="btn btn-danger" />
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
 }
