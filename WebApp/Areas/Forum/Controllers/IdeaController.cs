@@ -36,13 +36,13 @@ namespace WebApp.Areas.Forum.Controllers
         {
             var model = new CreateIdeaViewModel()
             {
-                Categories = await context
-                .Category.Select(c => new SelectListItem()
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                })
-                .ToListAsync(),
+                Categories = await context.Category
+                    .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                    .Select(c => new SelectListItem()
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    }).ToListAsync(),
             };
 
             return View(model);
@@ -55,42 +55,55 @@ namespace WebApp.Areas.Forum.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await userManager.GetUserAsync(HttpContext.User);
+                var category = context.Category.FirstOrDefault(c => c.Id == model.CategoryId);
 
-                var idea = new Idea()
+                if (category == null)
                 {
-                    Title = model.Title,
-                    Content = model.Content,
-                    CategoryId = model.CategoryId,
-                    UserId = user.Id,
-                    IsIncognito = model.IsIncognito,
-                };
-
-                await context.Idea.AddAsync(idea);
-                var count = await context.SaveChangesAsync();
-
-                var coors = (await userManager.GetUsersInRoleAsync(Role.Coordinator))
-                    .Where(c => c.DepartmentId == user.DepartmentId)
-                    .ToList();
-
-                var url = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
-
-                foreach (var coor in coors)
-                {
-                    await sender.SendEmailAsync(coor.Email, "New Idea is created by your department staff", $"<a href={HtmlEncoder.Default.Encode(url)}>Idea</a>");
-
+                    ModelState.AddModelError(nameof(model.CategoryId), "The selected category has been deleted or does not exist. Please choose another idea.");
                 }
+                else if (DateTime.Now > category.DueDate)
+                {
+                    ModelState.AddModelError("", $"The due date of the category '{category.Name}' is over. Cannot submit idea. Please choose another idea.");
+                }
+                else
+                {
+                    var user = await userManager.GetUserAsync(HttpContext.User);
 
-                return RedirectToAction(nameof(Index), new {id = idea.Id});
+                    var idea = new Idea()
+                    {
+                        Title = model.Title,
+                        Content = model.Content,
+                        CategoryId = model.CategoryId,
+                        UserId = user.Id,
+                        IsIncognito = model.IsIncognito,
+                    };
+
+                    await context.Idea.AddAsync(idea);
+                    var count = await context.SaveChangesAsync();
+
+                    var coors = (await userManager.GetUsersInRoleAsync(Role.Coordinator))
+                        .Where(c => c.DepartmentId == user.DepartmentId)
+                        .ToList();
+
+                    var url = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
+
+                    foreach (var coor in coors)
+                    {
+                        if (coor.EmailConfirmed)
+                            await sender.SendEmailAsync(coor.Email, "New Idea is created by your department staff", $"<a href={HtmlEncoder.Default.Encode(url!)}>Idea</a>");
+                    }
+
+                    return RedirectToAction(nameof(Index), new { id = idea.Id });
+                }
             }
 
-            model.Categories = await context
-                .Category.Select(c => new SelectListItem()
+            model.Categories = await context.Category
+                .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
                     Text = c.Name
-                })
-                .ToListAsync();
+                }).ToListAsync();
 
             return View(model);
         }
@@ -110,8 +123,8 @@ namespace WebApp.Areas.Forum.Controllers
             return View(model);
         }
 
-        [HttpGet]       
-        public async Task<IActionResult> Delete(int? id)
+        [HttpGet]
+        private async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -130,19 +143,17 @@ namespace WebApp.Areas.Forum.Controllers
             return View(idea);
         }
 
-        
+
         [HttpPost, ActionName("Delete")]
         [Authorize(Roles = Role.Coordinator)]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        private async Task<IActionResult> DeleteConfirmed(int id)
         {
             var idea = await context.Idea.FindAsync(id);
-                context.Idea.Remove(idea);
-                await context.SaveChangesAsync();
+            context.Idea.Remove(idea);
+            await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), "Home");
         }
-
-
     }
 }
