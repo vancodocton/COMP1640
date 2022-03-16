@@ -10,7 +10,7 @@ using WebApp.ViewModels;
 namespace WebApp.Areas.Coordinator.Controllers
 {
     [Area("Coordinator")]
-    [Authorize(Roles = $"{Role.Coordinator}")]
+    [Authorize(Roles = Role.Coordinator)]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -37,6 +37,10 @@ namespace WebApp.Areas.Coordinator.Controllers
                 .Include(x => x.Category)
                 .Include(x => x.User)
                 .Where(x => x.User.DepartmentId == coors)
+                .Include(x => x.Comments
+                    .OrderByDescending(i => i.Id)
+                    .Take(2)
+                    .OrderBy(i => i.Id))
                 .AsQueryable();
 
             if (cid != null)
