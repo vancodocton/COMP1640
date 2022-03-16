@@ -1,16 +1,18 @@
-﻿function disableInteract() {
+﻿var isReacted = true;
+var isCommented = true;
+
+function disableInteract() {
     document.getElementById("ThumbUp").disabled = true;
     document.getElementById("ThumbDown").disabled = true;
     document.getElementById("sendComment").disabled = true;
     document.getElementById("comment").disabled = true;
 }
 
-
 function enableInteract() {
-    document.getElementById("ThumbUp").disabled = false;
-    document.getElementById("ThumbDown").disabled = false;
-    document.getElementById("sendComment").disabled = false;
-    document.getElementById("comment").disabled = false;
+    document.getElementById("ThumbUp").disabled = !isReacted;
+    document.getElementById("ThumbDown").disabled = !isReacted;
+    document.getElementById("sendComment").disabled = !isCommented;
+    document.getElementById("comment").disabled = !isCommented;
 }
 
 function userInteractIdea(ideaId) {
@@ -26,6 +28,10 @@ function userInteractIdea(ideaId) {
         .build();
 
     connection.on("IdeaStatus", (res) => {
+        isReacted = res.isReacted;
+        isCommented = res.isCommented;
+        console.log(res);
+        enableInteract();
         $('#countthumbup').html(res.thumbUp);
         $('#countthumbdown').html(res.thumbDown);
         $('#countcomment').html(res.numComment);
@@ -134,12 +140,13 @@ function userInteractIdea(ideaId) {
             },
             body: JSON.stringify(comment)
         }).then(response => {
-            console.log(response);
-            return response.status;
-        })
-            .then((data) => {
-                console.log(`sent comment`);
-            });
+            return response.text();
+        }).then((data) => {
+            console.log(data);
+        }).catch((er) => {
+            console.log(er);
+        });
+
         $('#comment-form')[0].reset();
 
         event.preventDefault();
