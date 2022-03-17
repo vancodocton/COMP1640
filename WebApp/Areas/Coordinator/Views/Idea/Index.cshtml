@@ -19,25 +19,10 @@
     </div>
     <div class="card-footer">
         <div class="row">
-            <div class="col-sm">
-                <form id="react-Model" class="btn-group" role="group" aria-label="React button group @Model.Id">
-                    <input type="checkbox" class="btn-check" name="react" id="ThumbUp" autocomplete="off" data-checked="Thumbed Up" data-unchecked="Thumb Up" data-loading-text="Loading">
-                    <label class="btn btn-outline-primary" for="ThumbUp">
-                        <i class="fa-regular fa-thumbs-up"></i>
-                        <span id="countthumbup">@Model.ThumbUp</span>
-                    </label>
-
-                    <input type="checkbox" class="btn-check" name="react" id="ThumbDown" autocomplete="off" data-checked="Thumbed Down" data-unchecked="Thumb Down" data-loading-text="Loading">
-                    <label class="btn btn-outline-danger" for="ThumbDown">
-                        <i class="fa-regular fa-thumbs-down"></i>
-                        <span id="countthumbdown">@Model.ThumbDown</span>
-                    </label>
-                </form>
-            </div>
 
             <div class="col-sm d-inline-flex justify-content-end align-items-center">
                 <div class="px-2">
-                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.Email : "Anonymous user")
+                    <i class="fa-solid fa-user"></i>@Model.User?.Email
                 </div>
 
                 <div class="px-2">
@@ -54,14 +39,6 @@
     </div>
     <br />
     <div class="container-fluid">
-        <form id="comment-form">
-            <div class="input-group">
-                <input asp-for="Id" name="IdeaId" hidden />
-                <span class="input-group-text">COMMENT</span>
-                <input id="comment" placeholder="Type comment..." type="text" class="form-control" aria-label="new comment" required>
-                <input type="submit" id="sendComment" class="btn btn-primary" value="Send">
-            </div>
-        </form>
         <h5 class="h5">List of previous comments</h5>
         <ul id="commentsList">
             @if (Model.Comments == null)

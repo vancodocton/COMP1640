@@ -7,10 +7,10 @@ using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
 
-namespace WebApp.Areas.Forum.Controllers
+namespace WebApp.Areas.Coordinator.Controllers
 {
-    [Area("Forum")]
-    [Authorize(Roles = $"{Role.Staff},{Role.Coordinator},{Role.Manager}")]
+    [Area("Coordinator")]
+    [Authorize(Roles = Role.Coordinator)]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext context;
@@ -31,6 +31,8 @@ namespace WebApp.Areas.Forum.Controllers
 
         public async Task<ActionResult> Index(int? cid, string? sort, int page = 1)
         {
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var coors = user.DepartmentId;
             var ideas = context.Idea
                 .Include(x => x.Category)
                 .Include(x => x.User)
@@ -38,6 +40,7 @@ namespace WebApp.Areas.Forum.Controllers
                     .OrderByDescending(i => i.Id)
                     .Take(2)
                     .OrderBy(i => i.Id))
+                .Where(x => x.User.DepartmentId == coors)
                 .AsQueryable();
 
             if (cid != null)

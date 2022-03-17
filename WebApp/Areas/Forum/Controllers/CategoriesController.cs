@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
+using WebApp.ViewModels;
 
 namespace WebApp.Areas.Forum.Controllers
 {
@@ -56,15 +57,29 @@ namespace WebApp.Areas.Forum.Controllers
         // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
+        public async Task<IActionResult> Create(CategoryViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (model.DueDate > model.FinalDueDate)
+                    ModelState.AddModelError("FinalDueDate", "The final due Date cannot be earlier than the due date.");
+                else
+                {
+                    var category = new Category()
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        DueDate = model.DueDate,
+                        FinalDueDate = model.FinalDueDate
+                    };
+
+                    _context.Category.Add(category);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }                 
             }
-            return View(category);
+
+            return View(model);
         }
 
         // GET: Categories/Edit/5
@@ -76,6 +91,7 @@ namespace WebApp.Areas.Forum.Controllers
             }
 
             var category = await _context.Category.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();

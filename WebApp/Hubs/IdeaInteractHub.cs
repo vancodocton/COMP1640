@@ -155,18 +155,20 @@ namespace WebApp.Hubs
 
         private async Task ReponseIdeaStatus(int ideaId)
         {
-            var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
+            var ideaStatus = await dbContext.Idea
+                .Include(i => i.Category)
+                .Select(i => new IdeaStatus()
+                {
+                    IdeaId = i.Id,
+                    ThumbUp = i.ThumbUp,
+                    ThumbDown = i.ThumbDown,
+                    NumComment = i.NumComment,
+                    NumView = i.NumView,
+                    IsCommented = i.Category!.FinalDueDate == null || DateTime.Now <= i.Category!.FinalDueDate,
+                    IsReacted = true
+                }).FirstAsync(i => i.IdeaId == ideaId);
 
-            var response = new IdeaStatus()
-            {
-                IdeaId = idea.Id,
-                ThumbUp = idea.ThumbUp,
-                ThumbDown = idea.ThumbDown,
-                NumComment = idea.NumComment,
-                NumView = idea.NumView
-            };
-
-            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaStatus", response);
+            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaStatus", ideaStatus);
         }
 
         private async Task AddReact(Idea idea, IdeaReactRequest request)

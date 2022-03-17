@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebApp.Models;
 
-namespace WebApp.Models
+namespace WebApp.ViewModels
 {
-    public class Category
+    public class CategoryViewModel
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -13,8 +15,14 @@ namespace WebApp.Models
 
         public IEnumerable<Idea>? Ideas { get; set; }
 
+        [Display(Name = "Due Date")]
+        [DataType(DataType.DateTime)]
+        [Required]
         public DateTime? DueDate { get; set; }
 
+        [Display(Name = "Final Due Date")]
+        [DataType(DataType.DateTime)]
+        [Required]
         public DateTime? FinalDueDate { get; set; }
     }
 }
