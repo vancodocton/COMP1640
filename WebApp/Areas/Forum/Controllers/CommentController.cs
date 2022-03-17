@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +15,7 @@ namespace WebApp.Areas.Forum.Controllers
     [Route("Forum/[controller]/[action]")]
     [Area("Forum")]
     [Authorize]
-    public class CommentController : Controller
+    public class CommentController : ControllerBase
     {
 
         private readonly ApplicationDbContext dbContext;
@@ -43,26 +41,51 @@ namespace WebApp.Areas.Forum.Controllers
         public async Task<IActionResult> Add([FromBody] IdeaCommentRequest request)
         {
             if (!User.IsInRole(Role.Staff))
-                return StatusCode(StatusCodes.Status401Unauthorized);
+                return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff can comment idea.");
 
             if (request.IdeaId == null)
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return StatusCode(StatusCodes.Status400BadRequest, "IdeaId cannot be null.");
 
             if (string.IsNullOrWhiteSpace(request.Content))
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return StatusCode(StatusCodes.Status400BadRequest, "Comment cannot be null or empty.");
 
             var user = await userManager.GetUserAsync(User);
 
-            if (user == null)
-                return StatusCode(StatusCodes.Status400BadRequest);
-
             var idea = await dbContext.Idea
                 .Include(i => i.User)
-                .FirstAsync(i => i.Id == request.IdeaId);
+                .Include(i => i.Category)
+                .Select(i => new Idea()
+                {
+                    Id = i.Id,
+                    NumComment = i.NumComment,
+                    Category = new Category()
+                    {
+                        Id = i.CategoryId,
+                        DueDate = i.Category!.DueDate,
+                        FinalDueDate = i.Category!.FinalDueDate,
+                    },
+                    ThumbUp = i.ThumbUp,
+                    ThumbDown = i.ThumbDown,
+                    NumView = i.NumView,
+                    User = new ApplicationUser()
+                    {
+                        EmailConfirmed = i.User!.EmailConfirmed,
+                        Email = i.User.Email
+                    },
+                })
+                .FirstOrDefaultAsync(i => i.Id == request.IdeaId);
+
+            if (idea == null || idea.Category == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Idea is deleted or not existed.");
+            }
+
+            if (DateTime.Now > idea.Category.FinalDueDate)
+                return StatusCode(StatusCodes.Status400BadRequest, "Cannot comment idea becaufe its final due date is over.");
 
             var comment = new Comment()
             {
-                IdeaId = (int) request.IdeaId,
+                IdeaId = request.IdeaId.Value,
                 UserId = user.Id,
                 Content = request.Content,
             };
@@ -77,7 +100,7 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 var ideaUrl = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
 
-                if (ideaUrl != null)
+                if (ideaUrl != null && idea.User!.EmailConfirmed)
                 {
                     var htmlMessage = $"{user.Email} commented about your idea '{idea.Title}'. Please click <a href={HtmlEncoder.Default.Encode(ideaUrl)}>at here</a> to see new comment.";
                     await sender.SendEmailAsync(idea.User.Email, "New comment about your idea", htmlMessage);
@@ -99,7 +122,10 @@ namespace WebApp.Areas.Forum.Controllers
                 IdeaId = idea.Id,
                 ThumbUp = idea.ThumbUp,
                 ThumbDown = idea.ThumbDown,
-                NumComment = idea.NumComment
+                NumView = idea.NumView,
+                NumComment = idea.NumComment,
+                IsCommented = idea.Category.FinalDueDate == null || DateTime.Now <= idea.Category.FinalDueDate,
+                IsReacted = true
             };
 
             await hubContext.Clients.Groups($"{idea.Id}").SendAsync("IdeaStatus", responseStatus);
