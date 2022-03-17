@@ -94,15 +94,15 @@
                         <i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
                     </span>
                 </div>
-                <div class="container">
+                <div class="container rounded-3 border-primary border-3 bg-white">
                     @if (idea.Comments.Count != 0)
                     {
                         <h6>Last comments</h6>
                         foreach (var cmt in idea.Comments)
                         {
-                            <div>
-                                <b>@(cmt.User?.UserName ?? "Deleted_User"): </b>
-                                @cmt.Content
+                            <div class="#">
+                                <b>"@cmt.Content" </b> by 
+                                <b>@(cmt.User?.UserName ?? "Deleted_User")</b>
                             </div>
                         }
                     }
