@@ -108,6 +108,7 @@ namespace WebApp.Areas.Forum.Controllers
             return View(model);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(int? id)
         {
             if (id == null) return BadRequest();
