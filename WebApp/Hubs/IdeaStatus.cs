@@ -11,5 +11,9 @@
         public int? NumComment { get; set; }
 
         public int? NumView { get; set; }
+
+        public bool IsCommented { get; set; }
+
+        public bool IsReacted { get; set; }
     }
 }

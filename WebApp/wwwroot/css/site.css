@@ -18,12 +18,12 @@ body {
     width: auto;
     height: auto;
     /*margin-bottom: 300px;
-/*  background-image: url("~/img/Colorful.png");
+    background-image: url("~/img/Colorful.png");
     background-size: cover;
     background-position: center center;
-    background-repeat: no-repeat;*/
-    /*    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);
-*/ background-color: #D3D3D3;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);*/ 
+    background-color: #D3D3D3;
     margin: auto;
     
 }
@@ -47,7 +47,7 @@ body {
     margin:auto;
 }
 .form-floating {
-    display: block;
+    /*display: block;*/
     margin-bottom: 20px;
 }
 

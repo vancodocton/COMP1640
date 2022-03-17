@@ -55,7 +55,7 @@
 			</div>
 			<div class="card-body">
 				<h5 class="card-title">
-					<a class="text-decoration-none" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
+					<a class="text-decoration-none" asp-area="forum" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
 						@Html.DisplayFor(modelItem => idea.Title)
 					</a>
 				</h5>
@@ -65,9 +65,20 @@
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-end">
-					<button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" data-bs-toggle="modal" data-bs-target="#confirmationModal">
-						<i class="fa-solid fa-trash"></i> Remove this idea
+
+					<button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" 
+					data-bs-toggle="modal" data-bs-target="#confirmationModal" >
+						<i class="fa-solid fa-trash" asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id"></i>Remove this idea 
 					</button>
+
+					<td>
+					<button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" 
+					data-bs-toggle="modal" data-bs-target="#confirmationModal">
+						<a class="fa-solid fa-trash" asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id">Remove this idea </a>
+					</button>
+					</td>
+
+
 					<span class="px-2">
 						<i class="fa-solid fa-user"></i>@idea.User?.Email
 					</span>
