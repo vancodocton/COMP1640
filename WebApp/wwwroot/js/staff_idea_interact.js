@@ -1,5 +1,6 @@
 ﻿var isReacted = true;
 var isCommented = true;
+var reactType = null;
 
 function disableInteract() {
     document.getElementById("ThumbUp").disabled = true;
@@ -13,6 +14,15 @@ function enableInteract() {
     document.getElementById("ThumbDown").disabled = !isReacted;
     document.getElementById("sendComment").disabled = !isCommented;
     document.getElementById("comment").disabled = !isCommented;
+}
+
+function setUserReaction(reactType) {
+    // reset
+    $(`#react-form input`).prop('checked', false)
+    // load again
+    if (reactType != null) {
+        $(`#${reactType}`).prop('checked', true);
+    }
 }
 
 function userInteractIdea(ideaId) {
@@ -38,24 +48,13 @@ function userInteractIdea(ideaId) {
         $('#countview').html(res.numView);
     });
 
-    connection.on("ReactIdeaResponse", (res) => {
-        // reset
-        console.log(res);
+    connection.on("ResponseUserIdeaReaction", (res) => {
+        //console.log(res);
+
+        reactType = res.react;
+
         if (res.ideaId == ideaId) {
-            $(`#react-Model input`).prop('checked', false)
-            var status = $(`#react-Model span`);
-            var unchecked = $(`#react-Model input`);
-
-            for (var i = 0; i < status.length; i++) {
-                status[i].innerText = unchecked[i].getAttribute('data-unchecked');
-            }
-
-            // load again
-            if (res.react != null) {
-                $(`#${res.react}`).prop('checked', true);
-                var checkedstatus = $(`#${res.react}`).data('checked');
-                $(`label[for=${res.react}] span`).text(checkedstatus);
-            }
+            setUserReaction(res.react);
         }
     });
 
@@ -95,13 +94,11 @@ function userInteractIdea(ideaId) {
         console.log(er);
     });
 
-    $('#react-Model input').click(function (event) {
-        console.log(event.target.id);
+    $('#react-form input').click(function (event) {
+        //console.log(event.target.id);
 
         var isChecked = event.target.checked;
-
-        $('#react-Model input').prop('checked', false);
-
+        $('#react-form input').prop('checked', false);
         event.target.checked = isChecked;
 
         if (isChecked) {

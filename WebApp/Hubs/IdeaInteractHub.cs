@@ -22,17 +22,84 @@ namespace WebApp.Hubs
             this.logger = logger;
         }
 
+        public async Task RegisterIdeaStatus(int ideaId)
+        {
+            var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
+            // Register User to group following idea status
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"{idea.Id}");
+
+            var user = await userManager.GetUserAsync(Context.User);
+            var react = await dbContext.React
+                .FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
+
+            var response = new IdeaReactReponse()
+            {
+                IdeaId = ideaId,
+            };
+
+            if (react != null)
+            {
+                response.React = react.Type.ToString();
+            }
+            else
+            {
+                // add react with null type to count num view
+                dbContext.React.Add(new React()
+                {
+                    UserId = user.Id,
+                    IdeaId = ideaId,
+                    Type = ReactType.Null
+                });
+
+                idea.NumView++;
+                dbContext.Idea.Attach(idea);
+
+                await dbContext.SaveChangesAsync();
+            }
+            
+            if (Context.User.IsInRole(Role.Staff))
+                await ReponseIdeaStatus(idea);
+            else
+                await ReponseIdeaStatus(idea, isCommented: false, isReacted: false);
+
+            await Clients.User(user.Id).SendAsync("ResponseUserIdeaReaction", response);
+        }
+
+        private async Task ReponseIdeaStatus(Idea idea, bool? isCommented = null, bool? isReacted = null)
+        {
+            idea.Category = await dbContext.Category.FirstAsync(c => c.Id == idea.CategoryId);
+
+            var ideaStatus = new IdeaStatus()
+            {
+                IdeaId = idea.Id,
+                ThumbUp = idea.ThumbUp,
+                ThumbDown = idea.ThumbDown,
+                NumComment = idea.NumComment,
+                NumView = idea.NumView,
+                IsCommented = idea.Category!.FinalDueDate == null || DateTime.Now <= idea.Category!.FinalDueDate,
+                IsReacted = true
+            };
+
+            if (isCommented != null)
+                ideaStatus.IsCommented = isCommented.Value;
+
+            if (isReacted != null)
+                ideaStatus.IsReacted = isReacted.Value;
+
+            await Clients.Groups($"{idea.Id}").SendAsync("IdeaStatus", ideaStatus);
+        }
+
         [Authorize(Roles = Role.Staff)]
         public async Task ReactIdea(IdeaReactRequest request)
         {
             if (request.Type == null || request.IdeaId == null)
                 throw new HubException("Request type cannot be null");
 
-            Idea idea = await dbContext.Idea.FirstAsync(i => i.Id == request.IdeaId);
+            var idea = await dbContext.Idea.FirstAsync(i => i.Id == request.IdeaId);
 
-            ApplicationUser? user = await userManager.GetUserAsync(Context.User);
+            var user = await userManager.GetUserAsync(Context.User);
 
-            React? react = await dbContext.React
+            var react = await dbContext.React
                 .FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == request.IdeaId);
 
             try
@@ -71,104 +138,8 @@ namespace WebApp.Hubs
                 React = request.NewReact
             };
 
-            await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
-            await ReponseIdeaStatus(idea.Id);
-        }
-
-        //private async Task CommentIdea(IdeaCommentRequest request)
-        //{
-
-        //    if (request.IdeaId == null || string.IsNullOrWhiteSpace(request.Content))
-        //        throw new HubException("Request agruments cannot be null");
-
-        //    var user = await userManager.GetUserAsync(Context.User);
-
-        //    if (user == null)
-        //        throw new HubException("Refresh page pls");
-
-        //    var idea = await dbContext.Idea.FirstAsync(i => i.Id == request.IdeaId);
-
-        //    var comment = new Comment()
-        //    {
-        //        UserId = user.Id,
-        //        IdeaId = request.IdeaId,
-        //        Content = request.Content,
-        //    };
-
-        //    await dbContext.Comment.AddAsync(comment);
-        //    idea.NumComment++;
-        //    dbContext.Idea.Attach(idea);
-
-        //    var row = await dbContext.SaveChangesAsync();
-
-        //    logger.LogInformation(message: $"{row} affected");
-
-        //    var response = new IdeaCommentResponse()
-        //    {
-        //        IdeaId = idea.Id,
-        //        UserName = user.UserName,
-        //        CommentId = comment.Id,
-        //        Content = comment.Content
-        //    };
-
-        //    await Clients.Group(idea.Id.ToString()).SendAsync("ReceiveComment", response);
-
-        //    await ReponseIdeaStatus(idea.Id);
-        //}
-
-        public async Task RegisterIdeaStatus(int ideaId)
-        {
-            var idea = await dbContext.Idea.FirstAsync(i => i.Id == ideaId);
-
-            var user = await userManager.GetUserAsync(Context.User);
-
-            var react = await dbContext.React
-                .FirstOrDefaultAsync(r => r.UserId == user.Id && r.IdeaId == ideaId);
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, ideaId.ToString());
-
-            var response = new IdeaReactReponse()
-            {
-                IdeaId = ideaId,
-            };
-
-            if (react != null)
-            {
-                response.React = react.Type.ToString();
-            }
-            else
-            {
-                dbContext.React.Add(new React()
-                {
-                    UserId = user.Id,
-                    IdeaId = ideaId,
-                    Type = ReactType.Viewed
-                });
-                idea.NumView++;
-                dbContext.Idea.Attach(idea);
-                await dbContext.SaveChangesAsync();
-            }
-
-            await Clients.User(user.Id).SendAsync("ReactIdeaResponse", response);
-            await ReponseIdeaStatus(ideaId);
-        }
-
-        private async Task ReponseIdeaStatus(int ideaId)
-        {
-            var ideaStatus = await dbContext.Idea
-                .Include(i => i.Category)
-                .Select(i => new IdeaStatus()
-                {
-                    IdeaId = i.Id,
-                    ThumbUp = i.ThumbUp,
-                    ThumbDown = i.ThumbDown,
-                    NumComment = i.NumComment,
-                    NumView = i.NumView,
-                    IsCommented = i.Category!.FinalDueDate == null || DateTime.Now <= i.Category!.FinalDueDate,
-                    IsReacted = true
-                }).FirstAsync(i => i.IdeaId == ideaId);
-
-            await Clients.Groups(ideaId.ToString()).SendAsync("IdeaStatus", ideaStatus);
+            await ReponseIdeaStatus(idea);
+            await Clients.User(user.Id).SendAsync("ResponseUserIdeaReaction", response);
         }
 
         private async Task AddReact(Idea idea, IdeaReactRequest request)
@@ -214,7 +185,7 @@ namespace WebApp.Hubs
         {
             idea = CountOldReact(idea, react.Type);
 
-            react.Type = ReactType.Viewed;
+            react.Type = ReactType.Null;
 
             dbContext.React.Attach(react);
             dbContext.Idea.Attach(idea);
