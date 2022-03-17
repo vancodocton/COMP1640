@@ -54,25 +54,26 @@ namespace WebApp.Areas.Forum.Controllers
             var idea = await dbContext.Idea
                 .Include(i => i.User)
                 .Include(i => i.Category)
-                .Select(i => new Idea()
-                {
-                    Id = i.Id,
-                    NumComment = i.NumComment,
-                    Category = new Category()
-                    {
-                        Id = i.CategoryId,
-                        DueDate = i.Category!.DueDate,
-                        FinalDueDate = i.Category!.FinalDueDate,
-                    },
-                    ThumbUp = i.ThumbUp,
-                    ThumbDown = i.ThumbDown,
-                    NumView = i.NumView,
-                    User = new ApplicationUser()
-                    {
-                        EmailConfirmed = i.User!.EmailConfirmed,
-                        Email = i.User.Email
-                    },
-                })
+                //.Select(i => new Idea()
+                //{
+                //    Id = i.Id,
+                //    NumComment = i.NumComment,
+                //    CategoryId = i.CategoryId,
+                //    Category = new Category()
+                //    {
+                //        Id = i.CategoryId,
+                //        DueDate = i.Category!.DueDate,
+                //        FinalDueDate = i.Category!.FinalDueDate,
+                //    },
+                //    ThumbUp = i.ThumbUp,
+                //    ThumbDown = i.ThumbDown,
+                //    NumView = i.NumView,
+                //    User = new ApplicationUser()
+                //    {
+                //        EmailConfirmed = i.User!.EmailConfirmed,
+                //        Email = i.User.Email
+                //    },
+                //})
                 .FirstOrDefaultAsync(i => i.Id == request.IdeaId);
 
             if (idea == null || idea.Category == null)
@@ -92,7 +93,6 @@ namespace WebApp.Areas.Forum.Controllers
 
             await dbContext.Comment.AddAsync(comment);
             idea.NumComment++;
-            dbContext.Idea.Attach(idea);
 
             var row = await dbContext.SaveChangesAsync();
 
