@@ -58,6 +58,12 @@
                             </div>
                         </div>
                     </li>
+					<td>
+					<button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" 
+					data-bs-toggle="modal" data-bs-target="#confirmationModal">
+						<a class="fa-solid fa-trash" asp-controller="commentCoordinator" asp-action="Delete" asp-route-id="@cmt.Id">Remove this Comment </a>
+					</button>
+					</td>
                 }
         </ul>
     </div>
