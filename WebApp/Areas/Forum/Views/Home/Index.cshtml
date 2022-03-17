@@ -71,15 +71,8 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex justify-content-end">
-                    @if (User.Identity?.Name == idea.User?.UserName)
-                    {
-                        <button class="btn btn-sm btn-white fz-body text-danger rounded-3 px-2" data-bs-toggle="modal" data-bs-target="#confirmationModal">
-                            <i class="fa-solid fa-trash"></i> Remove your idea
-                        </button>
-                    }
-
                     <span class="px-2">
-                        <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.Email : "Anonymous user")
+                        <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
                     </span>
                     <span class="px-2">
                         <i class="fa-regular fa-comments"></i> @idea.NumComment
