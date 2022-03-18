@@ -140,5 +140,63 @@ namespace WebApp.Areas.Forum.Controllers
         {
             return Ok("Api worked.");
         }
+
+        [HttpDelete]
+        //[Authorize(Roles = $"{Role.Staff}, {Role.Coordinator}")]
+        [Authorize(Roles = $"{Role.Staff}")]
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return StatusCode(StatusCodes.Status404NotFound);
+
+            var cmt = await dbContext.Comment.Include(c => c.Idea).FirstOrDefaultAsync(i => i.Id == id);
+
+            if (cmt == null)
+                return StatusCode(StatusCodes.Status404NotFound);
+
+            var user = await userManager.GetUserAsync(User);
+
+            if (User.IsInRole(Role.Staff))
+            {
+                if (cmt.UserId == user.Id)
+                {
+                    cmt.Idea.NumComment--;
+
+                    var numCmt = cmt.Idea.NumComment;
+
+                    dbContext.Comment.Remove(cmt);
+
+                    await dbContext.SaveChangesAsync();
+
+                    return Ok(numCmt);
+                }
+                else
+                    return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
+            }
+            /*
+            if (User.IsInRole(Role.Coordinator))
+            {
+                var department = await dbContext.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+                if (cmt.User.DepartmentId == department.Id)
+                {
+                    cmt.Idea.NumComment--;
+
+                    var numCmt = cmt.Idea.NumComment;
+
+                    dbContext.Comment.Remove(cmt);
+
+                    await dbContext.SaveChangesAsync();
+
+                    return Ok(numCmt);
+                }
+                else
+                    return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
+            }
+            */
+            else
+                return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
+
+        }
     }
 }
