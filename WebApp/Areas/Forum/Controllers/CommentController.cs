@@ -14,7 +14,7 @@ using WebApp.Models.Responses;
 namespace WebApp.Areas.Forum.Controllers
 {
     [ApiController]
-    [Route("Forum/[controller]/[action]")]
+    [Route("Forum/{controller}/{action}/{id?}")]
     [Area("Forum")]
     [Authorize]
     public class CommentController : ControllerBase
@@ -100,7 +100,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             if (user.Id != idea.UserId)
             {
-                var ideaUrl = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
+                var ideaUrl = Url.ActionLink("Index", "Idea", new { id = idea.Id });
 
                 if (ideaUrl != null && idea.User!.EmailConfirmed)
                 {
@@ -135,9 +135,10 @@ namespace WebApp.Areas.Forum.Controllers
             return Ok(idea.Id);
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            return Ok();
+            return Ok("Api worked.");
         }
     }
 }
