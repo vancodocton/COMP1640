@@ -149,6 +149,9 @@ namespace WebApp.Areas.Forum.Controllers
                 }).Where(i => i.IdeaId == model.Id)
                 .ToListAsync();
 
+            var user = await userManager.GetUserAsync(User);
+            ViewData["UserId"] = user.Id;
+
             return View(model);
         }
 

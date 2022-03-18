@@ -1,6 +1,7 @@
 ﻿var isReacted = true;
 var isCommented = true;
 var reactType = null;
+var userName = null;
 
 function disableInteract() {
     document.getElementById("ThumbUp").disabled = true;
@@ -59,21 +60,47 @@ function userInteractIdea(ideaId) {
     });
 
     connection.on("ReceiveComment", (res) => {
-        var cmt =
-            `
-            <li class="card mb-1">
-                <div class="card-body bg-light">
-                    <p>${res.content}</p>
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex flex-row align-items-center">
-                                <span class="fst-italic">Written by &nbsp;</span>
-                                <i class="fa-solid fa-user"></i>
-                                <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
+
+        console.log(res);
+        var cmt;
+        if (userName != res.userName) {
+            cmt =
+                `
+                <li class="card mb-1">
+                    <div class="card-body bg-light">
+                        <p>${res.content}</p>
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex flex-row align-items-center">
+                                    <span class="fst-italic">Written by &nbsp;</span>
+                                    <i class="fa-solid fa-user"></i>
+                                    <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
+                                </div>
                             </div>
-                        </div>
-                </div>
-             </li>
-            `;
+                    </div>
+                 </li>
+                `;
+        }
+        else {
+            cmt =
+                `
+                <li id="cmt-${res.commentId}" class="card mb-1">
+                    <div class="card-body bg-light">
+                        <p>${res.content}</p>
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex flex-row align-items-center">
+                                    <span class="fst-italic">Written by &nbsp;</span>
+                                    <i class="fa-solid fa-user"></i>
+                                    <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
+                                    <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
+                                        onclick="deleteComment(${res.commentId})">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                    </div>
+                 </li>
+                `;
+        }
 
         $('#commentsList').append(cmt);
     });
@@ -148,4 +175,20 @@ function userInteractIdea(ideaId) {
 
         event.preventDefault();
     });
+}
+
+function deleteComment(cmtId) {
+    //console.log("clicked delete btn");
+
+    fetch(`/Forum/Comment/Delete/${cmtId}`, {
+        method: 'DELETE'
+    }).then((res) => {
+        //console.log(res);
+        if (res.ok) {
+            $(`#cmt-${cmtId}`).remove();
+        }
+        return res.text();
+    }).then((data) => {
+        $('#countcomment').html(data)
+    })
 }

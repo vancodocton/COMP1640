@@ -73,13 +73,20 @@
             }
             else foreach (var cmt in Model.Comments)
                 {
-                    <li class="card mb-1">
+                    <li id="cmt-@cmt.Id" class="card mb-1">
                         <div class="card-body bg-light">
                             <p>"@cmt.Content"</p>
                             <div class="d-flex justify-content-between">
                                 <div class="d-flex flex-row align-items-center">
                                     <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
                                     <p class="small mb-0 ms-2"><b>@(cmt.User?.UserName ?? "Deleted_User")</b></p>
+                                    @if (cmt.UserId == (string?)ViewData["UserId"])
+                                    {
+                                        <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
+                                    onclick="deleteComment(@cmt.Id)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -93,8 +100,8 @@
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/staff_idea_interact.js"></script>
 <script type="text/javascript">
-
+    userName = "@Html.Raw(User.Identity?.Name!)";
     const ideaId = @Model.Id;
-    userInteractIdea(ideaId);
+    userInteractIdea(ideaId);    
 </script>
 }
