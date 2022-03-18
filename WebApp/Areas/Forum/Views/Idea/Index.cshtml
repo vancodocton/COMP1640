@@ -9,6 +9,9 @@
 <a asp-controller="Home" asp-action="Index" class="btn btn-success mb-2">Home</a>
 
 <div class="card mb-3" id="idea-@Model.Id">
+    <div class="card-header">
+        Category: @Model.Category.Name (Due date: @(Model.Category.DueDate); Final due date: @(Model.Category.FinalDueDate))
+    </div>
     <div class="card-body">
         <h5 class="card-title">
             @Html.DisplayFor(modelItem => Model.Title)
@@ -37,7 +40,7 @@
 
             <div class="col-sm d-inline-flex justify-content-end align-items-center">
                 <div class="px-2">
-                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.Email : "Anonymous user")
+                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.UserName : "Anonymous user")
                 </div>
 
                 <div class="px-2">
@@ -89,7 +92,8 @@
 @section Scripts{
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/staff_idea_interact.js"></script>
-<script type="text/javascript">  
+<script type="text/javascript">
+
     const ideaId = @Model.Id;
     userInteractIdea(ideaId);
 </script>

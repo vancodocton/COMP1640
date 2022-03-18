@@ -114,12 +114,40 @@ namespace WebApp.Areas.Forum.Controllers
             if (id == null) return BadRequest();
 
             var model = await context.Idea
-                .Include(i => i.Comments).ThenInclude(c => c.User)
                 .Include(i => i.Category)
                 .Include(i => i.User)
-                .FirstOrDefaultAsync(i => i.Id == id);
+                .Select(i => new Idea()
+                {
+                    Id = i.Id,
+                    UserId = i.UserId,
+                    Title = i.Title,
+                    Content = i.Content,
+                    ThumbUp = i.ThumbUp,
+                    ThumbDown = i.ThumbDown,
+                    Category = i.Category,
+                    User = new ApplicationUser()
+                    {
+                        Id = i.UserId,
+                        UserName = i.User!.UserName,
+                    }
+                }).FirstOrDefaultAsync(i => i.Id == id);
 
             if (model == null) return BadRequest();
+
+            model.Comments = await context.Comment
+                .Include(c => c.User)
+                .Select(c => new Comment()
+                {
+                    Id = c.Id,
+                    UserId = c.UserId,
+                    User = new ApplicationUser()
+                    {
+                        UserName = c.User!.UserName,
+                    },
+                    IdeaId = c.IdeaId,
+                    Content = c.Content,
+                }).Where(i => i.IdeaId == model.Id)
+                .ToListAsync();
 
             return View(model);
         }
