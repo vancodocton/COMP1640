@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
+using WebApp.Models.Requests;
+using WebApp.Models.Responses;
 
 namespace WebApp.Hubs
 {
@@ -15,7 +17,10 @@ namespace WebApp.Hubs
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ILogger<IdeaInteractHub> logger;
 
-        public IdeaInteractHub(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, ILogger<IdeaInteractHub> logger)
+        public IdeaInteractHub(
+            ApplicationDbContext dbContext,
+            UserManager<ApplicationUser> userManager,
+            ILogger<IdeaInteractHub> logger)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
@@ -56,7 +61,7 @@ namespace WebApp.Hubs
 
                 await dbContext.SaveChangesAsync();
             }
-            
+
             if (Context.User.IsInRole(Role.Staff))
                 await ReponseIdeaStatus(idea);
             else
@@ -76,7 +81,7 @@ namespace WebApp.Hubs
                 ThumbDown = idea.ThumbDown,
                 NumComment = idea.NumComment,
                 NumView = idea.NumView,
-                IsCommented = idea.Category!.FinalDueDate == null || DateTime.Now <= idea.Category!.FinalDueDate,
+                IsCommented = idea.Category.FinalDueDate == null || DateTime.Now <= idea.Category.FinalDueDate,
                 IsReacted = true
             };
 

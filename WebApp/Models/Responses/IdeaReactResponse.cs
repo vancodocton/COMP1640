@@ -1,4 +1,4 @@
-﻿namespace WebApp.Hubs
+﻿namespace WebApp.Models.Responses
 {
     public class IdeaReactReponse
     {

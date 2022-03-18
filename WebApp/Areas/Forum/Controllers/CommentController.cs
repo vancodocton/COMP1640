@@ -8,6 +8,8 @@ using System.Text.Encodings.Web;
 using WebApp.Data;
 using WebApp.Hubs;
 using WebApp.Models;
+using WebApp.Models.Requests;
+using WebApp.Models.Responses;
 
 namespace WebApp.Areas.Forum.Controllers
 {
