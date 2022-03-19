@@ -1,4 +1,5 @@
-﻿@model WebApp.ViewModels.ForumViewModel
+﻿@using WebApp.Data
+@model WebApp.ViewModels.ForumViewModel
 
 @{
     ViewData["Title"] = "Forum";
@@ -72,9 +73,17 @@
             <div class="card-footer">
                 <div class="d-flex justify-content-end">
 
-                    <a asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id" class="btn btn-sm btn-white text-danger rounded-3 px-2">
-                        <i class="fa-solid fa-trash"></i>
-                    </a>
+                    @if (User.IsInRole(Role.Coordinator))
+                    {
+                        @if (idea.User.DepartmentId == (int) ViewData["UserDepartmentId"])
+                        {
+                            <a asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id"
+                            class="btn btn-sm btn-white text-danger rounded-3 px-2">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        }
+                    }
+
 
                     <span class="px-2">
                         <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")

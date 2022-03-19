@@ -76,6 +76,11 @@ namespace WebApp.Areas.Forum.Controllers
             model.Sort = sort ?? "";
             model.CategoryId = cid;
 
+            var user = await userManager.GetUserAsync(User);
+            var department = await context.Department
+                .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+            ViewData["UserDepartmentId"] = department?.Id  ;
+
             return View(model);
         }
     }
