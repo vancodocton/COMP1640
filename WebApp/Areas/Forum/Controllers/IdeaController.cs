@@ -208,7 +208,10 @@ namespace WebApp.Areas.Forum.Controllers
                 await context.SaveChangesAsync();
             }
             else
-                return Unauthorized();
+            {
+                ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
+                return View("Delete", idea);
+            }    
             //var idea = await context.Idea.FindAsync(id);
 
             return RedirectToAction(nameof(Index), "Home");
