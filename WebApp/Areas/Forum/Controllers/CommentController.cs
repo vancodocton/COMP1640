@@ -142,15 +142,16 @@ namespace WebApp.Areas.Forum.Controllers
         }
 
         [HttpDelete]
-        //[Authorize(Roles = $"{Role.Staff}, {Role.Coordinator}")]
-        [Authorize(Roles = $"{Role.Staff}")]
+        [Authorize(Roles = $"{Role.Staff},{Role.Coordinator}")]
 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-                return StatusCode(StatusCodes.Status404NotFound);
+                return StatusCode(StatusCodes.Status400BadRequest);
 
-            var cmt = await dbContext.Comment.Include(c => c.Idea).FirstOrDefaultAsync(i => i.Id == id);
+            var cmt = await dbContext.Comment
+                .Include(c => c.Idea)
+                .SingleOrDefaultAsync(i => i.Id == id);
 
             if (cmt == null)
                 return StatusCode(StatusCodes.Status404NotFound);
@@ -174,10 +175,14 @@ namespace WebApp.Areas.Forum.Controllers
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
             }
-            /*
-            if (User.IsInRole(Role.Coordinator))
+
+            else if (User.IsInRole(Role.Coordinator))
             {
-                var department = await dbContext.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+                var department = await dbContext.Department
+                    .SingleAsync(d => d.Id == user.DepartmentId);
+
+                cmt.User = await userManager.FindByIdAsync(cmt.UserId);
+
                 if (cmt.User.DepartmentId == department.Id)
                 {
                     cmt.Idea.NumComment--;
@@ -192,8 +197,9 @@ namespace WebApp.Areas.Forum.Controllers
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
+
+
             }
-            */
             else
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
 

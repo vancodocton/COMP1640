@@ -25,9 +25,15 @@ namespace WebApp.Controllers
             {
                 return RedirectToAction("Index", "Home", new { area = "Admin" });
             }
+
+            if(User.IsInRole(Role.Manager))
+            {
+                return RedirectToAction("Index", "Categories", new { area = "Forum" });
+            }
+
             if (User.IsInRole(Role.Coordinator))
             {
-                return RedirectToAction("Index", "Home", new { area = "Coordinator" });
+                return RedirectToAction("Index", "Home", new { area = "Forum" });
             }
 
             return View();
