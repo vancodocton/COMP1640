@@ -119,6 +119,30 @@ function userInteractIdea(ideaId) {
         $('#commentsList').append(cmt);
     });
 
+    connection.on("RevokeSentComment", (res) => {
+        //console.log(res);
+        var revokedCmtId = res.commentId;
+        var revokerUserName = res.revokerUserName;
+        var ownerUsername = res.commentOwnerUserName;
+
+        var cmtBody = $(`#cmt-${revokedCmtId} .card-body`)[0];
+        if (cmtBody != undefined) {
+            if (revokerUserName == ownerUsername)
+                if (ownerUsername == userName)
+                    cmtBody.innerHTML = `Your comment is revoked by yourself.`;
+                else
+                    cmtBody.innerHTML = `<i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> revoked this own comment`;
+            else
+                if (ownerUsername == userName)
+                    cmtBody.innerHTML = `Your comment is revoked by <i class="fa-solid fa-user"></i> <b>${revokerUserName}</b>`;
+                else
+                    if (revokerUserName == userName)
+                        cmtBody.innerHTML = `This comment of <i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> is revoked by yourself`;
+                    else
+                        cmtBody.innerHTML = `This comment of <i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> is revoked by <i class="fa-solid fa-user"></i> <b>${revokerUserName}</b>`;
+        }
+    });
+
     async function start() {
         try {
             await connection.start();
@@ -197,8 +221,10 @@ function deleteComment(cmtId) {
     }).then((res) => {
         //console.log(res);
         if (res.ok) {
-            $(`#cmt-${cmtId}`).remove();
-            $('#countcomment').html(res.text());
+            //$(`#cmt-${cmtId}`).remove();
+            res.text().then(txt => {
+                $('#countcomment').html(txt);
+            });
         }
         return res;
     }).catch(er => {

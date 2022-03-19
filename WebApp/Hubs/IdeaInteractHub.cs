@@ -16,6 +16,8 @@ namespace WebApp.Hubs
 
         Task ReceiveComment(IdeaComment comment);
 
+        Task RevokeSentComment(RevokeSentIdeaResponse response);
+
         Task ReceiveReaction(IdeaReaction reaction);
     }
 

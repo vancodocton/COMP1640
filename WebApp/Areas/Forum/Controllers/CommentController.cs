@@ -160,15 +160,8 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 if (cmt.UserId == user.Id)
                 {
-                    cmt.Idea.NumComment--;
-
-                    var numCmt = cmt.Idea.NumComment;
-
-                    dbContext.Comment.Remove(cmt);
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Ok(numCmt);
+                    var deletedCmtId = await DeleteConfirmed(cmt);
+                    return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
@@ -183,15 +176,8 @@ namespace WebApp.Areas.Forum.Controllers
 
                 if (cmt.User.DepartmentId == department.Id)
                 {
-                    cmt.Idea.NumComment--;
-
-                    var numCmt = cmt.Idea.NumComment;
-
-                    dbContext.Comment.Remove(cmt);
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Ok(numCmt);
+                    var deletedCmtId = await DeleteConfirmed(cmt);
+                    return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
@@ -201,6 +187,26 @@ namespace WebApp.Areas.Forum.Controllers
             else
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
 
+        }
+
+        private async Task<int> DeleteConfirmed(Comment cmt)
+        {
+            cmt.Idea.NumComment--;
+
+            var numCmt = cmt.Idea.NumComment;
+
+            dbContext.Comment.Remove(cmt);
+
+            await dbContext.SaveChangesAsync();
+
+            await hubContext.Clients.Group($"{cmt.Idea.Id}").RevokeSentComment(new RevokeSentIdeaResponse()
+            {
+                CommentId = cmt.Id,
+                CommentOwnerUserName = cmt.User.UserName,
+                RevokerUserName = User.Identity.Name,
+            });
+
+            return cmt.Idea.NumComment;
         }
     }
 }
