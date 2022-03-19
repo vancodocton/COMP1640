@@ -4,7 +4,7 @@ var isReacted = true;
 var isCommented = true;
 var reactType = null;
 var userName = null;
-var a = null;
+
 function disableInteract() {
     document.getElementById("ThumbUp").disabled = true;
     document.getElementById("ThumbDown").disabled = true;
@@ -156,35 +156,40 @@ function userInteractIdea(ideaId) {
             });
         }
 
-        $(`label[for=${event.target.id}] span`).html('Loading...');
-    });
-
-    $('#comment-form').submit(function (event) {
-        var comment = $('#comment').val();
-
-        var comment = {
-            ideaId: ideaId,
-            content: comment
-        }
-        fetch("/Forum/Comment/Add", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(comment)
-        }).then(res => {
-            if (res.ok) {
-                res.text().then(txt => console.log(`Added cmt ${txt}`));
-                $('#comment-form')[0].reset();
-            }
-            return res;
-        }).catch((er) => {
-            console.log(er);
-        });
-
-        event.preventDefault();
+        var spinner = `
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>`;
+        $(`label[for=${event.target.id}] span`).html(spinner);
     });
 }
+
+$('#comment-form').submit(function (event) {
+    var comment = $('#comment').val();
+    document.getElementById("sendComment").disabled = true;
+    var comment = {
+        ideaId: ideaId,
+        content: comment
+    }
+    fetch("/Forum/Comment/Add", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(comment)
+    }).then(res => {
+        if (res.ok) {
+            res.text().then(txt => console.log(`Added cmt ${txt}`));
+            $('#comment-form')[0].reset();
+            document.getElementById("sendComment").disabled = false;
+        }
+        return res;
+    }).catch((er) => {
+        console.log(er);
+    });
+
+    event.preventDefault();
+});
 
 function deleteComment(cmtId) {
     fetch(`/Forum/Comment/Delete/${cmtId}`, {

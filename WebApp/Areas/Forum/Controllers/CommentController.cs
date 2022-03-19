@@ -113,7 +113,8 @@ namespace WebApp.Areas.Forum.Controllers
                 IdeaId = idea.Id,
                 UserName = user.UserName,
                 CommentId = comment.Id,
-                Content = comment.Content
+                Content = comment.Content,
+                DepartmentId = user.DepartmentId
             };
 
             await hubContext.Clients.Groups($"{idea.Id}").ReceiveComment(response);

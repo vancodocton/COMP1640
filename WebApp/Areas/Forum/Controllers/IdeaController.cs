@@ -125,6 +125,7 @@ namespace WebApp.Areas.Forum.Controllers
                     ThumbUp = i.ThumbUp,
                     ThumbDown = i.ThumbDown,
                     Category = i.Category,
+                    IsIncognito = i.IsIncognito,
                     User = new ApplicationUser()
                     {
                         Id = i.UserId,
@@ -143,6 +144,7 @@ namespace WebApp.Areas.Forum.Controllers
                     User = new ApplicationUser()
                     {
                         UserName = c.User!.UserName,
+                        DepartmentId = c.User!.DepartmentId
                     },
                     IdeaId = c.IdeaId,
                     Content = c.Content,
