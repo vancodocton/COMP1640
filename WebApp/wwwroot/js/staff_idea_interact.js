@@ -54,7 +54,7 @@ function userInteractIdea(ideaId) {
         isReacted = per.isReacted;
         isCommented = per.isCommented;
 
-        enableInteract(isCommented, isReacted);
+        enableInteract(isReacted, isCommented);
     });
 
     connection.on("ReceiveInteractionStatus", (res) => {

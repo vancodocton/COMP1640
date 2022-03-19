@@ -158,7 +158,7 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 var department = await context.Department
                     .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
-                ViewData["UserDepartmentId"] = department.Id;
+                ViewData["UserDepartmentId"] = department?.Id;
             }
             
             return View(model);

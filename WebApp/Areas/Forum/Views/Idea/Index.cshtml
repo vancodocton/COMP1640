@@ -85,7 +85,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     }
-                                    else if (User.IsInRole(WebApp.Data.Role.Coordinator) && cmt.User.DepartmentId == (int) ViewData["UserDepartmentId"])
+                                    else if (User.IsInRole(WebApp.Data.Role.Coordinator) && cmt.User.DepartmentId == (int)(ViewData["UserDepartmentId"] ?? 0))
                                     {
                                         <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
                                     onclick="deleteComment(@cmt.Id)">
