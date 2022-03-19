@@ -90,46 +90,54 @@ namespace WebApp.Areas.Forum.Controllers
                 return NotFound();
             }
 
+
             var category = await _context.Category.FindAsync(id);
+
 
             if (category == null)
             {
                 return NotFound();
             }
-            return View(category);
+            var model = new CategoryViewModel()
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                DueDate = category.DueDate,
+                FinalDueDate = category.FinalDueDate
+            };
+            return View(model);
         }
 
         // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Category category)
+        public async Task<IActionResult> Edit(CategoryViewModel model)
         {
-            if (id != category.Id)
-            {
-                return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
+                if (model.DueDate > model.FinalDueDate)
+                    ModelState.AddModelError("FinalDueDate", "The final due Date cannot be earlier than the due date.");
+                else
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoryExists(category.Id))
+                    var category = await _context.Category.FindAsync(model.Id);
+                    if (category == null)
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                    category.Name = model.Name;
+                    category.Description = model.Description;
+                    category.DueDate = model.DueDate;
+                    category.FinalDueDate = model.FinalDueDate;
+
+                    _context.Category.Attach(category);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+
+                }                   
             }
-            return View(category);
+            return View(model);
         }
 
         // GET: Categories/Delete/5

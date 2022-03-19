@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<WebApp.Models.Category>
 
+
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Index Page</h1>
@@ -12,12 +12,17 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FinalDueDate)
             </th>
             <th></th>
         </tr>
@@ -30,6 +35,12 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FinalDueDate)
             </td>
             <td>
                 <a class="btn btn-outline-warning btn-sm text-black text-decoration-none" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
