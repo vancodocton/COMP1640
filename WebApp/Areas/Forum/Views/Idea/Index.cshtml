@@ -87,6 +87,13 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     }
+                                    @if (cmt.User.DepartmentId == (int)ViewData["UserDepartmentId"])
+                                    {
+                                        <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
+                                    onclick="deleteComment(@cmt.Id)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -102,6 +109,6 @@
 <script type="text/javascript">
     userName = "@Html.Raw(User.Identity?.Name!)";
     const ideaId = @Model.Id;
-    userInteractIdea(ideaId);    
+    userInteractIdea(ideaId);
 </script>
 }

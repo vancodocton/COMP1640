@@ -150,19 +150,27 @@ namespace WebApp.Areas.Forum.Controllers
                 .ToListAsync();
 
             var user = await userManager.GetUserAsync(User);
-            ViewData["UserId"] = user.Id;
-
+            { 
+                ViewData["UserId"] = user.Id;
+            }
+            {
+                var department = await context.Department
+                    .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+                ViewData["UserDepartmentId"] = department.Id;
+            }
+            
             return View(model);
         }
 
+
         [HttpGet]
-        private async Task<IActionResult> Delete(int? id)
+        [Authorize(Roles = Role.Coordinator)]
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
             var idea = await context.Idea
                 .Include(i => i.Category)
                 .Include(i => i.User)
@@ -175,15 +183,31 @@ namespace WebApp.Areas.Forum.Controllers
             return View(idea);
         }
 
-
         [HttpPost, ActionName("Delete")]
         [Authorize(Roles = Role.Coordinator)]
         [ValidateAntiForgeryToken]
-        private async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var idea = await context.Idea.FindAsync(id);
-            context.Idea.Remove(idea);
-            await context.SaveChangesAsync();
+
+            var user = await userManager.GetUserAsync(User);
+
+            var department = await context.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+
+            var idea = await context.Idea.Include(i => i.User).SingleOrDefaultAsync(i => i.Id == id);
+
+            if (idea == null)
+            {
+                return RedirectToAction(nameof(Index), "Home");
+            }
+
+            if (idea.User.DepartmentId == department.Id)
+            {
+                context.Idea.Remove(idea);
+                await context.SaveChangesAsync();
+            }
+            else
+                return Unauthorized();
+            //var idea = await context.Idea.FindAsync(id);
 
             return RedirectToAction(nameof(Index), "Home");
         }

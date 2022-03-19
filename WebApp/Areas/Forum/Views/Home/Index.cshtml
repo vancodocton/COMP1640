@@ -71,6 +71,11 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex justify-content-end">
+
+                    <a asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id" class="btn btn-sm btn-white text-danger rounded-3 px-2">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+
                     <span class="px-2">
                         <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
                     </span>
@@ -94,7 +99,7 @@
                         foreach (var cmt in idea.Comments)
                         {
                             <div class="#">
-                                <b>"@cmt.Content" </b> by 
+                                <b>"@cmt.Content" </b> by
                                 <b>@(cmt.User?.UserName ?? "Deleted_User")</b>
                             </div>
                         }
