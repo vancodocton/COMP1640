@@ -1,6 +1,6 @@
-﻿namespace WebApp.Hubs
+﻿namespace WebApp.Models.Hubs
 {
-    public class IdeaStatus
+    public class IdeaIntereactionStatus
     {
         public int? IdeaId { get; set; }
 
@@ -11,9 +11,5 @@
         public int? NumComment { get; set; }
 
         public int? NumView { get; set; }
-
-        public bool IsCommented { get; set; }
-
-        public bool IsReacted { get; set; }
     }
 }

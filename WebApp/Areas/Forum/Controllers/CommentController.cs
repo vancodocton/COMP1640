@@ -8,8 +8,7 @@ using System.Text.Encodings.Web;
 using WebApp.Data;
 using WebApp.Hubs;
 using WebApp.Models;
-using WebApp.Models.Requests;
-using WebApp.Models.Responses;
+using WebApp.Models.Hubs;
 
 namespace WebApp.Areas.Forum.Controllers
 {
@@ -23,13 +22,13 @@ namespace WebApp.Areas.Forum.Controllers
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IEmailSender sender;
-        private readonly IHubContext<IdeaInteractHub> hubContext;
+        private readonly IHubContext<IdeaInteractHub, IIdeaInteractClient> hubContext;
 
         public CommentController(
             ApplicationDbContext dbContext,
             UserManager<ApplicationUser> userManager,
             IEmailSender sender,
-            IHubContext<IdeaInteractHub> hubContext
+            IHubContext<IdeaInteractHub, IIdeaInteractClient> hubContext
             )
         {
             this.dbContext = dbContext;
@@ -40,12 +39,12 @@ namespace WebApp.Areas.Forum.Controllers
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add([FromBody] IdeaCommentRequest request)
+        public async Task<IActionResult> Add(Comment request)
         {
             if (!User.IsInRole(Role.Staff))
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff can comment idea.");
 
-            if (request.IdeaId == null)
+            if (request.IdeaId == 0)
                 return StatusCode(StatusCodes.Status400BadRequest, "IdeaId cannot be null.");
 
             if (string.IsNullOrWhiteSpace(request.Content))
@@ -76,7 +75,7 @@ namespace WebApp.Areas.Forum.Controllers
                 //        Email = i.User.Email
                 //    },
                 //})
-                .FirstOrDefaultAsync(i => i.Id == request.IdeaId);
+                .SingleOrDefaultAsync(i => i.Id == request.IdeaId);
 
             if (idea == null || idea.Category == null)
             {
@@ -88,7 +87,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var comment = new Comment()
             {
-                IdeaId = request.IdeaId.Value,
+                IdeaId = request.IdeaId,
                 UserId = user.Id,
                 Content = request.Content,
             };
@@ -109,30 +108,29 @@ namespace WebApp.Areas.Forum.Controllers
                 }
             }
 
-            var responseComment = new IdeaCommentResponse()
+            var response = new IdeaComment()
             {
                 IdeaId = idea.Id,
                 UserName = user.UserName,
                 CommentId = comment.Id,
-                Content = comment.Content
+                Content = comment.Content,
+                DepartmentId = user.DepartmentId
             };
 
-            await hubContext.Clients.Group($"{idea.Id}").SendAsync("ReceiveComment", responseComment);
+            await hubContext.Clients.Groups($"{idea.Id}").ReceiveComment(response);
 
-            var responseStatus = new IdeaStatus()
+            var responseStatus = new IdeaIntereactionStatus()
             {
                 IdeaId = idea.Id,
                 ThumbUp = idea.ThumbUp,
                 ThumbDown = idea.ThumbDown,
                 NumView = idea.NumView,
-                NumComment = idea.NumComment,
-                IsCommented = idea.Category.FinalDueDate == null || DateTime.Now <= idea.Category.FinalDueDate,
-                IsReacted = true
+                NumComment = idea.NumComment
             };
 
-            await hubContext.Clients.Groups($"{idea.Id}").SendAsync("IdeaStatus", responseStatus);
+            await hubContext.Clients.Groups($"{idea.Id}").ReceiveInteractionStatus(responseStatus);
 
-            return Ok(idea.Id);
+            return Ok(comment.Id);
         }
 
         [HttpGet]
@@ -162,15 +160,8 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 if (cmt.UserId == user.Id)
                 {
-                    cmt.Idea.NumComment--;
-
-                    var numCmt = cmt.Idea.NumComment;
-
-                    dbContext.Comment.Remove(cmt);
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Ok(numCmt);
+                    var deletedCmtId = await DeleteConfirmed(cmt);
+                    return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
@@ -185,15 +176,8 @@ namespace WebApp.Areas.Forum.Controllers
 
                 if (cmt.User.DepartmentId == department.Id)
                 {
-                    cmt.Idea.NumComment--;
-
-                    var numCmt = cmt.Idea.NumComment;
-
-                    dbContext.Comment.Remove(cmt);
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Ok(numCmt);
+                    var deletedCmtId = await DeleteConfirmed(cmt);
+                    return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
@@ -203,6 +187,26 @@ namespace WebApp.Areas.Forum.Controllers
             else
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
 
+        }
+
+        private async Task<int> DeleteConfirmed(Comment cmt)
+        {
+            cmt.Idea.NumComment--;
+
+            var numCmt = cmt.Idea.NumComment;
+
+            dbContext.Comment.Remove(cmt);
+
+            await dbContext.SaveChangesAsync();
+
+            await hubContext.Clients.Group($"{cmt.Idea.Id}").RevokeSentComment(new RevokeSentIdeaResponse()
+            {
+                CommentId = cmt.Id,
+                CommentOwnerUserName = cmt.User.UserName,
+                RevokerUserName = User.Identity.Name,
+            });
+
+            return cmt.Idea.NumComment;
         }
     }
 }

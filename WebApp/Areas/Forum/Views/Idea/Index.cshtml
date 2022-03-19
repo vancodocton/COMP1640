@@ -2,8 +2,6 @@
 
 @{
     ViewData["Title"] = "Idea";
-    //Layout = "~/Views/Shared/_ForumLayout.cshtml";
-    string permission = User.IsInRole(WebApp.Data.Role.Staff) ? "true" : "false";
 }
 
 <a asp-controller="Home" asp-action="Index" class="btn btn-success mb-2">Home</a>
@@ -40,7 +38,7 @@
 
             <div class="col-sm d-inline-flex justify-content-end align-items-center">
                 <div class="px-2">
-                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.UserName : "Anonymous user")
+                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.UserName : "Anonymous user") @(User.Identity?.Name == Model.User?.UserName ? "(Me)" : "")
                 </div>
 
                 <div class="px-2">
@@ -80,14 +78,14 @@
                                 <div class="d-flex flex-row align-items-center">
                                     <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
                                     <p class="small mb-0 ms-2"><b>@(cmt.User?.UserName ?? "Deleted_User")</b></p>
-                                    @if (cmt.UserId == (string?)ViewData["UserId"])
+                                    @if (cmt.User!.UserName == User.Identity!.Name)
                                     {
                                         <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
                                     onclick="deleteComment(@cmt.Id)">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     }
-                                    @if (cmt.User.DepartmentId == (int)ViewData["UserDepartmentId"])
+                                    else if (User.IsInRole(WebApp.Data.Role.Coordinator) && cmt.User.DepartmentId == (int) ViewData["UserDepartmentId"])
                                     {
                                         <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
                                     onclick="deleteComment(@cmt.Id)">

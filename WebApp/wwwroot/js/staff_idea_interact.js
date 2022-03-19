@@ -1,4 +1,6 @@
-﻿var isReacted = true;
+﻿"use strict";
+
+var isReacted = true;
 var isCommented = true;
 var reactType = null;
 var userName = null;
@@ -10,7 +12,7 @@ function disableInteract() {
     document.getElementById("comment").disabled = true;
 }
 
-function enableInteract() {
+function enableInteract(isReacted, isCommented) {
     document.getElementById("ThumbUp").disabled = !isReacted;
     document.getElementById("ThumbDown").disabled = !isReacted;
     document.getElementById("sendComment").disabled = !isCommented;
@@ -26,42 +28,54 @@ function setUserReaction(reactType) {
     }
 }
 
+// disable button. enable it untils the connection is started.
+disableInteract();
+
 function userInteractIdea(ideaId) {
-
-    // disable button. enable it untils the connection is started.
-    disableInteract();
-
     var connection = new signalR
         .HubConnectionBuilder()
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
-        .withUrl("/ideaInteractHub")
+        .withUrl(`/ideaInteractHub?IdeaId=${ideaId}`)
         .build();
 
-    connection.on("IdeaStatus", (res) => {
-        isReacted = res.isReacted;
-        isCommented = res.isCommented;
-        console.log(res);
-        enableInteract();
+    connection.onclose((er) => {
+        disableInteract();
+    });
+
+    connection.onreconnecting((er) => {
+        disableInteract();
+    });
+
+    connection.on("ReceiveRegisteredConfirmation", function (per, reaction) {
+        //console.log(reaction);
+        //console.log(per);
+        setUserReaction(reaction.reactType);
+        isReacted = per.isReacted;
+        isCommented = per.isCommented;
+
+        enableInteract(isCommented, isReacted);
+    });
+
+    connection.on("ReceiveInteractionStatus", (res) => {
+        //console.log(res);
         $('#countthumbup').html(res.thumbUp);
         $('#countthumbdown').html(res.thumbDown);
         $('#countcomment').html(res.numComment);
         $('#countview').html(res.numView);
     });
 
-    connection.on("ResponseUserIdeaReaction", (res) => {
+    connection.on("ReceiveReaction", (res) => {
         //console.log(res);
+        reactType = res.reactType;
 
-        reactType = res.react;
-
-        if (res.ideaId == ideaId) {
-            setUserReaction(res.react);
+        if (res.userName == userName && res.ideaId == ideaId) {
+            setUserReaction(res.reactType);
         }
     });
 
     connection.on("ReceiveComment", (res) => {
-
-        console.log(res);
+        //console.log(res);
         var cmt;
         if (userName != res.userName) {
             cmt =
@@ -105,90 +119,115 @@ function userInteractIdea(ideaId) {
         $('#commentsList').append(cmt);
     });
 
-    connection.onreconnecting((er) => {
-        console.log(er);
-        disableInteract();
-    });
-    connection.onreconnected((er) => {
-        console.log(er);
-        enableInteract();
+    connection.on("RevokeSentComment", (res) => {
+        //console.log(res);
+        var revokedCmtId = res.commentId;
+        var revokerUserName = res.revokerUserName;
+        var ownerUsername = res.commentOwnerUserName;
+
+        var cmtBody = $(`#cmt-${revokedCmtId} .card-body`)[0];
+        if (cmtBody != undefined) {
+            if (revokerUserName == ownerUsername)
+                if (ownerUsername == userName)
+                    cmtBody.innerHTML = `Your comment is revoked by yourself.`;
+                else
+                    cmtBody.innerHTML = `<i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> revoked this own comment`;
+            else
+                if (ownerUsername == userName)
+                    cmtBody.innerHTML = `Your comment is revoked by <i class="fa-solid fa-user"></i> <b>${revokerUserName}</b>`;
+                else
+                    if (revokerUserName == userName)
+                        cmtBody.innerHTML = `This comment of <i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> is revoked by yourself`;
+                    else
+                        cmtBody.innerHTML = `This comment of <i class="fa-solid fa-user"></i> <b>${ownerUsername}</b> is revoked by <i class="fa-solid fa-user"></i> <b>${revokerUserName}</b>`;
+        }
     });
 
-    connection.start().then(function () {
-        enableInteract();
-        connection.invoke("RegisterIdeaStatus", ideaId);
-    }).catch(function (er) {
-        console.log(er);
-    });
+    async function start() {
+        try {
+            await connection.start();
+            console.assert(connection.state === signalR.HubConnectionState.Connected);
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.assert(connection.state === signalR.HubConnectionState.Disconnected);
+            console.log(err);
+            setTimeout(() => start(), 1000);
+        }
+    };
+
+    start();
 
     $('#react-form input').click(function (event) {
         //console.log(event.target.id);
 
         var isChecked = event.target.checked;
         $('#react-form input').prop('checked', false);
+
         event.target.checked = isChecked;
 
         if (isChecked) {
-            console.log('update')
-
+            //console.log('update reaction')
             connection.invoke("ReactIdea", {
                 ideaId: ideaId,
-                type: 'update',
-                newreact: event.target.id
+                reactType: event.target.id
             });
-
         }
         else {
-            console.log('delete')
+            //console.log('delete reaction')
             connection.invoke("ReactIdea", {
                 ideaId: ideaId,
-                type: 'delete',
+                reactType: null,
             });
         }
-        $(`label[for=${event.target.id}] span`).html('Loading...');
-    });
 
-    $('#comment-form').submit(function (event) {
-        var comment = $('#comment').val();
-
-        //$('#comment').val("");
-
-        var comment = {
-            ideaId: ideaId,
-            content: comment
-        }
-        fetch("/Forum/Comment/Add", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(comment)
-        }).then(response => {
-            return response.text();
-        }).then((data) => {
-            console.log(data);
-        }).catch((er) => {
-            console.log(er);
-        });
-
-        $('#comment-form')[0].reset();
-
-        event.preventDefault();
+        var spinner = `
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>`;
+        $(`label[for=${event.target.id}] span`).html(spinner);
     });
 }
 
-function deleteComment(cmtId) {
-    //console.log("clicked delete btn");
+$('#comment-form').submit(function (event) {
+    var comment = $('#comment').val();
+    document.getElementById("sendComment").disabled = true;
+    var comment = {
+        ideaId: ideaId,
+        content: comment
+    }
+    fetch("/Forum/Comment/Add", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(comment)
+    }).then(res => {
+        if (res.ok) {
+            res.text().then(txt => console.log(`Added cmt ${txt}`));
+            $('#comment-form')[0].reset();
+            document.getElementById("sendComment").disabled = false;
+        }
+        return res;
+    }).catch((er) => {
+        console.log(er);
+    });
 
+    event.preventDefault();
+});
+
+function deleteComment(cmtId) {
     fetch(`/Forum/Comment/Delete/${cmtId}`, {
         method: 'DELETE'
     }).then((res) => {
         //console.log(res);
         if (res.ok) {
-            $(`#cmt-${cmtId}`).remove();
+            //$(`#cmt-${cmtId}`).remove();
+            res.text().then(txt => {
+                $('#countcomment').html(txt);
+            });
         }
-        return res.text();
-    }).then((data) => {
-        $('#countcomment').html(data)
+        return res;
+    }).catch(er => {
+        console.log(er);
     })
 }
