@@ -8,7 +8,19 @@
 
 <div class="card mb-3" id="idea-@Model.Id">
     <div class="card-header">
-        Category: @Model.Category.Name (Due date: @(Model.Category.DueDate); Final due date: @(Model.Category.FinalDueDate))
+        <h5 class="card-title">
+            @Model.Category.Name
+        </h5>
+        <h6 class="card-subtitle">
+            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea">
+                Due date: @(Model.Category.DueDate.HasValue ? Model.Category.DueDate : "none")
+            </span>
+            |
+            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea's comment">
+                Final due date: @(Model.Category.FinalDueDate.HasValue ? Model.Category.FinalDueDate : "none")
+            </span>
+        </h6>
+        <p class="card-text pt-2">@(Model.Category.Description)</p>
     </div>
     <div class="card-body">
         <h5 class="card-title">

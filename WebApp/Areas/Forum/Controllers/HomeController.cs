@@ -38,7 +38,29 @@ namespace WebApp.Areas.Forum.Controllers
                     .OrderByDescending(i => i.Id)
                     .Take(2)
                     .OrderBy(i => i.Id))
-                .AsQueryable();
+                .ThenInclude(c => c.User)
+                .AsQueryable()
+                .Select(i => new Idea()
+                {
+                    Id = i.Id,
+                    UserId = i.UserId,
+                    User = new ApplicationUser()
+                    {
+                        Id = i.UserId,
+                        UserName = i.User.UserName,
+                        Email = i.User.Email
+                    },
+                    CategoryId = i.CategoryId,
+                    Category = i.Category,
+                    IsIncognito = i.IsIncognito,
+                    Title = i.Title,
+                    Content = i.Content,
+                    Comments = i.Comments,
+                    ThumbUp = i.ThumbUp,
+                    ThumbDown = i.ThumbDown,
+                    NumComment = i.NumComment,
+                    NumView = i.NumView,
+                });
 
             if (cid != null)
             {
@@ -79,7 +101,7 @@ namespace WebApp.Areas.Forum.Controllers
             var user = await userManager.GetUserAsync(User);
             var department = await context.Department
                 .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
-            ViewData["UserDepartmentId"] = department?.Id  ;
+            ViewData["UserDepartmentId"] = department?.Id;
 
             return View(model);
         }
