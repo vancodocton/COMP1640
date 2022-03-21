@@ -29,7 +29,7 @@ namespace WebApp.Areas.Forum.Controllers
             this.sender = sender;
         }
 
-        public async Task<ActionResult> Index(int? cid, string? sort, int page = 1)
+        public async Task<ActionResult> Index(int? cid, string? sort, int? dpmtId, int page = 1)
         {
             var ideas = context.Idea
                 .Include(x => x.Category)
@@ -48,7 +48,8 @@ namespace WebApp.Areas.Forum.Controllers
                     {
                         Id = i.UserId,
                         UserName = i.User.UserName,
-                        Email = i.User.Email
+                        Email = i.User.Email,
+                        DepartmentId = i.User.DepartmentId
                     },
                     CategoryId = i.CategoryId,
                     Category = i.Category,
@@ -60,7 +61,28 @@ namespace WebApp.Areas.Forum.Controllers
                     ThumbDown = i.ThumbDown,
                     NumComment = i.NumComment,
                     NumView = i.NumView,
-                });
+                }).Where(i => true).Where(i => true);
+
+            var user = await userManager.GetUserAsync(User);
+            var department = await context.Department
+                .FirstOrDefaultAsync(d => d.Id == user.DepartmentId);
+
+            ViewData["UserDepartmentId"] = department?.Id;
+
+            if (dpmtId != null)
+            {
+                if (User.IsInRole(Role.Coordinator) && dpmtId == department.Id)
+                {
+                    ideas = ideas.Where(i => i.User.DepartmentId == department.Id);
+                }
+                else if (User.IsInRole(Role.Manager))
+                {
+                    if (await context.Department.AnyAsync(i => i.Id == dpmtId))
+                        ideas = ideas.Where(i => i.User.DepartmentId == dpmtId);
+                    else return BadRequest();
+                }
+                else return Unauthorized();
+            }
 
             if (cid != null)
             {
@@ -97,11 +119,6 @@ namespace WebApp.Areas.Forum.Controllers
             model.Page = page;
             model.Sort = sort ?? "";
             model.CategoryId = cid;
-
-            var user = await userManager.GetUserAsync(User);
-            var department = await context.Department
-                .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
-            ViewData["UserDepartmentId"] = department?.Id;
 
             return View(model);
         }
