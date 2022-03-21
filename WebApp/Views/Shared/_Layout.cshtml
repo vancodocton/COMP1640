@@ -1,60 +1,89 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - WebApp</title>
-	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-	<link rel="stylesheet" href="~/lib/fortawesome/fontawesome-free/css/all.css" />
-	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
-	@await RenderSectionAsync("localCSS", required: false)
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebApp</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/lib/fortawesome/fontawesome-free/css/all.min.css" />
+    </environment>
+    <environment include="Staging,Production">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only"
+              asp-fallback-test-property="position"
+              asp-fallback-test-value="absolute"
+              rel="stylesheet"
+              crossorigin="anonymous"
+              integrity="sha512-F7WyTLiiiPqvu2pGumDR15med0MDkUIo5VTVyyfECR5DZmCnDhti9q5VID02ItWjq6fvDfMaBaDl2J3WdL1uxA==" />
+        <script src="https://kit.fontawesome.com/d3b89e3f6b.js" crossorigin="anonymous"></script>
+    </environment>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-	<header>
-		<nav class=" navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow">
-			<div class="container-fluid navbar navbar-light" style="background-color: grey">
-				@*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">idea forum</a>*@
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-						aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-					<ul class="navbar-nav flex-grow-1">
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-						</li>
-						@if (User.Identity.IsAuthenticated)
-						{
-							if (User.IsInRole(WebApp.Data.Role.Coordinator))
-							{
-								<li class="nav-item">
-									<a class="nav-link text-dark" asp-area="Coordinator" asp-controller="Home" asp-action="Index">Forum</a>
-								</li>
-							}
-						}
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy"></a>
-						</li>
-					</ul>
-					<partial name="_LoginPartial" />
-				</div>
-			</div>
-		</nav>
-	</header>
-	<div class="container-fluid body-background">
-		<main role="main" class="container-lg pb-3 pt-3">
-			@RenderBody()
-		</main>
-	</div>
-	<footer class="border-top footer text-muted">
-		<div class="container content">
-			&copy; 2022 - idea forum
-		</div>
-	</footer>
-	<script src="~/lib/jquery/dist/jquery.min.js"></script>
-	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="~/js/site.js" asp-append-version="true"></script>
-	@await RenderSectionAsync("Scripts", required: false)
+    <header>
+        <nav class=" navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow">
+            <div class="container-fluid navbar navbar-light" style="background-color: grey">
+                @*<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">idea forum</a>*@
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole(WebApp.Data.Role.Coordinator))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Coordinator" asp-controller="Statistical" asp-action="Index">Statistical Board</a>
+                                </li>
+                            }
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy"></a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid body-background">
+        <main role="main" class="container-lg pb-3 pt-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted">
+        <div class="container content">
+            &copy; 2022 - idea forum
+        </div>
+    </footer>
+    <environment include="Staging,Production">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+                crossorigin="anonymous"
+                referrerpolicy="no-referrer">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.0/js/bootstrap.bundle.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+                asp-fallback-test="window.bootstrap"
+                integrity="sha512-PqRelaJGXVuQ81N6wjUrRQelCDR7z8RvKGiR9SbSxKHPIt15eJDmIVv9EJgwq0XvgylszsjzvQ0+VyI2WtIshQ=="
+                crossorigin="anonymous"
+                referrerpolicy="no-referrer">
+        </script>
+    </environment>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </environment>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
