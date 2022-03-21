@@ -3,18 +3,63 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "fontawesome-iconpicker@3.2.0",
-      "destination": "wwwroot/lib/fontawesome-iconpicker/"
+      "provider": "unpkg",
+      "library": "bootstrap@5.1.0",
+      "destination": "wwwroot/lib/bootstrap/",
+      "files": [
+        "LICENSE",
+        "package.json",
+        "README.md",
+        "dist/css/bootstrap.min.css",
+        "dist/css/bootstrap.min.css.map",
+        "dist/js/bootstrap.bundle.min.js",
+        "dist/js/bootstrap.bundle.min.js.map",
+        "dist/js/bootstrap.min.js",
+        "dist/js/bootstrap.min.js.map"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "jquery@3.5.1",
+      "destination": "wwwroot/lib/jquery/",
+      "files": [
+        "LICENSE.txt",
+        "dist/jquery.js",
+        "dist/jquery.min.js",
+        "dist/jquery.min.map"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "jquery-validation@1.17.0",
+      "destination": "wwwroot/lib/jquery-validation/",
+      "files": [
+        "README.md",
+        "LICENSE.md",
+        "dist/additional-methods.js",
+        "dist/jquery.validate.js",
+        "dist/jquery.validate.min.js"
+      ]
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.12",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/js/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.js.map",
+        "dist/browser/signalr.min.js",
+        "dist/browser/signalr.min.js.map"
+      ]
     },
     {
       "provider": "jsdelivr",
       "library": "@fortawesome/fontawesome-free@6.0.0",
       "destination": "wwwroot/lib/fortawesome/fontawesome-free/"
-    },
-    {
-      "provider": "unpkg",
-      "library": "@microsoft/signalr@latest",
-      "destination": "wwwroot/js/signalr/"
     }
   ]
 }
