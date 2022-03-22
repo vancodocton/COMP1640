@@ -37,7 +37,7 @@ namespace WebApp.Areas.Forum.Controllers
             var model = new CreateIdeaViewModel()
             {
                 Categories = await context.Category
-                    .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                    .Where(c => c.DueDate == null || DateTime.UtcNow <= c.DueDate)
                     .Select(c => new SelectListItem()
                     {
                         Value = c.Id.ToString(),
@@ -61,7 +61,7 @@ namespace WebApp.Areas.Forum.Controllers
                 {
                     ModelState.AddModelError(nameof(model.CategoryId), "The selected category has been deleted or does not exist. Please choose another idea.");
                 }
-                else if (DateTime.Now > category.DueDate)
+                else if (DateTime.UtcNow > category.DueDate)
                 {
                     ModelState.AddModelError("", $"The due date of the category '{category.Name}' is over. Cannot submit idea. Please choose another idea.");
                 }
@@ -98,7 +98,7 @@ namespace WebApp.Areas.Forum.Controllers
             }
 
             model.Categories = await context.Category
-                .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                .Where(c => c.DueDate == null || DateTime.UtcNow <= c.DueDate)
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),

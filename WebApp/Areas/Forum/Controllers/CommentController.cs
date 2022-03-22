@@ -82,7 +82,7 @@ namespace WebApp.Areas.Forum.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, "Idea is deleted or not existed.");
             }
 
-            if (DateTime.Now > idea.Category.FinalDueDate)
+            if (DateTime.UtcNow > idea.Category.FinalDueDate)
                 return StatusCode(StatusCodes.Status400BadRequest, "Cannot comment idea becaufe its final due date is over.");
 
             var comment = new Comment()

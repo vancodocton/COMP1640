@@ -1,12 +1,8 @@
-﻿#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
@@ -62,21 +58,23 @@ namespace WebApp.Areas.Forum.Controllers
             if (ModelState.IsValid)
             {
                 if (model.DueDate > model.FinalDueDate)
-                    ModelState.AddModelError("FinalDueDate", "The final due Date cannot be earlier than the due date.");
+                    ModelState.AddModelError(
+                        key: "FinalDueDate",
+                        errorMessage: "The final due Date cannot be earlier than the due date.");
                 else
                 {
                     var category = new Category()
                     {
                         Name = model.Name,
                         Description = model.Description,
-                        DueDate = model.DueDate,
-                        FinalDueDate = model.FinalDueDate
+                        DueDateByUserTz = model.DueDate,
+                        FinalDueDateByUserTz = model.FinalDueDate,
                     };
 
                     _context.Category.Add(category);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
-                }                 
+                }
             }
 
             return View(model);
@@ -90,9 +88,7 @@ namespace WebApp.Areas.Forum.Controllers
                 return NotFound();
             }
 
-
             var category = await _context.Category.FindAsync(id);
-
 
             if (category == null)
             {
@@ -103,8 +99,8 @@ namespace WebApp.Areas.Forum.Controllers
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                DueDate = category.DueDate,
-                FinalDueDate = category.FinalDueDate
+                DueDate = category.DueDateByUserTz,
+                FinalDueDate = category.FinalDueDateByUserTz
             };
             return View(model);
         }
@@ -128,26 +124,19 @@ namespace WebApp.Areas.Forum.Controllers
                     }
                     category.Name = model.Name;
                     category.Description = model.Description;
-                    category.DueDate = model.DueDate;
-                    category.FinalDueDate = model.FinalDueDate;
+                    category.DueDateByUserTz = model.DueDate;
+                    category.FinalDueDateByUserTz = model.FinalDueDate;
 
                     _context.Category.Attach(category);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index");
-
-                }                   
+                }
             }
             return View(model);
         }
 
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var category = await _context.Category
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (category == null)
@@ -158,12 +147,14 @@ namespace WebApp.Areas.Forum.Controllers
             return View(category);
         }
 
-        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Category.FindAsync(id);
+            var category = await _context.Category.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+                return RedirectToAction(nameof(Index));
 
             var idea = await _context.Idea.FirstOrDefaultAsync(i => i.CategoryId == category.Id);
 
@@ -173,7 +164,6 @@ namespace WebApp.Areas.Forum.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             else
                 ModelState.AddModelError("", "Category contains idea(s), cannot delete it!");
 

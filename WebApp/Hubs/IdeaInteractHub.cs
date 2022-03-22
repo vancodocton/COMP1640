@@ -100,7 +100,7 @@ namespace WebApp.Hubs
                 idea.Category = await dbContext.Category.FirstAsync(c => c.Id == idea.CategoryId);
 
                 permission.IdeaId = idea.Id;
-                permission.IsCommented = idea.Category.FinalDueDate == null || DateTime.Now <= idea.Category.FinalDueDate;
+                permission.IsCommented = idea.Category.FinalDueDate == null || DateTime.UtcNow <= idea.Category.FinalDueDate;
                 permission.IsReacted = true;
             }
 
