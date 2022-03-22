@@ -39,12 +39,12 @@ namespace WebApp.Areas.Forum.Controllers
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(Comment request)
+        public async Task<IActionResult> Add(IdeaComment request)
         {
             if (!User.IsInRole(Role.Staff))
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff can comment idea.");
 
-            if (request.IdeaId == 0)
+            if (request.IdeaId == null)
                 return StatusCode(StatusCodes.Status400BadRequest, "IdeaId cannot be null.");
 
             if (string.IsNullOrWhiteSpace(request.Content))
@@ -87,7 +87,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var comment = new Comment()
             {
-                IdeaId = request.IdeaId,
+                IdeaId = request.IdeaId.Value,
                 UserId = user.Id,
                 Content = request.Content,
             };
@@ -208,5 +208,6 @@ namespace WebApp.Areas.Forum.Controllers
 
             return cmt.Idea.NumComment;
         }
+
     }
 }
