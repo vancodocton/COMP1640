@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-6 col-sm-8">
+        <h5>Management</h5>
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action"
+               asp-controller="Home"
+               asp-area="Forum">
+                Forum
+            </a>
+        </div>
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action"
+               asp-controller="Categories"
+               asp-area="Forum">
+                Manage Categories
+            </a>
+        </div>
+    </div>
+</div>
