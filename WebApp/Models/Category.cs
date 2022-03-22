@@ -19,7 +19,7 @@ namespace WebApp.Models
         public DateTime? FinalDueDate { get; set; }
 
         [NotMapped]
-        public TimeZoneInfo UserTz { get; set; } = TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh");
+        public TimeZoneInfo UserTz { get; set; } = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
         [NotMapped]
         public DateTime? DueDateByUserTz

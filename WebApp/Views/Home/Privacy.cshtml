@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
+    var category = new Category();
+    category.DueDate = DateTime.UtcNow;
 }
 <h1>@ViewData["Title"]</h1>
 
@@ -8,6 +10,11 @@
 <button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
 <button type="button" class="btn btn-primary" id="liveToastBtn1">Show live toast</button>
 
+@{
+    
+}
+<p class="text-success">@DateTime.UtcNow</p>
+<p class="text-success">@category.DueDateByUserTz | @category.DueDate</p>
 
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
