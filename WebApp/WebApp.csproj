@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,6 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-WebApp-0C788AF4-92FB-4587-815B-B4D24986BBDD</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Coordinator\Controllers\HomeController.cs" />
+    <Content Remove="Areas\Coordinator\Views\Home\Index.cshtml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ErikEJ.EntityFrameworkCore.DgmlBuilder" Version="6.0.0" />
@@ -19,6 +24,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.161" />
     <PackageReference Include="SendGrid" Version="9.25.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Forum\Views\Home\" />
   </ItemGroup>
 
 </Project>

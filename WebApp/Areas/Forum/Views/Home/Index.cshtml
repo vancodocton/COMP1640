@@ -1,5 +1,5 @@
 ﻿@using WebApp.Data
-@model WebApp.ViewModels.ForumViewModel
+@model ForumViewModel
 
 @{
     ViewData["Title"] = "Forum";
@@ -17,7 +17,11 @@
                 </a>
             </div>
             <div class="nav-item pb-2">
-                <a id="cid-" class="btn btn-outline-primary" asp-action="Index" asp-route-sort="@Model.Sort">All ideas</a>
+                <a id="cid-" class="btn btn-outline-primary" asp-action="Index"
+                   asp-route-order="@Model.Search.Order"
+                   asp-route-DpmtId="@Model.Search.DepartmentId">
+                    All ideas
+                </a>
             </div>
         </div>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarleft"
@@ -26,10 +30,15 @@
         </button>
         <aside class="collapse navbar-collapse mt-3" id="navbarleft">
             <ul class="navbar-nav nav-pills flex-column">
-                @foreach (var category in Model.Categories)
+                @foreach (var category in Model.Search.Categories)
                 {
                 <li class="nav-item">
-                    <a id="cid-@category.Id" class="nav-link" asp-action="Index" asp-route-cid="@category.Id" asp-route-sort="@Model.Sort">@category.Name</a>
+                    <a id="cid-@category.Id" class="nav-link" asp-action="Index"
+                       asp-route-cid="@category.Id"
+                       asp-route-order="@Model.Search.Order"
+                       asp-route-DpmtId="@Model.Search.DepartmentId">
+                        @category.Name
+                    </a>
                 </li>
                 }
             </ul>
@@ -38,50 +47,46 @@
 </nav>
 }
 
-@if (Model.CategoryId != null)
+@if (Model.Category != null)
 {
-    var category = Model.Categories.First(c => c.Id == Model.CategoryId);
 
     <div class="card mb-2 text-white bg-success text-center">
-        <div class="card-body">
-            <h5 class="card-title">
-                @category.Name
-            </h5>
-            <h6 class="card-subtitle">
-                <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea">
-                    Due date: @(category.DueDate.HasValue ? category.DueDate : "none")
-                </span>
-                |
-                <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea's comment">
-                    Final due date: @(category.FinalDueDate.HasValue ? category.FinalDueDate : "none")
-                </span>
-            </h6>
-            <p class="card-text pt-2">@(category.Description)</p>
-        </div>
+        <partial name="_CardCategory" for="Category" />
     </div>
 }
 
-@if (Model.Ideas.Count != 0)
-{
-    <nav class="pb-2">
-        <form asp-action="Index" method="get" id="sort-form">
-            <input id="cid" name="cid" value="@Model.CategoryId" type="hidden" />
-            <div class="d-inline-flex">
-                <select class="form-select" aria-label="Select to sort by" asp-for="Sort">
+<nav class="pb-2">
+    <form asp-action="Index" method="get" id="sort-form">
+        <input type="hidden" asp-for="Search.CategoryId" name="cid" />
+        <div class="d-flex flex-row align-items-center">
+            <div class="me-2">
+                <select class="form-select" asp-for="Search.Order" name="order" aria-label="Select to sort order">
                     <option value="lastest">Lastest</option>
                     <option value="popular">Popular</option>
                     <option value="topview">Top View</option>
                 </select>
-                <a type="reset" class="btn btn-danger" asp-action="Index" asp-route-cid="@Model.CategoryId">Reset</a>
             </div>
-        </form>
-    </nav>
+            @if (User.IsInRole(Role.Manager) || User.IsInRole(Role.Coordinator))
+            {
+                <div class="me-2">
+                    <select class="form-select" aria-label="Select department"
+                        asp-for="Search.DepartmentId" name="dpmtId"
+                        asp-items="Model.Search.Departments">
+                    </select>
+                </div>
+            }
+            <a class="btn btn-danger" asp-action="Index" asp-route-cid="@Model.Search.CategoryId">Reset</a>
+        </div>
+    </form>
+</nav>
 
+@if (Model.Ideas.Count != 0)
+{
     foreach (var idea in Model.Ideas)
     {
         <div class="card mb-3">
             <div class="card-header">
-                <a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId" asp-route-sort="@Model.Sort">@idea.Category?.Name</a>
+                <a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId" asp-route-order="@Model.Search.Order">@idea.Category?.Name</a>
             </div>
             <div class="card-body">
                 <h5 class="card-title">
@@ -95,8 +100,21 @@
             </div>
             <div class="card-footer">
                 <div class="d-flex justify-content-end">
+                    @if (User.IsInRole(Role.Coordinator) && Model.User.DepartmentId == idea.User?.DepartmentId)
+                    {
+                        <a class="btn btn-sm btn-white text-danger rounded-3 px-2" asp-controller="Idea" asp-action="Delete" asp-route-id="@idea.Id">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    }
                     <span class="px-2">
-                        <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
+                        @if (User.IsInRole(Role.Staff))
+                        {
+                            <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-user"></i> @(idea.User!.UserName)
+                        }
                     </span>
                     <span class="px-2">
                         <i class="fa-regular fa-comments"></i> @idea.NumComment
@@ -120,7 +138,7 @@
                     {
                         <div class="#">
                             <b>"@cmt.Content" </b> by
-                            <b>@(cmt.User.UserName ?? "Deleted_User")</b>
+                            <b>@(cmt.User?.UserName ?? "Deleted_User")</b>
                         </div>
                     }
                 }
@@ -134,10 +152,22 @@
     <div aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             <li class="page-item @prevDisabled">
-                <a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Previous</a>
+                <a class="page-link"
+               asp-route-cid="@Model.Search.CategoryId"
+               asp-route-order="@Model.Search.Order"
+               asp-route-DpmtId="@Model.Search.DepartmentId"
+               asp-route-page="@(Model.Search.Page - 1)">
+                    Previous
+                </a>
             </li>
             <li class="page-item @nextDisabled">
-                <a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Next</a>
+                <a class="page-link"
+               asp-route-cid="@Model.Search.CategoryId"
+               asp-route-order="@Model.Search.Order"
+               asp-route-DpmtId="@Model.Search.DepartmentId"
+               asp-route-page="@(Model.Search.Page + 1)">
+                    Next
+                </a>
             </li>
         </ul>
     </div>
@@ -145,7 +175,7 @@
 else
 {
     <div class="alert alert-danger" role="alert">
-        This category has no idea or is on the wrong page number.
+        No idea.
     </div>
 }
 
@@ -157,6 +187,7 @@ else
        document.forms['sort-form'].submit();
     });
 
-    //$('#page').sumbit()
+    const category = '#cid-' + "@Model.Category?.Id";
+    $(category).addClass("active");
 </script>
 }

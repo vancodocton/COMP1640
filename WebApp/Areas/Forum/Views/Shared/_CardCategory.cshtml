@@ -1,0 +1,17 @@
+﻿@model Category
+
+<div class="card-body">
+    <h5 class="card-title">
+        @Model.Name
+    </h5>
+    <h6 class="card-subtitle">
+        <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea">
+            Due date: @(Model.DueDate.HasValue ? Model.DueDate : "none")
+        </span>
+        |
+        <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Deadline for new idea's comment">
+            Final due date: @(Model.FinalDueDate.HasValue ? Model.FinalDueDate : "none")
+        </span>
+    </h6>
+    <p class="card-text pt-2">@(Model.Description)</p>
+</div>

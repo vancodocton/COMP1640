@@ -12,10 +12,5 @@
 </div>
 
 @section Scripts{
-<script type="text/javascript">
-    //const params = new URLSearchParams(window.location.search);
-    const category = '#cid-' + '@ViewData["cid"]';
-    $(category).addClass("active");
-</script>
 @await RenderSectionAsync("Scripts", required: false)
 }
