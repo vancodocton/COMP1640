@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    int i = 0;
 }
 <head>
     <environment include="Development">
@@ -13,7 +14,7 @@
     <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
 </head>
 <body>
-<h1>Index Page</h1>
+<h1 class="text-center">List of Categories</h1>
 
 <p>
     <a class="btn btn-outline-primary" asp-action="Create" class="text-white text-decoration-none"><i class="fas fa-plus"></i> Create New</a>
@@ -39,7 +40,8 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+                { i++; }
+                <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
@@ -53,9 +55,23 @@
                     @Html.DisplayFor(modelItem => item.FinalDueDateByUserTz)
                 </td>
                 <td>
-                    <a class="btn btn-outline-warning btn-sm text-black text-decoration-none" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a class="btn btn-outline-success btn-sm text-black text-decoration-none" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a class="btn btn-outline-danger btn-sm text-black text-decoration-none" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">
+							Actions
+					</button>
+                    <div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@i">
+						<a class="dropdown-item text-success" asp-action="Edit" asp-route-id="@item.Id">
+							Edit
+						</a>
+						<a class="dropdown-item text-success" asp-action="Details" asp-route-id="@item.Id">
+							Details
+						</a>
+						<a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
+							Delete
+						</a>
+				    </div>   
+                   </div>
                 </td>
             </tr>
         }
