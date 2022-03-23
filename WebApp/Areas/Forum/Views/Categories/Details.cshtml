@@ -39,13 +39,15 @@
         <dd class="col-sm-10">
             @if (Model.FinalDueDate == null || Model.FinalDueDate <= DateTime.UtcNow)
             {
-                <div>
-                    <a class="btn btn-primary" asp-action="DownloadIdeaCSV" asp-route-id="@Model.Id">
-                        Export ideas in category to CSV file
+                <div class="d-flex flex-column">
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Users">
+                        Export Users in category to CSV file
                     </a>
-                    <wbr>
-                    <a class="btn btn-secondary" asp-action="DownloadIdeaCommentCSV" asp-route-id="@Model.Id">
-                        Export ideas in category to CSV file with comments
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Ideas">
+                        Export Ideas in category to CSV file
+                    </a>
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Comments">
+                        Export Comments in category to CSV
                     </a>
                 </div>
             }

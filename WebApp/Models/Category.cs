@@ -58,5 +58,12 @@ namespace WebApp.Models
                     FinalDueDate = TimeZoneInfo.ConvertTimeToUtc(value.Value, UserTz);
             }
         }
+
+        [NotMapped]
+        public bool IsExportable
+        {
+            get => !FinalDueDate.HasValue || FinalDueDate <= DateTime.UtcNow;
+        }
+
     }
 }

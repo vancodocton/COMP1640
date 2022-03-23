@@ -21,6 +21,12 @@ namespace WebApp.Models
         [ValidateNever]
         public ICollection<React> Reacts { get; set; } = null!;
 
+        [ValidateNever]
+        public ICollection<Idea> Ideas { get; set; } = null!;
+
+        [ValidateNever]
+        public ICollection<Comment> Comments { get; set; } = null!;
+        
         [Required]
         public bool TermConfirmed { get; set; } = false;
     }
