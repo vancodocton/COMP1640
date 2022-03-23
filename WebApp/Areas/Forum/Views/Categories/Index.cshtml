@@ -4,7 +4,15 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+<head>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="~/lib/fortawesome/fontawesome-free/css/all.min.css" />
+    </environment>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
+</head>
+<body>
 <h1>Index Page</h1>
 
 <p>
@@ -33,7 +41,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
+            <td  class="text-truncate col-2" style="max-width: 400px;">
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
@@ -51,3 +59,4 @@
 }
     </tbody>
 </table>
+</body>
