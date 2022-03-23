@@ -33,51 +33,41 @@ namespace WebApp.Areas.Forum.Controllers
             var user = await userManager.GetUserAsync(User);
 
             var ideas = context.Idea
-                .Include(x => x.Category)
-                .Include(x => x.User)
-                .Include(x => x.Comments
-                    .OrderByDescending(i => i.Id)
+                .Include(i => i.Category)
+                .Include(i => i.User)
+                .Include(i => i.Comments
+                    .OrderByDescending(c => c.Id)
                     .Take(2)
-                    .OrderBy(i => i.Id))
+                    .OrderBy(c => c.Id)
+                    )
                 .ThenInclude(c => c.User)
-                .AsQueryable()
-                .Select(i => new Idea()
-                {
-                    Id = i.Id,
-                    UserId = i.UserId,
-                    User = new ApplicationUser()
-                    {
-                        Id = i.UserId,
-                        UserName = i.User.UserName,
-                        Email = i.User.Email,
-                        DepartmentId = i.User.DepartmentId
-                    },
-                    CategoryId = i.CategoryId,
-                    Category = new Category()
-                    {
-                        Id = i.Category.Id,
-                        Name = i.Category.Name
-                    },
-                    IsIncognito = i.IsIncognito,
-                    Title = i.Title,
-                    Content = i.Content,
-                    Comments = i.Comments.Select(c => new Comment()
-                    {
-                        Id = c.Id,
-                        UserId = c.UserId,
-                        User = new ApplicationUser()
-                        {
-                            Id = c.User.Id,
-                            UserName = c.User.UserName,
-                        },
-                        IdeaId = c.IdeaId,
-                        Content = c.Content
-                    }).ToList(),
-                    ThumbUp = i.ThumbUp,
-                    ThumbDown = i.ThumbDown,
-                    NumComment = i.NumComment,
-                    NumView = i.NumView,
-                });
+                .AsSplitQuery();
+                //.Select(i => new Idea()
+                //{
+                //    Id = i.Id,
+                //    UserId = i.UserId,
+                //    User = new ApplicationUser()
+                //    {
+                //        Id = i.UserId,
+                //        UserName = i.User.UserName,
+                //        Email = i.User.Email,
+                //        DepartmentId = i.User.DepartmentId
+                //    },
+                //    CategoryId = i.CategoryId,
+                //    Category = new Category()
+                //    {
+                //        Id = i.Category.Id,
+                //        Name = i.Category.Name
+                //    },
+                //    IsIncognito = i.IsIncognito,
+                //    Title = i.Title,
+                //    Content = i.Content,
+                //    Comments = i.Comments,
+                //    ThumbUp = i.ThumbUp,
+                //    ThumbDown = i.ThumbDown,
+                //    NumComment = i.NumComment,
+                //    NumView = i.NumView,
+                //});
 
             // filter by category
             Category? category = null;

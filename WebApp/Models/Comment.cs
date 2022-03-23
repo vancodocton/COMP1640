@@ -12,7 +12,7 @@ namespace WebApp.Models
         public ApplicationUser? User { get; set; }
 
         public int IdeaId { get; set; }
-        public Idea? Idea { get; set; }
+        public Idea Idea { get; set; } = null!;
 
         public string Content { get; set; } = null!;
     }

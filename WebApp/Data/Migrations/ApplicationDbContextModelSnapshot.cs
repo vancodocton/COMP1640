@@ -269,7 +269,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.Comment", b =>
@@ -296,7 +296,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.Department", b =>
@@ -319,7 +319,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Department");
+                    b.ToTable("Department", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.Idea", b =>
@@ -366,7 +366,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Idea");
+                    b.ToTable("Idea", (string)null);
                 });
 
             modelBuilder.Entity("WebApp.Models.React", b =>
@@ -392,7 +392,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("React");
+                    b.ToTable("React", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

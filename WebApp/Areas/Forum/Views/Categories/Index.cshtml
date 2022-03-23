@@ -20,6 +20,7 @@
 </p>
 <table class="table">
     <thead>
+        <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -36,27 +37,28 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td  class="text-truncate col-2" style="max-width: 400px;">
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinalDueDate)
-            </td>
-            <td>
-                <a class="btn btn-outline-warning btn-sm text-black text-decoration-none" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a class="btn btn-outline-success btn-sm text-black text-decoration-none" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a class="btn btn-outline-danger btn-sm text-black text-decoration-none" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DueDateByUserTz)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FinalDueDateByUserTz)
+                </td>
+                <td>
+                    <a class="btn btn-outline-warning btn-sm text-black text-decoration-none" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-outline-success btn-sm text-black text-decoration-none" asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a class="btn btn-outline-danger btn-sm text-black text-decoration-none" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 </body>
