@@ -102,7 +102,17 @@
 </div>
 
 @section Scripts{
-<script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+<environment include="Development">
+    <script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+</environment>
+<environment include="Staging,Production">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.3/signalr.min.js"
+            asp-fallback-src="~/lib/signalr/dist/browser/signalr.min.js"
+            asp-fallback-test="window.signalR"
+            integrity="sha512-tjVd2CQVR1kY0h9MKM7PzmX9viGDUoYkPt1EBfPHVMskwwZ1d7gPGmWOrvZIidBKqNyZdDl4PUVFVVXNQJ3L+Q=="
+            crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+</environment>
 <script src="~/js/staff_idea_interact.js"></script>
 <script type="text/javascript">
     userName = "@Html.Raw(User.Identity?.Name!)";
