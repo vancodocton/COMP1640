@@ -17,12 +17,6 @@ html {
 body {
     width: auto;
     height: auto;
-    /*margin-bottom: 300px;
-    background-image: url("~/img/Colorful.png");
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);*/ 
     background-color: #D3D3D3;
     margin: auto;
     
@@ -31,7 +25,6 @@ body {
 .body-background {
     height: auto;
     width: auto;
-    /*background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);*/
     background-size: cover;
     margin-bottom: 0;
     min-height:595px;
@@ -47,7 +40,6 @@ body {
     margin:auto;
 }
 .form-floating {
-    /*display: block;*/
     margin-bottom: 20px;
 }
 
@@ -63,14 +55,4 @@ body {
 .btn-signup {
     height: 50px;
     border-radius: 10px
-}
-
-#add-button, #reset-pwd-button {
-    text-decoration: none;
-    color: white;
-}
-
-#return-index-button {
-    text-decoration: none;
-    color: white;
 }
