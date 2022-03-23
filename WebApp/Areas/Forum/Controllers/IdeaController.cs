@@ -173,29 +173,20 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 return NotFound();
             }
-            var idea = await context.Idea
-                .Include(i => i.Category)
-                .Include(i => i.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (idea == null)
-            {
-                return NotFound();
-            }
-
-            return View(idea);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = Role.Coordinator)]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-
             var user = await userManager.GetUserAsync(User);
 
             var department = await context.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
 
             var idea = await context.Idea.Include(i => i.User).SingleOrDefaultAsync(i => i.Id == id);
+
+
+            /*
+            var idea = await context.Idea
+                .Include(i => i.Category)
+                .Include(i => i.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            */
+
 
             if (idea == null)
             {
@@ -204,15 +195,20 @@ namespace WebApp.Areas.Forum.Controllers
 
             if (idea.User.DepartmentId == department.Id)
             {
-                context.Idea.Remove(idea);
-                await context.SaveChangesAsync();
+                return View(idea);
             }
             else
-            {
-                ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
-                return View("Delete", idea);
-            }    
-            //var idea = await context.Idea.FindAsync(id);
+                return Unauthorized();
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = Role.Coordinator)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var idea = await context.Idea.FindAsync(id);
+            context.Idea.Remove(idea);
+            await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), "Home");
         }
