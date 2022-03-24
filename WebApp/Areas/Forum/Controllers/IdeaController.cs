@@ -67,7 +67,7 @@ namespace WebApp.Areas.Forum.Controllers
                 }
                 else
                 {
-                    
+
                     if (model.Files != null)
                     {
                         throw new NotImplementedException();
@@ -158,7 +158,7 @@ namespace WebApp.Areas.Forum.Controllers
                 .ToListAsync();
 
             var user = await userManager.GetUserAsync(User);
-            { 
+            {
                 ViewData["UserId"] = user.Id;
             }
             {
@@ -166,37 +166,28 @@ namespace WebApp.Areas.Forum.Controllers
                     .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
                 ViewData["UserDepartmentId"] = department?.Id;
             }
-            
+
             return View(model);
         }
 
 
         [HttpGet]
         [Authorize(Roles = Role.Coordinator)]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var user = await userManager.GetUserAsync(User);
+            var user = await userManager
+                .GetUserAsync(User);
 
-            var department = await context.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
+            var department = await context.Department
+                .FirstAsync(d => d.Id == user.DepartmentId);
 
-            var idea = await context.Idea.Include(i => i.User).SingleOrDefaultAsync(i => i.Id == id);
-
-
-            /*
             var idea = await context.Idea
-                .Include(i => i.Category)
                 .Include(i => i.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            */
-
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
             {
-                return RedirectToAction(nameof(Index), "Home");
+                return NotFound();
             }
 
             if (idea.User.DepartmentId == department.Id)
@@ -212,7 +203,31 @@ namespace WebApp.Areas.Forum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var idea = await context.Idea.FindAsync(id);
+            var user = await userManager.GetUserAsync(User);
+
+            var department = await context.Department
+                .FirstAsync(d => d.Id == user.DepartmentId);
+
+            var idea = await context.Idea
+                .Include(i => i.User)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (idea == null)
+            {
+                return RedirectToAction(nameof(Index), "Home");
+            }
+
+            if (idea.User.DepartmentId == department.Id)
+            {
+                context.Idea.Remove(idea);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
+                return View("Delete", idea);
+            }
+
             context.Idea.Remove(idea);
             await context.SaveChangesAsync();
 

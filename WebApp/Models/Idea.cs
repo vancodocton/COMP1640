@@ -8,7 +8,7 @@ namespace WebApp.Models
 
         [Required]
         public string UserId { get; set; } = null!;
-        public ApplicationUser? User { get; set; }
+        public ApplicationUser User { get; set; } = null!;
 
         public bool IsIncognito { get; set; } = false;
 
@@ -20,9 +20,9 @@ namespace WebApp.Models
 
         [Required]
         public int CategoryId { get; set; }
-        public Category? Category { get; set; }
+        public Category Category { get; set; } = null!;
 
-        public ICollection<FileOnFileSystem>? FileOnFileSystems { get; set; } 
+        public ICollection<FileOnFileSystem>? FileOnFileSystems { get; set; }
 
         public ICollection<React> Reacts { get; set; } = null!;
 
