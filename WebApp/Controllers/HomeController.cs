@@ -28,7 +28,7 @@ namespace WebApp.Controllers
 
             if(User.IsInRole(Role.Manager))
             {
-                return View("Index.Manager");
+                return RedirectToAction("Index", "Home", new { area = "Forum" });
             }
 
             if (User.IsInRole(Role.Coordinator))
