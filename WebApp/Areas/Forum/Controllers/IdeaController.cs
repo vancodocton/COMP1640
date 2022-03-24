@@ -67,12 +67,6 @@ namespace WebApp.Areas.Forum.Controllers
                 }
                 else
                 {
-
-                    if (model.Files != null)
-                    {
-                        throw new NotImplementedException();
-                    }
-
                     var user = await userManager.GetUserAsync(HttpContext.User);
 
                     var idea = new Idea()
@@ -83,6 +77,41 @@ namespace WebApp.Areas.Forum.Controllers
                         UserId = user.Id,
                         IsIncognito = model.IsIncognito,
                     };
+
+                    if (model.Files != null)
+                    {
+                        idea.FileOnFileSystems = new List<FileOnFileSystem>();
+
+                        foreach (var file in model.Files)
+                        {
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
+
+                            bool basePathExists = Directory.Exists(basePath);
+                            if (!basePathExists) Directory.CreateDirectory(basePath);
+
+                            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var filePath = Path.Combine(basePath, file.FileName);
+                            var extension = Path.GetExtension(file.FileName);
+
+                            if (!System.IO.File.Exists(filePath))
+                            {
+                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await file.CopyToAsync(stream);
+                                }
+                                var fileModel = new FileOnFileSystem
+                                {
+                                    FileType = file.ContentType,
+                                    Extension = extension,
+                                    Name = fileName,
+                                    FilePath = filePath,
+
+                                };
+
+                                idea.FileOnFileSystems.Add(fileModel);
+                            }
+                        }
+                    }
 
                     await context.Idea.AddAsync(idea);
                     var count = await context.SaveChangesAsync();
@@ -122,6 +151,7 @@ namespace WebApp.Areas.Forum.Controllers
             var model = await context.Idea
                 .Include(i => i.Category)
                 .Include(i => i.User)
+                .Include(i => i.FileOnFileSystems)
                 .Select(i => new Idea()
                 {
                     Id = i.Id,
@@ -136,7 +166,8 @@ namespace WebApp.Areas.Forum.Controllers
                     {
                         Id = i.UserId,
                         UserName = i.User!.UserName,
-                    }
+                    },
+                    FileOnFileSystems = i.FileOnFileSystems
                 }).FirstOrDefaultAsync(i => i.Id == id);
 
             if (model == null) return BadRequest();
