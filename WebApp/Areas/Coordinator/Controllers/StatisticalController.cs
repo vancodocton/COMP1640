@@ -29,16 +29,25 @@ namespace WebApp.Areas.Coordinator.Controllers
         }
         public async Task<ActionResult> Index()
         {
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var idea = await context.Idea.FirstOrDefaultAsync(i => i.Id == 1);
-            var coors = user.DepartmentId;
-            var model = await userManager.Users.Where(u => u.DepartmentId == coors)
+            var user = await userManager.GetUserAsync(User);
+            // Get a list of users in the role
+            var usersWithPermission = userManager.GetUsersInRoleAsync(Role.Staff).Result;
+            // Then get a list of the ids of these users
+            var idsWithPermission = usersWithPermission.Select(u => u.Id);
+            var model = await userManager.Users
+                .Where(u => idsWithPermission.Contains(u.Id))
+                .Where(u => u.DepartmentId == user.DepartmentId)
                 .Select(u => new StatisticalAnalysisViewModel()
                 {
+                    ideaCount = u.Ideas.Count,
+                    reactCount = u.Reacts.Count,
+                    commentCount = u.Comments.Count,
                     Id = u.Id,
                     Email = u.Email,
                 })
-                .ToListAsync();
+                .OrderByDescending(u => u.ideaCount)
+                .ThenByDescending(u => u.reactCount)
+                .ToListAsync();         
             return View(model);
         }
     }

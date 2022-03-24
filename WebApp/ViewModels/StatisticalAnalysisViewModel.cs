@@ -8,5 +8,9 @@ namespace WebApp.ViewModels
 
         public string? Email { get; set; }
         public ApplicationUser? User { get; set; }
+        public int ideaCount { get; set; }
+        public int commentCount { get; set; }
+        public int reactCount { get; set; }
+
     }
 }
