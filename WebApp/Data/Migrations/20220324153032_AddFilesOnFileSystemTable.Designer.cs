@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApp.Data;
 
@@ -11,9 +12,10 @@ using WebApp.Data;
 namespace WebApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220324153032_AddFilesOnFileSystemTable")]
+    partial class AddFilesOnFileSystemTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,7 +271,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("WebApp.Models.Comment", b =>
@@ -296,7 +298,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("WebApp.Models.Department", b =>
@@ -319,7 +321,7 @@ namespace WebApp.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Department", (string)null);
+                    b.ToTable("Department");
                 });
 
             modelBuilder.Entity("WebApp.Models.FileOnFileSystem", b =>
@@ -356,7 +358,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("IdeaId");
 
-                    b.ToTable("FileOnFileSystem", (string)null);
+                    b.ToTable("FileOnFileSystem");
                 });
 
             modelBuilder.Entity("WebApp.Models.Idea", b =>
@@ -403,7 +405,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Idea", (string)null);
+                    b.ToTable("Idea");
                 });
 
             modelBuilder.Entity("WebApp.Models.React", b =>
@@ -429,7 +431,7 @@ namespace WebApp.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("React", (string)null);
+                    b.ToTable("React");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

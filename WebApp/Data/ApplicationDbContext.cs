@@ -21,6 +21,8 @@ namespace WebApp.Data
 
         public DbSet<Comment> Comment { get; set; } = null!;
 
+        public DbSet<FileOnFileSystem> FileOnFileSystem { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
