@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Files\**" />
+    <Content Remove="Files\**" />
+    <EmbeddedResource Remove="Files\**" />
+    <None Remove="Files\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Areas\Coordinator\Controllers\HomeController.cs" />
     <Content Remove="Areas\Coordinator\Views\Home\Index.cshtml" />
   </ItemGroup>
