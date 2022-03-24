@@ -17,6 +17,16 @@
         <p class="card-text">
             @Html.DisplayFor(modelItem => Model.Content)
         </p>
+
+        <div class="list-group">
+            @if (Model.FileOnFileSystems != null && Model.FileOnFileSystems.Count != 0)
+                @foreach (var file in Model.FileOnFileSystems)
+                {
+                    <a class="list-group-item">
+                        @*link download here*@
+                    </a>
+                }
+        </div>
     </div>
     <div class="card-footer">
         <div class="row">

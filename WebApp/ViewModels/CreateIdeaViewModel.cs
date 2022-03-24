@@ -29,6 +29,8 @@ namespace WebApp.ViewModels
         [Display(Name = "Make my idea incognito")]
         [Required]
         public bool IsIncognito { get; set; }
+
+        public List<IFormFile>? Files { get; set; }
     }
 
     public class BooleanMustBeTrueAttribute : ValidationAttribute

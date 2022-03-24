@@ -44,8 +44,8 @@ body {
 }
 
 .form-control {
-    height: 45px;
-    border-radius: 10px
+    /*height: 45px;*/
+    border-radius: 10px  
 }
 
 .form-control:focus {

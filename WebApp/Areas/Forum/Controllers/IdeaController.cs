@@ -67,6 +67,12 @@ namespace WebApp.Areas.Forum.Controllers
                 }
                 else
                 {
+                    
+                    if (model.Files != null)
+                    {
+                        throw new NotImplementedException();
+                    }
+
                     var user = await userManager.GetUserAsync(HttpContext.User);
 
                     var idea = new Idea()
