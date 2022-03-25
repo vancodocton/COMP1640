@@ -84,7 +84,7 @@ namespace WebApp.Areas.Forum.Controllers
 
                         foreach (var file in model.Files)
                         {
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\Files\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + $"\\Files\\{category.Id}\\");
 
                             bool basePathExists = Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
@@ -275,9 +275,6 @@ namespace WebApp.Areas.Forum.Controllers
                 ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
                 return View("Delete", idea);
             }
-
-            context.Idea.Remove(idea);
-            await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index), "Home");
         }

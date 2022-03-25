@@ -6,6 +6,8 @@ namespace WebApp.Models
     {
         public int Id { get; set; }
 
+        public int IdeaId { get; set; }
+
         public string Name { get; set; } = null!;
 
         public string FileType { get; set; } = null!;
