@@ -8,6 +8,8 @@ namespace WebApp.Models
 
         public int IdeaId { get; set; }
 
+        public Idea Idea { get; set; } = null!;
+
         public string Name { get; set; } = null!;
 
         public string FileType { get; set; } = null!;

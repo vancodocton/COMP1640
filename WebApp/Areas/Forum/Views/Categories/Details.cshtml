@@ -41,13 +41,16 @@
             {
                 <div class="d-flex flex-column">
                     <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Users">
-                        Export Users in category to CSV file
+                        Export Users related to Ideas in category to CSV file
                     </a>
                     <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Ideas">
                         Export Ideas in category to CSV file
                     </a>
                     <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Comments">
-                        Export Comments in category to CSV
+                        Export Comments of Ideas in category to CSV
+                    </a>
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Files">
+                        Export Files of Ideas in category to Zip
                     </a>
                 </div>
             }

@@ -173,6 +173,7 @@ namespace WebApp.Areas.Forum.Controllers
                 "Ideas" => await ExportIdeasAsCSV(category),
                 "Comments" => await ExportCommentsAsCSV(category),
                 "Users" => await ExportUsersAsCSV(category),
+                "Files" => await ExportIdeaFilesAsZip(category),
                 _ => BadRequest(),
             };
         }
@@ -184,9 +185,10 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 var downloadFileName = $"{category.Name}-Users-{DateTime.UtcNow.Ticks}";
 
-                var ideas = _context.Users
-                    .IgnoreAutoIncludes()
-                    .Where(u => u.Ideas.Any(i => i.CategoryId == category.Id))
+                var users = _context.Users
+                    .Include(u => u.Reacts)
+                    .ThenInclude(r => r.Idea)
+                    .Where(u => u.Reacts.Any(r => r.Idea.CategoryId == category.Id))
                     .Select(u => new
                     {
                         u.Id,
@@ -197,7 +199,7 @@ namespace WebApp.Areas.Forum.Controllers
 
                 var stream = new MemoryStream();
 
-                await WriteCsvToStreamAsync(await ideas.ToListAsync(), stream);
+                await WriteCsvToStreamAsync(await users.ToListAsync(), stream);
                 // the following is return File without Archiving
                 //stream.Seek(0, SeekOrigin.Begin);
                 //return File(stream, "application/octet-stream", $"{downloadFileName}.csv");
@@ -282,6 +284,70 @@ namespace WebApp.Areas.Forum.Controllers
                 return File(ms, "application/zip", $"{downloadFileName}.zip");
             }
             else return BadRequest();
+        }
+
+        private async Task<IActionResult> ExportIdeaFilesAsZip(Category category)
+        {
+            //_logger.LogInformation("Starting export data...");
+            if (category.IsExportable)
+            {
+                var downloadZipName = $"{category.Name}-IdeaFiles-{DateTime.UtcNow.Ticks}";
+
+                var files = _context.FileOnFileSystem
+                    .Include(f => f.Idea)
+                    .Where(f => f.Idea.CategoryId == category.Id);
+
+                var stream = new MemoryStream();
+
+                await ArchiveFilesEntryFromStream(await files.ToListAsync(), stream);
+
+                //_logger.LogInformation("Send exported file to client...");
+                stream.Seek(0, SeekOrigin.Begin);
+                return File(stream, "application/zip", $"{downloadZipName}.zip");
+            }
+            else return BadRequest();
+        }
+
+        private static async Task<Stream> ArchiveFilesEntryFromStream(ICollection<FileOnFileSystem> files, Stream stream)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true, Encoding.UTF8))
+            {
+                var archiveCSVEntry = archive.CreateEntry($"IdeaFiles.csv", CompressionLevel.Optimal);
+
+                using (var archiveEntryStream = archiveCSVEntry.Open())
+                {
+                    using (var writeFile = new StreamWriter(archiveEntryStream, leaveOpen: true, encoding: Encoding.UTF8))
+                    {
+                        var csv = new CsvWriter(writeFile, culture: CultureInfo.InvariantCulture, leaveOpen: true);
+
+                        await csv.WriteRecordsAsync(files.Select(f => new
+                        {
+                            f.Id,
+                            f.IdeaId,
+                            f.Idea.Title,
+                            f.Name,
+                            f.FileType,
+                            f.Extension,
+                            f.UploadTime,
+                            f.FilePath
+                        }));
+                        writeFile.Flush();
+                    }
+                }
+
+                foreach (var file in files)
+                {
+                    var archiveEntry = archive.CreateEntry($"{file.IdeaId}/{file.Name}{file.Extension}", CompressionLevel.Optimal);
+
+                    using var archiveEntryStream = archiveEntry.Open();
+                    using var fileStream = new FileStream(file.FilePath, FileMode.Open);
+
+                    await fileStream.CopyToAsync(archiveEntryStream);
+                }
+            }
+
+            return stream;
         }
 
         private static async Task<Stream> ArchiveAddCsvEntryFromStream(string fileName, Stream stream)
