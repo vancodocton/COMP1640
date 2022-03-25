@@ -1,31 +1,27 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.ViewModels;
 
-namespace WebApp.Areas.Coordinator.Controllers
+namespace WebApp.Areas.Forum.Controllers
 {
-    [Area("Coordinator")]
-    [Authorize(Roles = Role.Coordinator)]
-    public class StatisticalController : Controller
+    [Area("Forum")]
+    [Authorize(Roles = $"{Role.Coordinator},{Role.Manager}")]
+    public class AnalysisController : Controller
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IEmailSender sender;
 
-        public StatisticalController(
+        public AnalysisController(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            IEmailSender sender
+            UserManager<ApplicationUser> userManager
             )
         {
             this.context = context;
             this.userManager = userManager;
-            this.sender = sender;
         }
         public async Task<ActionResult> Index()
         {
@@ -34,7 +30,7 @@ namespace WebApp.Areas.Coordinator.Controllers
             var usersWithPermission = userManager.GetUsersInRoleAsync(Role.Staff).Result;
             // Then get a list of the ids of these users
             var idsWithPermission = usersWithPermission.Select(u => u.Id);
-            var model = await userManager.Users
+            var modelcoor = await userManager.Users
                 .Where(u => idsWithPermission.Contains(u.Id))
                 .Where(u => u.DepartmentId == user.DepartmentId)
                 .Select(u => new StatisticalAnalysisViewModel()
@@ -47,8 +43,31 @@ namespace WebApp.Areas.Coordinator.Controllers
                 })
                 .OrderByDescending(u => u.ideaCount)
                 .ThenByDescending(u => u.reactCount)
-                .ToListAsync();         
-            return View(model);
+                .ToListAsync();
+            var modelmng = await userManager.Users
+                .Where(u => idsWithPermission.Contains(u.Id))
+                .Select(u => new StatisticalAnalysisViewModel()
+                {
+                    ideaCount = u.Ideas.Count,
+                    reactCount = u.Reacts.Count,
+                    commentCount = u.Comments.Count,
+                    Id = u.Id,
+                    Email = u.Email,
+                })
+                .OrderByDescending(u => u.ideaCount)
+                .ThenByDescending(u => u.reactCount)
+                .ToListAsync();
+
+            if (User.IsInRole(Role.Manager))
+            {
+                return View(modelmng);
+            }
+            else if (User.IsInRole(Role.Coordinator))
+            {
+                return View(modelcoor);
+            }
+            else
+                return Unauthorized();
         }
     }
 }

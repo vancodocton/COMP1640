@@ -42,19 +42,19 @@
                             }
                             else
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="Forum" asp-controller="Home" asp-action="Index">Forum</a>
-                                </li>
                                 if (User.IsInRole(Role.Manager))
                                 {
                                     <li class="nav-item">
                                         <a class="nav-link text-dark" asp-area="Forum" asp-controller="Categories" asp-action="Index">Category management</a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="Forum" asp-controller="Analysis" asp-action="Index">Statistical Board</a>
+                                    </li>
                                 }
                                 if (User.IsInRole(Role.Coordinator))
                                 {
                                     <li class="nav-item">
-                                        <a class="nav-link text-dark" asp-area="Coordinator" asp-controller="Statistical" asp-action="Index">Statistical Board</a>
+                                        <a class="nav-link text-dark" asp-area="Forum" asp-controller="Analysis" asp-action="Index">Statistical Board</a>
                                     </li>
                                 }
                             }
