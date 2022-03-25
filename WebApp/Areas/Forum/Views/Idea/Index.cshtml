@@ -22,9 +22,9 @@
             @if (Model.FileOnFileSystems != null && Model.FileOnFileSystems.Count != 0)
                 @foreach (var file in Model.FileOnFileSystems)
                 {
-                    <a class="list-group-item">
-                        @*link download here*@
-                    </a>
+                    @*<a class="list-group-item">*@
+                          <a asp-controller="Idea" asp-action="DownloadFileFromFileSystem" asp-route-id="@file.Id">@($"{file.Name}{file.Extension}")</a>
+                    
                 }
         </div>
     </div>

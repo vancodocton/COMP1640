@@ -144,13 +144,11 @@ namespace WebApp.Areas.Forum.Controllers
         }
         public async Task<IActionResult?> DownloadFileFromFileSystem(int id)
         {
-
             var file = await context.FileOnFileSystem
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (file == null)
-                return null;
+                return NotFound();
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(file.FilePath, FileMode.Open))
