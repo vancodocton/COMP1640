@@ -142,6 +142,25 @@ namespace WebApp.Areas.Forum.Controllers
 
             return View(model);
         }
+        public async Task<IActionResult?> DownloadFileFromFileSystem(int id)
+        {
+
+            var file = await context.FileOnFileSystem
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (file == null)
+                return null;
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(file.FilePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, file.FileType, file.Name + file.Extension);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Index(int? id)
