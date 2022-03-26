@@ -89,7 +89,7 @@
                                 <div class="d-flex flex-row align-items-center">
                                     <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
                                     <p class="small mb-0 ms-2"><b>@(cmt.User?.UserName ?? "Deleted_User")</b></p>
-                                    @if (DateTime.UtcNow < Model.Category.FinalDueDate)
+                                    @if (Model.Category.FinalDueDate == null || DateTime.UtcNow < Model.Category.FinalDueDate)
                                     {
                                         @if (cmt.User!.UserName == User.Identity!.Name)
                                         {
