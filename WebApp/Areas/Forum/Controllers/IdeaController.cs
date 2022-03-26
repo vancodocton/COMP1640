@@ -78,11 +78,11 @@ namespace WebApp.Areas.Forum.Controllers
                         IsIncognito = model.IsIncognito,
                     };
 
-                    if (model.Files != null)
+                    if (model.Documents != null)
                     {
                         idea.FileOnFileSystems = new List<FileOnFileSystem>();
 
-                        foreach (var file in model.Files)
+                        foreach (var file in model.Documents)
                         {
                             var basePath = Path.Combine(Directory.GetCurrentDirectory() + $"\\Files\\{category.Id}\\");
 
@@ -90,7 +90,7 @@ namespace WebApp.Areas.Forum.Controllers
                             if (!basePathExists) Directory.CreateDirectory(basePath);
 
                             var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                            var filePath = Path.Combine(basePath, file.FileName);
+                            var filePath = Path.Combine(basePath, Path.GetRandomFileName());
                             var extension = Path.GetExtension(file.FileName);
 
                             if (!System.IO.File.Exists(filePath))
