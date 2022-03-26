@@ -149,6 +149,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var cmt = await dbContext.Comment
                 .Include(c => c.Idea)
+                .ThenInclude(i => i.Category)
                 .SingleOrDefaultAsync(i => i.Id == id);
 
             if (cmt == null)
@@ -156,7 +157,11 @@ namespace WebApp.Areas.Forum.Controllers
 
             var user = await userManager.GetUserAsync(User);
 
-            if (User.IsInRole(Role.Staff))
+            if (DateTime.UtcNow > cmt.Idea.Category.FinalDueDate)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Cannot delete comment after the final due date");
+            }
+            else if (User.IsInRole(Role.Staff))
             {
                 if (cmt.UserId == user.Id)
                 {
@@ -166,26 +171,20 @@ namespace WebApp.Areas.Forum.Controllers
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
             }
-
             else if (User.IsInRole(Role.Coordinator))
             {
-                var department = await dbContext.Department
-                    .SingleAsync(d => d.Id == user.DepartmentId);
-
                 cmt.User = await userManager.FindByIdAsync(cmt.UserId);
 
-                if (cmt.User.DepartmentId == department.Id)
+                if (cmt.User.DepartmentId == user.DepartmentId)
                 {
                     var deletedCmtId = await DeleteConfirmed(cmt);
                     return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
-
-
             }
             else
-                return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
+                return StatusCode(StatusCodes.Status401Unauthorized, "You have no permission to delete this comment");
 
         }
 

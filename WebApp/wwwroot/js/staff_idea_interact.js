@@ -226,6 +226,11 @@ function deleteComment(cmtId) {
                 $('#countcomment').html(txt);
             });
         }
+        else {
+            res.text().then(txt => {
+                console.log(txt);
+            });
+        }
         return res;
     }).catch(er => {
         console.log(er);
