@@ -231,6 +231,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var idea = await context.Idea
                 .Include(i => i.User)
+                .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
@@ -238,12 +239,19 @@ namespace WebApp.Areas.Forum.Controllers
                 return NotFound();
             }
 
-            if (idea.User.DepartmentId == department.Id)
+            /*
+            if(DateTime.UtcNow >= idea.Category.FinalDueDate)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Cannot delete idea becaufe its final due date is over.");
+            }
+            */
+            if (idea.User.DepartmentId == department.Id && ( idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate))
             {
                 return View(idea);
             }
             else
                 return Unauthorized();
+
         }
 
         [HttpPost, ActionName("Delete")]
@@ -258,6 +266,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var idea = await context.Idea
                 .Include(i => i.User)
+                .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
@@ -265,7 +274,7 @@ namespace WebApp.Areas.Forum.Controllers
                 return RedirectToAction(nameof(Index), "Home");
             }
 
-            if (idea.User.DepartmentId == department.Id)
+            if (idea.User.DepartmentId == department.Id && DateTime.UtcNow < idea.Category.FinalDueDate)
             {
                 context.Idea.Remove(idea);
                 await context.SaveChangesAsync();
