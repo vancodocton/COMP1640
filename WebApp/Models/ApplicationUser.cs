@@ -26,8 +26,5 @@ namespace WebApp.Models
 
         [ValidateNever]
         public ICollection<Comment> Comments { get; set; } = null!;
-        
-        [Required]
-        public bool TermConfirmed { get; set; } = false;
     }
 }
