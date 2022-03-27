@@ -7,8 +7,10 @@
 <h1 class="text-center">List of Accounts</h1>
 
 <div class="text-center d-flex justify-content-between mx-auto w-50">
-<a class="btn btn-primary" asp-area="Admin" asp-controller="Account" asp-action="Create" id="add-button"><i class="fa fa-plus-square-o"></i> Create account</a>
-<a class="btn btn-danger" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" id="reset-pwd-button">Reset Password</a>
+<a class="btn btn-primary mw" asp-area="Admin" asp-controller="Account" asp-action="Create" id="add-button"><i class="fa fa-plus-square-o"></i> Create account</a>
+<a class="btn btn-primary btn-sm mw-420 " asp-area="Admin" asp-controller="Account" asp-action="Create" id="add-button"><i class="fa fa-plus-square-o"></i> Create account</a>
+<a class="btn btn-danger mw" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" id="reset-pwd-button">Reset Password</a>
+<a class="btn btn-danger btn-sm mw-420" asp-area="Admin" asp-controller="Account" asp-action="ResetPwd" id="reset-pwd-button">Reset Password</a>
 </div>
 <div>
 	<div class="container-fluid d-flex justify-content-center align-items-center h-100">
@@ -28,16 +30,15 @@
 						{ i++; j++; }
 						<tr>
 							<th scope="row">@i</th>
-							<td>@user.UserName</td>
+							<td class="truncate-email text-truncate">@user.UserName</td>
 							<td>@user.FullName</td>
-							@*                            <td>
-								@string.Join(", ", user.Roles)
-								</td>*@
 							<td class="dropdown">
-								<button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
+								<button class="btn btn-primary dropdown-toggle mw" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
 									aria-haspopup="true" aria-expanded="false">
 									Actions
 								</button>
+								<button class="btn btn-primary dropdown-toggle mw-420" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false"></button>
 								<div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@j">
 									<a class="dropdown-item text-success" asp-area="Admin" asp-controller="Account" asp-action="Update" asp-route-id="@user.Id">
 										Edit

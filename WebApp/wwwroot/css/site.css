@@ -61,7 +61,12 @@ body {
 .descr {
     max-width: 300px;
 }
-
+.truncate-email{
+    max-width:auto
+}
+.mw{
+    display:block;
+}
 @media only screen and (max-width : 420px) {
     .dpm, .descr {
         display: none;
@@ -71,5 +76,15 @@ body {
     }
     .mw-420 {
         display: block;
+    }
+    .truncate-email{
+        max-width: 200px;
+    }
+    .mw-420{
+        display:block;
+        font-size:10px;
+    }
+    .mw{
+        display:none;
     }
 }
