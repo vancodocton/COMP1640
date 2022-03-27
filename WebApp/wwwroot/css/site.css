@@ -44,7 +44,6 @@ body {
 }
 
 .form-control {
-    /*height: 45px;*/
     border-radius: 10px  
 }
 
@@ -72,8 +71,5 @@ body {
     }
     .mw-420 {
         display: block;
-    }
-    .truncate-descr {
-        max-width: 10px !important;
     }
 }
