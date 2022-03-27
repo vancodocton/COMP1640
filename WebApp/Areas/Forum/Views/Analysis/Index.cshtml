@@ -6,10 +6,10 @@
 	int i = 0, j = 0;
 }
 
-<h1>Statistical Analysis Page</h1>
+<h1 class="text-center">Statistical Analysis Page</h1>
 <div>
 	<div class="container-fluid d-flex justify-content-center align-items-center h-100">
-		<div class="form-input p-3 text-center py-4">
+		<div class="form-input text-center py-4">
 			<table class="table table-striped">
 				<thead>
 					<tr>
@@ -17,12 +17,13 @@
 						<th scope="col">Username</th>
 						@if (User.IsInRole(Role.Manager))
 						{
-							<th scope="col">Department</th>
+							<th class="dpm" scope="col">Department</th>
 						}
 						<th scope="col">Idea</th>
 						<th scope="col">React</th>
 						<th scope="col">Comment</th>
-						<th scope="col">Action</th>
+						<th class="mw" scope="col">Action</th>
+						<th class="mw-420" scope="col">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -34,13 +35,16 @@
 							<td>@user.Email</td>
 							@if (User.IsInRole(Role.Manager))
 							{
-								<td>@user.DepartmentName</td>
+								<td class="dpm">@user.DepartmentName</td>
 							}
 							<td>@user.ideaCount</td>
 							<td>@user.reactCount</td>
 							<td>@user.commentCount</td>
-							<td>
+							<td class="mw">
 								<button class="btn btn-primary" type="button" onclick="location.href='mailto:@user.Email';">Send Mail</button>
+							</td>
+							<td class="mw-420">
+								<button style="font-size: 6px" class="btn btn-primary btn-sm" type="button" onclick="location.href='mailto:@user.Email';">Send Mail</button>
 							</td>
 						</tr>
 					}

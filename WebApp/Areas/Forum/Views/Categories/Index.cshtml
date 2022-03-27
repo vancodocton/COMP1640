@@ -5,15 +5,7 @@
     ViewData["Title"] = "Index";
     int i = 0;
 }
-<head>
-    <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="~/lib/fortawesome/fontawesome-free/css/all.min.css" />
-    </environment>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
-</head>
-<body>
+
 <h1 class="text-center">List of Categories</h1>
 
 <p>
@@ -25,7 +17,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th>
+            <th class="descr">
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
@@ -45,7 +37,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
-                <td class="text-truncate" style="max-width: 300px;">
+                <td class="text-truncate descr">
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
@@ -56,10 +48,12 @@
                 </td>
                 <td>
                     <div class="dropdown">
-					<button class="btn btn-primary dropdown-toggle" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+					<button class="btn btn-primary dropdown-toggle mw" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
 							aria-haspopup="true" aria-expanded="false">
 							Actions
 					</button>
+					<button class="btn btn-primary dropdown-toggle mw-420" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false"></button>
                     <div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@i">
 						<a class="dropdown-item text-success" asp-action="Edit" asp-route-id="@item.Id">
 							Edit
@@ -77,4 +71,3 @@
         }
     </tbody>
 </table>
-</body>

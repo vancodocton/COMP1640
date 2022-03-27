@@ -56,3 +56,24 @@ body {
     height: 50px;
     border-radius: 10px
 }
+.mw-420 {
+    display: none;
+}
+.descr {
+    max-width: 300px;
+}
+
+@media only screen and (max-width : 420px) {
+    .dpm, .descr {
+        display: none;
+    }
+    .mw {
+        display: none;
+    }
+    .mw-420 {
+        display: block;
+    }
+    .truncate-descr {
+        max-width: 10px !important;
+    }
+}
