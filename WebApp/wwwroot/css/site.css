@@ -19,7 +19,6 @@ body {
     height: auto;
     background-color: #D3D3D3;
     margin: auto;
-    
 }
 
 .body-background {
@@ -27,64 +26,55 @@ body {
     width: auto;
     background-size: cover;
     margin-bottom: 0;
-    min-height:595px;
+    min-height: 570px;
 }
 
 .form-input {
     width: 700px;
 }
-.form-login{
-    display:block;
+
+.form-login {
+    display: block;
     width: 500px;
-    height:100px;
-    margin:auto;
+    height: 100px;
+    margin: auto;
 }
+
 .form-floating {
     margin-bottom: 20px;
 }
 
 .form-control {
-    border-radius: 10px  
+    border-radius: 10px
 }
 
-.form-control:focus {
+    .form-control:focus {
         box-shadow: none
-}
+    }
 
 .btn-signup {
     height: 50px;
     border-radius: 10px
 }
+
 .mw-420 {
     display: none;
 }
+
 .descr {
     max-width: 300px;
 }
-.truncate-email{
-    max-width:auto
-}
-.mw{
-    display:block;
-}
+
 @media only screen and (max-width : 420px) {
     .dpm, .descr {
         display: none;
     }
+
     .mw {
         display: none;
     }
+
     .mw-420 {
         display: block;
-    }
-    .truncate-email{
-        max-width: 200px;
-    }
-    .mw-420{
-        display:block;
-        font-size:10px;
-    }
-    .mw{
-        display:none;
     }
 }
