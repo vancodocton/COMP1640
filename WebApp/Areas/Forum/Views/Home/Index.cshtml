@@ -112,12 +112,16 @@
             <div class="card-footer">
                 <div class="d-flex flex-wrap justify-content-end">
                     <div class="text-truncate fw-bold">
-                        @if (User.IsInRole(Role.Coordinator) && Model.User.DepartmentId == idea.User?.DepartmentId && DateTime.UtcNow < idea.Category.FinalDueDate)
+                        @if (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
                         {
-                            <a class="btn btn-sm btn-white text-danger rounded-3 px-2" asp-controller="Idea" asp-action="Delete" asp-route-id="@idea.Id">
-                                <i class="fa-solid fa-trash"></i>
-                            </a>
+                            @if (User.IsInRole(Role.Coordinator) && Model.User.DepartmentId == idea.User?.DepartmentId)
+                            {
+                                <a class="btn btn-sm btn-white text-danger rounded-3 px-2" asp-controller="Idea" asp-action="Delete" asp-route-id="@idea.Id">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            }
                         }
+
                         <span class="px-2 ">
                             @if (User.IsInRole(Role.Staff))
                             {

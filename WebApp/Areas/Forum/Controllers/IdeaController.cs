@@ -232,6 +232,7 @@ namespace WebApp.Areas.Forum.Controllers
             var idea = await context.Idea
                 .Include(i => i.User)
                 .Include(i => i.Category)
+                .Include(i => i.FileOnFileSystems)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
@@ -239,12 +240,6 @@ namespace WebApp.Areas.Forum.Controllers
                 return NotFound();
             }
 
-            /*
-            if(DateTime.UtcNow >= idea.Category.FinalDueDate)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, "Cannot delete idea becaufe its final due date is over.");
-            }
-            */
             if (idea.User.DepartmentId == department.Id && ( idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate))
             {
                 return View(idea);
@@ -267,14 +262,15 @@ namespace WebApp.Areas.Forum.Controllers
             var idea = await context.Idea
                 .Include(i => i.User)
                 .Include(i => i.Category)
+                .Include(i => i.FileOnFileSystems)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
             {
                 return RedirectToAction(nameof(Index), "Home");
             }
-
-            if (idea.User.DepartmentId == department.Id && DateTime.UtcNow < idea.Category.FinalDueDate)
+            
+            if (idea.User.DepartmentId == department.Id && idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
             {
                 context.Idea.Remove(idea);
                 await context.SaveChangesAsync();
@@ -284,6 +280,8 @@ namespace WebApp.Areas.Forum.Controllers
                 ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
                 return View("Delete", idea);
             }
+
+            /*
             var file = await context.FileOnFileSystem
                     .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -297,7 +295,9 @@ namespace WebApp.Areas.Forum.Controllers
                 context.FileOnFileSystem.Remove(file);
                 context.SaveChanges();
                 TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
+            */
                 return RedirectToAction(nameof(Index), "Home");
+
         }
     }
 }
