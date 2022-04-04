@@ -264,7 +264,18 @@ namespace WebApp.Areas.Forum.Controllers
                 .Include(i => i.Category)
                 .Include(i => i.FileOnFileSystems)
                 .FirstOrDefaultAsync(i => i.Id == id);
-
+            var file = await context.FileOnFileSystem
+                .FirstOrDefaultAsync(x => x.IdeaId == idea.Id);
+            if (file == null)
+            {
+                return RedirectToAction(nameof(Index), "Home");
+            }
+            if (System.IO.File.Exists(file.FilePath))
+            {
+                System.IO.File.Delete(file.FilePath);
+                context.FileOnFileSystem.Remove(file);
+                context.SaveChanges();
+            }
             if (idea == null)
             {
                 return RedirectToAction(nameof(Index), "Home");
@@ -280,23 +291,7 @@ namespace WebApp.Areas.Forum.Controllers
                 ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
                 return View("Delete", idea);
             }
-
-            /*
-            var file = await context.FileOnFileSystem
-                    .FirstOrDefaultAsync(x => x.Id == id);
-
-                if (file == null)
-                    return NotFound();
-
-                if (System.IO.File.Exists(file.FilePath))
-                {
-                    System.IO.File.Delete(file.FilePath);
-                }
-                context.FileOnFileSystem.Remove(file);
-                context.SaveChanges();
-                TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
-            */
-                return RedirectToAction(nameof(Index), "Home");
+            return RedirectToAction(nameof(Index), "Home");
 
         }
     }
