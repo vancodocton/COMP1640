@@ -29,8 +29,8 @@
         </div>
     </div>
     <div class="card-footer">
-        <div class="row">
-            <div class="col-sm">
+        <div class="d-flex flex-wrap">
+            <div>
                 <form id="react-form" class="btn-group" role="group" aria-label="React button group @Model.Id">
                     <input type="checkbox" class="btn-check" name="react" id="ThumbUp" autocomplete="off" data-checked="Thumbed Up" data-unchecked="Thumb Up" data-loading-text="Loading">
                     <label class="btn btn-outline-primary" for="ThumbUp">
@@ -46,20 +46,20 @@
                 </form>
             </div>
 
-            <div class="col-sm d-inline-flex justify-content-end align-items-center">
-                <div class="px-2">
+            <div class="d-flex flex-wrap justify-content-end align-items-center">
+                <span class="px-2">
                     <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.UserName : "Anonymous user") @(User.Identity?.Name == Model.User?.UserName ? "(Me)" : "")
-                </div>
+                </span>
 
-                <div class="px-2">
+                <span class="px-2">
                     <i class="fa-solid fa-comments"></i>
                     <span id="countcomment">@Model.NumComment</span>
-                </div>
+                </span>
 
-                <div class="px-2">
+                <span class="px-2">
                     <i class="fa-solid fa-eye"></i>
                     <span id="countview">@Model.NumView</span>
-                </div>
+                </span>
             </div>
         </div>
     </div>
@@ -74,45 +74,44 @@
             </div>
         </form>
         <h5 class="h5">List of previous comments</h5>
-        <ul id="commentsList">
+        <div id="commentsList">
 
             @if (Model.Comments == null)
             {
-                <li class="text-danger">Comments isn't loaded</li>
+                <div class="text-danger">Comments isn't loaded</div>
             }
             else foreach (var cmt in Model.Comments)
                 {
-                    <li id="cmt-@cmt.Id" class="card mb-1">
+                    <div id="cmt-@cmt.Id" class="card mb-1">
                         <div class="card-body bg-light">
-                            <p>"@cmt.Content"</p>
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex flex-row align-items-center">
-                                    <span class="fst-italic">Written by &nbsp;</span><i class="fa-solid fa-user"></i>
-                                    <p class="small mb-0 ms-2"><b>@(cmt.User?.UserName ?? "Deleted_User")</b></p>
+                            <div class="d-flex flex-wrap">
+                                <p class="text-truncate pe-1">
+                                    <i class="fa-solid fa-user"> </i>
+                                    <b>@(cmt.User?.UserName ?? "Deleted_User")</b>
+                                </p>
+                                <p>
+                                    @cmt.Content
                                     @if (Model.Category.FinalDueDate == null || DateTime.UtcNow < Model.Category.FinalDueDate)
                                     {
-                                        @if (cmt.User!.UserName == User.Identity!.Name)
+                                        @if (cmt.User?.UserName == User.Identity!.Name)
                                         {
-                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
-                                    onclick="deleteComment(@cmt.Id)">
+                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(@cmt.Id)">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         }
-                                        else if (User.IsInRole(WebApp.Data.Role.Coordinator) && cmt.User.DepartmentId == (int)(ViewData["UserDepartmentId"] ?? 0))
+                                        else if (User.IsInRole(WebApp.Data.Role.Coordinator) && cmt.UserId == null || cmt.User?.DepartmentId == (int)(ViewData["UserDepartmentId"] ?? 0))
                                         {
-                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
-                                    onclick="deleteComment(@cmt.Id)">
+                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(@cmt.Id)">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         }
                                     }
-
-                                </div>
+                                </p>
                             </div>
                         </div>
-                    </li>
+                    </div>
                 }
-        </ul>
+        </div>
     </div>
 </div>
 

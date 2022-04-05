@@ -175,7 +175,7 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 cmt.User = await userManager.FindByIdAsync(cmt.UserId);
 
-                if (cmt.User.DepartmentId == user.DepartmentId)
+                if (cmt.User == null || cmt.User.DepartmentId == user.DepartmentId)
                 {
                     var deletedCmtId = await DeleteConfirmed(cmt);
                     return Ok(deletedCmtId);
@@ -201,12 +201,11 @@ namespace WebApp.Areas.Forum.Controllers
             await hubContext.Clients.Group($"{cmt.Idea.Id}").RevokeSentComment(new RevokeSentIdeaResponse()
             {
                 CommentId = cmt.Id,
-                CommentOwnerUserName = cmt.User.UserName,
-                RevokerUserName = User.Identity.Name,
+                CommentOwnerUserName = cmt.User?.UserName ?? "Deleted User",
+                RevokerUserName = User.Identity!.Name,
             });
 
             return cmt.Idea.NumComment;
         }
-
     }
 }
