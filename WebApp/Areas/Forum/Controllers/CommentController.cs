@@ -8,7 +8,7 @@ using System.Text.Encodings.Web;
 using WebApp.Data;
 using WebApp.Hubs;
 using WebApp.Models;
-using WebApp.Models.Hubs;
+using WebApp.ViewModels.IdeaInteractHub;
 
 namespace WebApp.Areas.Forum.Controllers
 {

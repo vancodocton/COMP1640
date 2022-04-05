@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
-using WebApp.Models.Hubs;
+using WebApp.ViewModels.IdeaInteractHub;
 
 namespace WebApp.Hubs
 {
