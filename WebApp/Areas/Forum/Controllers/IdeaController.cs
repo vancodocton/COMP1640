@@ -240,7 +240,7 @@ namespace WebApp.Areas.Forum.Controllers
                 return NotFound();
             }
 
-            if (idea.User.DepartmentId == department.Id && ( idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate))
+            if (idea.User.DepartmentId == department.Id && (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate))
             {
                 return View(idea);
             }
@@ -280,7 +280,7 @@ namespace WebApp.Areas.Forum.Controllers
             {
                 return RedirectToAction(nameof(Index), "Home");
             }
-            
+
             if (idea.User.DepartmentId == department.Id && idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
             {
                 context.Idea.Remove(idea);

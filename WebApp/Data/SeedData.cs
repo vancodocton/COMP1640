@@ -95,7 +95,7 @@ namespace WebApp.Data
 
             foreach (var category in categorys)
             {
-                if (!await context.Category.AnyAsync(d => d.Name == category.Name)) 
+                if (!await context.Category.AnyAsync(d => d.Name == category.Name))
                     await context.Category.AddAsync(category);
             }
             await context.SaveChangesAsync();

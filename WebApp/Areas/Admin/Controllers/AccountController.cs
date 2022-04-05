@@ -108,7 +108,7 @@ namespace WebApp.Areas.Admin.Controllers
                             var callbackUrl = Url.Action(
                                 action: "ConfirmEmail",
                                 controller: "Account",
-                                new { area = "Identity", userId = user.Id,  code, returnUrl = "/Identity/Account/Login" },
+                                new { area = "Identity", userId = user.Id, code, returnUrl = "/Identity/Account/Login" },
                                 protocol: "https");
 
                             await _emailSender.SendEmailAsync(user.Email, "Confirm your email",

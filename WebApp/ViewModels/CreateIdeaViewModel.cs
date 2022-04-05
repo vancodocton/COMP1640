@@ -95,9 +95,9 @@ namespace WebApp.ViewModels
     {
         public List<string> DocumentExtensions { get; } = UploadFileHelper.DocumentExtensions;
 
-        public new string ErrorMessage 
+        public new string ErrorMessage
         {
-            get => $"Only document is allowed ({string.Join(", ",DocumentExtensions)})"; 
+            get => $"Only document is allowed ({string.Join(", ", DocumentExtensions)})";
         }
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
