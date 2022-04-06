@@ -1,12 +1,12 @@
 ﻿@model WebApp.ViewModels.CreateIdeaViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create new Idea";
 }
-<h1>Create</h1>
-<h4>IdeaViewModel</h4>
 <div class="row justify-content-center">
     <div class="col-lg-5 col-sm-8">
+        <h4>Create new idea</h4>
+        <hr />
         <form asp-action="Create" enctype="multipart/form-data" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -29,7 +29,7 @@
 
             <div class="mb-3">
                 <label asp-for="Documents" class="form-label"></label>
-                <input type="file" asp-for="Documents" class="form-control" multiple/>
+                <input type="file" asp-for="Documents" class="form-control" multiple />
                 <span asp-validation-for="Documents" class="text-danger"></span>
             </div>
 
@@ -61,7 +61,7 @@
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true" >
+<div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -69,24 +69,24 @@
             </div>
             <div class="modal-body">
                 <strong class="mb-0 text-danger"> 1. PERSONALLY IDENTIFIABLE INFORMATION </strong>
-                    <p style="text-align: justify">
-                        We do not collect your name, email address, telephone number or other personally identifiable information (“Personal Data”) from you when you become a Subscriber of the Login Site.
-                    </p>
+                <p style="text-align: justify">
+                    We do not collect your name, email address, telephone number or other personally identifiable information (“Personal Data”) from you when you become a Subscriber of the Login Site.
+                </p>
                 <strong class="mb-0 text-danger"> 2. HOW WE USE YOUR INFORMATION</strong>
                 <p style="text-align: justify">
-                We may use your Personal Data in a manner that is consistent with this Privacy Policy. If you provide Personal Data for a certain reason, we may use such Personal Data in connection with the reason for which it was provided.  
-                For instance, we will use Personal Data to administer access to the Site and to respond to submissions made to the Site; complete product orders and respond to other inquiries, and provide you with additional information about our products and services.
-                We may also use your Personal Data and personally non-identifiable information collected through the Site to help us improve the functionality of the Site, to better understand the end users of the Site and to provide and improve our Services.
-                If we intend on using any of your Personal Data in any manner that is not consistent with this Privacy Policy, you will be informed of such anticipated use prior to or at the time at which the Personal Data is collected. You may choose not to submit your Personal Data at any time, but that decision may prevent you from accessing and/or using our Services.
+                    We may use your Personal Data in a manner that is consistent with this Privacy Policy. If you provide Personal Data for a certain reason, we may use such Personal Data in connection with the reason for which it was provided.
+                    For instance, we will use Personal Data to administer access to the Site and to respond to submissions made to the Site; complete product orders and respond to other inquiries, and provide you with additional information about our products and services.
+                    We may also use your Personal Data and personally non-identifiable information collected through the Site to help us improve the functionality of the Site, to better understand the end users of the Site and to provide and improve our Services.
+                    If we intend on using any of your Personal Data in any manner that is not consistent with this Privacy Policy, you will be informed of such anticipated use prior to or at the time at which the Personal Data is collected. You may choose not to submit your Personal Data at any time, but that decision may prevent you from accessing and/or using our Services.
                 </p>
                 <strong class="mb-0 text-danger"> 3. SECURITY</strong>
                 <p style="text-align: justify">
-                    We have reasonable security measures in place intended to protect against the loss, misuse or alteration of personally identifiable information that we have collected from you through the Site. 
+                    We have reasonable security measures in place intended to protect against the loss, misuse or alteration of personally identifiable information that we have collected from you through the Site.
                     However, we are unable to guarantee that the security measures we take will not be penetrated or compromised or that your personally identifiable information will remain secure under all circumstances.
                 </p>
                 <strong class="mb-0 text-danger"> 4. CHANGES TO OUR PRIVACY POLICY</strong>
                 <p style="text-align: justify">
-                    This Privacy Policy is effective as of the “Last Updated” date set forth above. We reserve the right to amend this Privacy Policy at any time and from time to time without notice. 
+                    This Privacy Policy is effective as of the “Last Updated” date set forth above. We reserve the right to amend this Privacy Policy at any time and from time to time without notice.
                     If you use the Site after a revised Privacy Policy has been posted, you will be deemed to have agreed to such Privacy Policy.
                 </p>
                 <strong class="mb-0 text-danger"> 5. HOW TO CONTACT US</strong>
