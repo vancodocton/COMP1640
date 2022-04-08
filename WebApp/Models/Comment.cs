@@ -7,7 +7,6 @@ namespace WebApp.Models
     {
         public int Id { get; set; }
 
-        // Change UserId is not required to save the comment after deleted user
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
 

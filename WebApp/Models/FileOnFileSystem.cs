@@ -19,6 +19,5 @@ namespace WebApp.Models
         public DateTime UploadTime { get; set; } = DateTime.UtcNow;
 
         public string FilePath { get; set; } = null!;
-
     }
 }

@@ -7,9 +7,9 @@ namespace WebApp.Models
     {         
         public int Id { get; set; }
 
-        [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
 
+        [DataType(DataType.MultilineText)]
         public string? Description { get; set; }
 
         public IEnumerable<Idea> Ideas { get; set; } = null!;

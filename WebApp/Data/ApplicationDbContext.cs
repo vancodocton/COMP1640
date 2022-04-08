@@ -25,8 +25,6 @@ namespace WebApp.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-
             builder.Entity<Department>()
                 .HasIndex(u => u.Name)
                 .IsUnique();
@@ -34,6 +32,28 @@ namespace WebApp.Data
             builder.Entity<Category>()
                 .HasIndex(c => c.Name)
                 .IsUnique();
+
+            builder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comments)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<React>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Reacts)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Idea>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Ideas)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<ApplicationUser>()
+               .HasOne(c => c.Department)
+               .WithMany(u => u.Users)
+               .OnDelete(DeleteBehavior.SetNull);
+
+            base.OnModelCreating(builder);
         }
     }
 }

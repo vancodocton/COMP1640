@@ -4,14 +4,12 @@ namespace WebApp.Models
 {
     public class Department
     {
-        [Key]
         public int Id { get; set; }
 
-        [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public string? Description { get; set; }
 
-        public IEnumerable<ApplicationUser>? Users { get; set; }
+        public ICollection<ApplicationUser> Users { get; set; } = null!;
     }
 }
