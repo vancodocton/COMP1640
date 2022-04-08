@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Encodings.Web;
 using WebApp.Data;
-using WebApp.Hubs;
 using WebApp.Models;
+using WebApp.Services.Hubs;
 using WebApp.ViewModels.IdeaInteractHub;
 
 namespace WebApp.Areas.Forum.Controllers

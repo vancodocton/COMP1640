@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
-using WebApp.Hubs;
 using WebApp.Models;
 using WebApp.Services;
+using WebApp.Services.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
