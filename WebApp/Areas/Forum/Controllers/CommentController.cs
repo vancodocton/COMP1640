@@ -99,7 +99,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             if (user.Id != idea.UserId)
             {
-                var ideaUrl = Url.ActionLink("Index", "Idea", new { id = idea.Id });
+                var ideaUrl = Url.ActionLink("Index", "Idea", new { area = "Forum", id = idea.Id });
 
                 if (ideaUrl != null && idea.User!.EmailConfirmed)
                 {

@@ -120,7 +120,7 @@ namespace WebApp.Areas.Forum.Controllers
                         .Where(c => c.DepartmentId == user.DepartmentId)
                         .ToList();
 
-                    var url = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
+                    var url = Url.ActionLink("Index", "Idea", new { area = "Forum", id = idea.Id });
 
                     foreach (var coor in coors)
                     {
@@ -254,45 +254,36 @@ namespace WebApp.Areas.Forum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await userManager.GetUserAsync(User);
-
-            var department = await context.Department
-                .FirstAsync(d => d.Id == user.DepartmentId);
-
             var idea = await context.Idea
                 .Include(i => i.User)
                 .Include(i => i.Category)
                 .Include(i => i.FileOnFileSystems)
                 .FirstOrDefaultAsync(i => i.Id == id);
-            var file = await context.FileOnFileSystem
-                .FirstOrDefaultAsync(x => x.IdeaId == idea.Id);
-            if (file == null)
-            {
-                return RedirectToAction(nameof(Index), "Home");
-            }
-            if (System.IO.File.Exists(file.FilePath))
-            {
-                System.IO.File.Delete(file.FilePath);
-                context.FileOnFileSystem.Remove(file);
-                context.SaveChanges();
-            }
+
             if (idea == null)
             {
                 return RedirectToAction(nameof(Index), "Home");
             }
 
-            if (idea.User.DepartmentId == department.Id && idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
+            var user = await userManager.GetUserAsync(User);
+
+            var department = await context.Department
+                .FirstAsync(d => d.Id == user.DepartmentId);
+
+            if (idea.User == null
+                || (idea.User.DepartmentId == department.Id
+                    && (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)))
             {
                 context.Idea.Remove(idea);
-                await context.SaveChangesAsync();
+                var result = await context.SaveChangesAsync();
             }
             else
             {
                 ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
                 return View("Delete", idea);
             }
-            return RedirectToAction(nameof(Index), "Home");
 
+            return RedirectToAction(nameof(Index), "Home");
         }
     }
 }
