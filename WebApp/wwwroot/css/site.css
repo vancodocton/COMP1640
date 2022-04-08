@@ -25,8 +25,7 @@ body {
     height: auto;
     width: auto;
     background-size: cover;
-    margin-bottom: 0;
-    min-height: 570px;
+    min-height: 80vh;
 }
 
 .form-input {
@@ -41,7 +40,7 @@ body {
 }
 
 .form-floating {
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 .form-control {
