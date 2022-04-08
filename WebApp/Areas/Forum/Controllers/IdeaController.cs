@@ -274,8 +274,18 @@ namespace WebApp.Areas.Forum.Controllers
                 || (idea.User.DepartmentId == department.Id
                     && (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)))
             {
+                var files = await context.FileOnFileSystem
+                .Where(x => x.IdeaId == idea.Id)
+                .ToListAsync();
                 context.Idea.Remove(idea);
                 var result = await context.SaveChangesAsync();
+                foreach (var file in files)
+                {
+                    if (System.IO.File.Exists(file.FilePath))
+                    {
+                        System.IO.File.Delete(file.FilePath);
+                    }
+                }
             }
             else
             {
