@@ -48,7 +48,7 @@
 
             <div class="d-flex flex-wrap justify-content-end align-items-center">
                 <span class="px-2">
-                    <i class="fa-solid fa-user"></i> @(!Model.IsIncognito ? Model.User!.UserName : "Anonymous user") @(User.Identity?.Name == Model.User?.UserName ? "(Me)" : "")
+                    <i class="fa-solid fa-user"></i> @(Model.UserId == null ? "Deleted_User" : $"{(Model.IsIncognito ? "Anonymous User" : Model.User!.UserName)}{(User.Identity?.Name == Model.User?.UserName ? " (Me)" : "")}")
                 </span>
 
                 <span class="px-2">

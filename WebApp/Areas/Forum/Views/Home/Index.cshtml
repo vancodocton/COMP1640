@@ -112,7 +112,7 @@
             <div class="card-footer">
                 <div class="d-flex flex-wrap justify-content-end">
                     <div class="text-truncate fw-bold">
-                        @if (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
+                        @if (idea.Category!.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
                         {
                             @if (User.IsInRole(Role.Coordinator) && Model.User.DepartmentId == idea.User?.DepartmentId)
                             {
@@ -123,13 +123,20 @@
                         }
 
                         <span class="px-2 ">
-                            @if (User.IsInRole(Role.Staff))
+                            @if (idea.UserId == null)
                             {
-                                <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
+                                <i class="fa-solid fa-user"></i> @("Deleted_User")
                             }
                             else
                             {
-                                <i class="fa-solid fa-user"></i> @(idea.User!.UserName)
+                                if (User.IsInRole(Role.Staff))
+                                {
+                                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User!.UserName ? "(Me)" : "")
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-user"></i> @(idea.User!.UserName + (idea.IsIncognito ? " (Anonymous idea)" : ""))
+                                }
                             }
                         </span>
                     </div>
