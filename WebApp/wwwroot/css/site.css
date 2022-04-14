@@ -77,3 +77,8 @@ body {
         display: block;
     }
 }
+
+.txtlink {
+    text-decoration: none;
+    font-size: 14px;
+}
