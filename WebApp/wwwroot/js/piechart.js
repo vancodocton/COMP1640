@@ -14,6 +14,10 @@ var options = {
         enabled: false
     },
     plugins: {
+        title: {
+            display: true,
+            text: 'Percentage of ideas by each Department.'
+        },
         datalabels: {
             formatter: (value, ctx) => {
                 const datapoints = ctx.chart.data.datasets[0].data
