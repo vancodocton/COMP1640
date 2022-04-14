@@ -9,11 +9,11 @@ namespace WebApp.ViewModels
     public class CreateIdeaViewModel
     {
         [Required]
-        public string? Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [Required]
         [DataType(DataType.MultilineText)]
-        public string? Content { get; set; }
+        public string Content { get; set; } = null!;
 
         [Required]
         [Display(Name = "Category")]
