@@ -10,7 +10,7 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
                 <a href="#" class="txtlink" data-bs-toggle="modal" data-bs-target="#Modal">
                     Details
@@ -79,8 +79,11 @@
         </div>
     </div>
     <div class="col-sm-6">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header">
+                <a href="#" class="txtlink">
+                    Details
+                </a>
             </div>
             <div class="card-body">
                 <canvas id="pieChart"></canvas>
@@ -91,6 +94,7 @@
 
 @section Scripts {
 <partial name="_ChartJsScriptsPartial" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
 <script type="text/javascript" src="~/js/mychart.js"></script>
 <script type="text/javascript" src="~/js/piechart.js"></script>
 }

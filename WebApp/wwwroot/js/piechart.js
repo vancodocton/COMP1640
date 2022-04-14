@@ -1,32 +1,40 @@
-﻿////const labels = [
-////    'Academic Department',
-////    'Support Department'];
-const data = {
-    labels: ['Orange', 'Blue'],
-    datasets: [
-        {
-            label: 'Dataset 1',
-            data: [10, 20],
-            backgroundColor: 'rgb(255, 99, 132)'
-        }
-    ]
-};
-const config = {
-    type: 'pie',
-    data: data,
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Chart.js Pie Chart'
-            }
-        }
+﻿var datapie = [{
+    data: [30, 55],
+    backgroundColor: [
+        "#5f255f",
+        "#B27200"
+    ],
+    borderColor: "#fff"
+}];
+
+var options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    tooltips: {
+        enabled: false
     },
+    plugins: {
+        datalabels: {
+            formatter: (value, ctx) => {
+                const datapoints = ctx.chart.data.datasets[0].data
+                const total = datapoints.reduce((total, datapoint) => total + datapoint, 0)
+                const percentage = value / total * 100
+                return percentage.toFixed(2) + "%";
+            },
+            color: '#fff',
+        }
+    }
 };
-const pieChart = new Chart(
-    document.getElementById('pieChart'),
-    config);
+
+var ctx = document.getElementById("pieChart").getContext('2d');
+ctx.width = 50;
+ctx.height = 50;
+var pieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Academic Department', 'Support Department'],
+        datasets: datapie
+    },
+    options: options,
+    plugins: [ChartDataLabels],
+});

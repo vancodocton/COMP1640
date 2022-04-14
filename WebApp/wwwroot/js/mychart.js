@@ -42,12 +42,8 @@ const config = {
     type: 'bar',
     data: data,
     options: {
-/*        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }*/
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top',
@@ -59,6 +55,9 @@ const config = {
         }
     },
 };
-const myChart = new Chart(
-    document.getElementById('myChart'),
-    config);
+var ctx = document.getElementById("myChart").getContext('2d');
+ctx.width = 100;
+ctx.height = 100;
+var my = new Chart(ctx, 
+    config
+);
