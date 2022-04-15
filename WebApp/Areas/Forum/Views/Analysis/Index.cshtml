@@ -94,6 +94,19 @@
 
 @section Scripts {
 <partial name="_ChartJsScriptsPartial" />
+<script type="text/javascript" >
+    var datasets = @Json.Serialize(Model
+        .Where(i => i.DepartmentName is not null)
+        .GroupBy(i => i.DepartmentName)
+        .Select(x => new DepartmentStaticalViewModel
+        {
+            Label = x.Key,
+            CountIdea = x.Sum(u => u.ideaCount),
+            CountComment = x.Sum(u => u.commentCount),
+            CountReact = x.Sum(u => u.reactCount),
+        })
+    );
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
 <script type="text/javascript" src="~/js/mychart.js"></script>
 <script type="text/javascript" src="~/js/piechart.js"></script>
