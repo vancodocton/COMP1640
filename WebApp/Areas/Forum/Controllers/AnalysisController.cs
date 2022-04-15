@@ -49,7 +49,7 @@ namespace WebApp.Areas.Forum.Controllers
                 .Select(u => new StatisticalAnalysisViewModel()
                 {
                     ideaCount = u.Ideas.Count,
-                    reactCount = u.Reacts.Count,
+                    reactCount = u.Reacts.Where(r => r.Type != ReactType.Null).Count(),
                     commentCount = u.Comments.Count,
                     Id = u.Id,
                     Email = u.Email,

@@ -80,39 +80,40 @@ function userInteractIdea(ideaId) {
         if (userName != res.userName) {
             cmt =
                 `
-                <li class="card mb-1">
-                    <div class="card-body bg-light">
-                        <p>${res.content}</p>
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex flex-row align-items-center">
-                                    <span class="fst-italic">Written by &nbsp;</span>
-                                    <i class="fa-solid fa-user"></i>
-                                    <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
-                                </div>
+                    <div id="cmt-${res.cmtId}" class="card mb-1">
+                        <div class="card-body bg-light">
+                            <div class="d-flex flex-wrap">
+                                <p class="text-truncate pe-1">
+                                    <i class="fa-solid fa-user"> </i>
+                                    <b>${res.userName}</b>
+                                </p>
+                                <p>
+                                    ${res.content}
+                                </p>
                             </div>
-                    </div>
-                 </li>
+                        </div>
+                    </div>                 
                 `;
         }
         else {
             cmt =
                 `
-                <li id="cmt-${res.commentId}" class="card mb-1">
-                    <div class="card-body bg-light">
-                        <p>${res.content}</p>
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex flex-row align-items-center">
-                                    <span class="fst-italic">Written by &nbsp;</span>
-                                    <i class="fa-solid fa-user"></i>
-                                    <p class="small mb-0 ms-2"><b>${res.userName}</b></p>
-                                    <button class="btn btn-sm btn-white text-danger rounded-3 px-2"
-                                        onclick="deleteComment(${res.commentId})">
+                    <div id="cmt-${res.cmtId}" class="card mb-1">
+                        <div class="card-body bg-light">
+                            <div class="d-flex flex-wrap">
+                                <p class="text-truncate pe-1">
+                                    <i class="fa-solid fa-user"> </i>
+                                    <b>${res.userName}</b>
+                                </p>
+                                <p>
+                                    ${res.content}
+                                    <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(${res.cmtId})">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
-                                </div>
+                                </p>
                             </div>
-                    </div>
-                 </li>
+                        </div>
+                    </div>                 
                 `;
         }
 
