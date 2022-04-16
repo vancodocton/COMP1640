@@ -13,9 +13,6 @@
     },
     plugins: [ChartDataLabels],
     options: {
-        parsing: {
-            key: 'contribution',
-        },
         responsive: true,
         maintainAspectRatio: false,
         tooltips: {

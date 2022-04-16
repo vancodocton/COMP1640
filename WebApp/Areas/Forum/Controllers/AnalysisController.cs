@@ -39,7 +39,8 @@ namespace WebApp.Areas.Forum.Controllers
                     reactCount = u.Reacts.Count,
                     commentCount = u.Comments.Count,
                     Id = u.Id,
-                    Email = u.Email
+                    Email = u.Email,
+                    DepartmentName = u.Department.Name
                 })
                 .OrderByDescending(u => u.ideaCount)
                 .ThenByDescending(u => u.reactCount)
