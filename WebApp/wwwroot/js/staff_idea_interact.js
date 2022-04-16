@@ -75,12 +75,12 @@ function userInteractIdea(ideaId) {
     });
 
     connection.on("ReceiveComment", (res) => {
-        //console.log(res);
+        console.log(res);
         var cmt;
         if (userName != res.userName) {
             cmt =
                 `
-                    <div id="cmt-${res.cmtId}" class="card mb-1">
+                    <div id="cmt-${res.commentId}" class="card mb-1">
                         <div class="card-body bg-light">
                             <div class="d-flex flex-wrap">
                                 <p class="text-truncate pe-1">
@@ -98,7 +98,7 @@ function userInteractIdea(ideaId) {
         else {
             cmt =
                 `
-                    <div id="cmt-${res.cmtId}" class="card mb-1">
+                    <div id="cmt-${res.commentId}" class="card mb-1">
                         <div class="card-body bg-light">
                             <div class="d-flex flex-wrap">
                                 <p class="text-truncate pe-1">
@@ -107,7 +107,7 @@ function userInteractIdea(ideaId) {
                                 </p>
                                 <p>
                                     ${res.content}
-                                    <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(${res.cmtId})">
+                                    <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(${res.commentId})">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </p>

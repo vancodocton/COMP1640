@@ -132,12 +132,12 @@ namespace WebApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult ResetPwd(string? id)
+        public async Task<ActionResult> ResetPwdAsync(string? id)
         {
             var model = new RegisterModel.InputModel();
 
             if (!string.IsNullOrEmpty(id))
-                model.Email = id;
+                model.Email = (await _userManager.FindByIdAsync(id))?.Email;
 
             return View(model);
         }

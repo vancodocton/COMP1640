@@ -131,7 +131,7 @@
                             {
                                 if (User.IsInRole(Role.Staff))
                                 {
-                                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User!.UserName ? "(Me)" : "")
+                                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User!.UserName ? " (Me)" : "")
                                 }
                                 else
                                 {
