@@ -21,6 +21,7 @@
 						<th scope="col">ID</th>
 						<th scope="col">Username</th>
 						<th scope="col">Full Name</th>
+						<th scope="col">Roles</th>
 						<th scope="col">Action</th>
 					</tr>
 				</thead>
@@ -31,7 +32,8 @@
 						<tr>
 							<th scope="row">@i</th>
 							<td class="truncate-email text-truncate">@user.UserName</td>
-							<td>@user.FullName</td>
+							<td class="text-nowrap">@user.FullName</td>
+							<td class="text-nowrap">@string.Join(", ", user.Roles)</td>
 							<td class="dropdown">
 								<button class="btn btn-primary dropdown-toggle mw" type="button" id="actions-dropdown-@j" data-bs-toggle="dropdown"
 									aria-haspopup="true" aria-expanded="false">
