@@ -14,33 +14,40 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-})
-    .AddRoles<IdentityRole>()
+    {
+        // Lockout settings.
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        options.User.RequireUniqueEmail = true;
+
+        options.SignIn.RequireConfirmedAccount = true;
+
+    }).AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-//builder.Services.ConfigureApplicationCookie(options =>
-//{
-//    //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-//    //options.Cookie.Name = "YourAppCookieName";
-//    options.Cookie.HttpOnly = true;
-//    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-//    options.LoginPath = "/Identity/Account/Login";
-//    // ReturnUrlParameter requires 
-//    //using Microsoft.AspNetCore.Authentication.Cookies;
-//    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-//    options.SlidingExpiration = true;
-//});
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
+
+
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.FromMinutes(5);
+});
+
 builder.Services.AddControllersWithViews();
-
 var mvcBuilder = builder.Services.AddRazorPages();
-
 if (builder.Environment.IsDevelopment())
 {
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
