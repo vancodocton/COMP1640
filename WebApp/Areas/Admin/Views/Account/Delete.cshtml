@@ -7,18 +7,18 @@
 </div>
 <form method="post" asp-action="Delete">
     <input asp-for="Id" hidden />
-    <div asp-validation-summary="All"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-3">
-        <label asp-for="FullName">Fullname</label>
+        <label asp-for="FullName"></label>
         <input type="text" class="form-control" asp-for="FullName" disabled>
-        <span asp-validation-for="FullName" class=" alert-danger"></span>
+        <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Email">Email</label>
+        <label asp-for="Email"></label>
         <input type="text" class="form-control" asp-for="Email" disabled>
-        <span asp-validation-for="Email" class=" alert-danger"></span>
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="isDeleteAll" name="isDeleteAll" value="true" />

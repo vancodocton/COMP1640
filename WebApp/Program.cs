@@ -35,6 +35,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
+    options.Cookie.MaxAge = TimeSpan.FromDays(3);
 });
 
 
