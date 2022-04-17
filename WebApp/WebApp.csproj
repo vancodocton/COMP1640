@@ -7,6 +7,16 @@
     <UserSecretsId>aspnet-WebApp-0C788AF4-92FB-4587-815B-B4D24986BBDD</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
+  </PropertyGroup>
+    
+  <Target Name="RemoveIdentityAssets"> 
+	<ItemGroup> 
+	  <StaticWebAsset Remove="@(StaticWebAsset)" Condition="%(SourceId) == 'Microsoft.AspNetCore.Identity.UI'" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <Compile Remove="Files\**" />
     <Content Remove="Files\**" />
