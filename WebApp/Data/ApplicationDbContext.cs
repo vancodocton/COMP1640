@@ -54,6 +54,12 @@ namespace WebApp.Data
                .OnDelete(DeleteBehavior.SetNull);
 
             base.OnModelCreating(builder);
+
+            builder.Entity<ApplicationUser>()
+                .HasMany(e => e.UserRoles)
+                .WithOne()
+                .HasForeignKey(ur => ur.UserId)
+                .IsRequired();
         }
     }
 }
