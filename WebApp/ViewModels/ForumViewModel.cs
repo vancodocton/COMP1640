@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.ComponentModel.DataAnnotations;
-using WebApp.Data;
+﻿using WebApp.Data;
 using WebApp.Models;
 
 namespace WebApp.ViewModels
@@ -10,14 +7,10 @@ namespace WebApp.ViewModels
     {
         public PaginatedList<Idea> Ideas { get; set; } = null!;
 
-        public string Sort { get; set; } = "lastest";
+        public ApplicationUser User { get; set; } = null!;
 
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid Page number")]
-        public int Page { get; set; } = 1;
-        
-        public int? CategoryId { get; set; }
+        public Category? Category { get; set; }
 
-        [BindNever]
-        public ICollection<Category> Categories { get; set; } = null!;
+        public ForumSearch Search { get; set; } = new();
     }
 }

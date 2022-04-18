@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
@@ -15,43 +15,73 @@ namespace WebApp.Areas.Forum.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IEmailSender sender;
         private readonly int pageSize = 5;
 
         public HomeController(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            IEmailSender sender
+            UserManager<ApplicationUser> userManager
             )
         {
             this.context = context;
             this.userManager = userManager;
-            this.sender = sender;
         }
 
-        public async Task<ActionResult> Index(int? cid, string? sort, int page = 1)
+        [HttpGet]
+        public async Task<ActionResult> Index(ForumSearch search)
         {
-            var ideas = context.Idea
-                .Include(x => x.Category)
-                .Include(x => x.User)
-                .Include(x => x.Comments
-                    .OrderByDescending(i => i.Id)
-                    .Take(2)
-                    .OrderBy(i => i.Id))
-                .AsQueryable();
+            var user = await userManager.GetUserAsync(User);
 
-            if (cid != null)
+            var ideas = context.Idea
+                .Include(i => i.Category)
+                .Include(i => i.User)
+                .Include(i => i.Comments
+                    .OrderByDescending(c => c.Id)
+                    .Take(2)
+                    .OrderBy(c => c.Id)
+                    )
+                .ThenInclude(c => c.User)
+                .AsSplitQuery();
+                //.Select(i => new Idea()
+                //{
+                //    Id = i.Id,
+                //    UserId = i.UserId,
+                //    User = new ApplicationUser()
+                //    {
+                //        Id = i.UserId,
+                //        UserName = i.User.UserName,
+                //        Email = i.User.Email,
+                //        DepartmentId = i.User.DepartmentId
+                //    },
+                //    CategoryId = i.CategoryId,
+                //    Category = new Category()
+                //    {
+                //        Id = i.Category.Id,
+                //        Name = i.Category.Name
+                //    },
+                //    IsIncognito = i.IsIncognito,
+                //    Title = i.Title,
+                //    Content = i.Content,
+                //    Comments = i.Comments,
+                //    ThumbUp = i.ThumbUp,
+                //    ThumbDown = i.ThumbDown,
+                //    NumComment = i.NumComment,
+                //    NumView = i.NumView,
+                //});
+
+            // filter by category
+            Category? category = null;
+            if (search.CategoryId != null)
             {
-                ideas = ideas.Where(i => i.CategoryId == cid);
-                ViewData["cid"] = cid;
+                category = await context.Category.FirstOrDefaultAsync(c => c.Id == search.CategoryId);
+                if (category != null)
+                    ideas = ideas.Where(i => i.CategoryId == search.CategoryId);
             }
 
-            switch (sort)
+            // filter by order
+            switch (search.Order)
             {
                 case null:
-                case "":
                 case "lastest":
-                default:
                     ideas = ideas.OrderByDescending(i => i.Id);
                     break;
                 case "popular":
@@ -65,21 +95,44 @@ namespace WebApp.Areas.Forum.Controllers
                         .OrderByDescending(i => i.NumView)
                         .ThenByDescending(i => i.Id);
                     break;
+                default:
+                    search.Order = null;
+                    break;
             }
 
-            var model = new ForumViewModel();
+            // filter by department (only Manager and Staff) and load data for filter
+            if (User.IsInRole(Role.Coordinator))
+            {
+                search.Departments.Add(
+                    new SelectListItem("My Department", $"{user.DepartmentId}"));
+                if (search.DepartmentId != null
+                    && search.DepartmentId == user.DepartmentId)
+                {
+                    ideas = ideas.Where(i => i.User.DepartmentId == user.DepartmentId);
+                }
+            }
+            else if (User.IsInRole(Role.Manager))
+            {
+                var departments = await context.Department
+                    .Select(d => new SelectListItem(d.Name, d.Id.ToString()))
+                    .ToListAsync();
+                search.Departments.AddRange(departments);
 
-            model.Ideas = await PaginatedList<Idea>.CreateAsync(ideas, page, pageSize);
+                if (search.DepartmentId != null && await context.Department.AnyAsync(i => i.Id == search.DepartmentId))
+                {
+                    ideas = ideas.Where(i => i.User.DepartmentId == search.DepartmentId);
+                }
+            }
 
-            model.Categories = await context.Category.ToListAsync();
-            model.Page = page;
-            model.Sort = sort ?? "";
-            model.CategoryId = cid;
-
-            var user = await userManager.GetUserAsync(User);
-            var department = await context.Department
-                .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
-            ViewData["UserDepartmentId"] = department?.Id  ;
+            // load data to view model
+            search.Categories = await context.Category.ToListAsync();
+            var model = new ForumViewModel
+            {
+                User = user,
+                Ideas = await PaginatedList<Idea>.CreateAsync(ideas, search.Page, pageSize),
+                Search = search,
+                Category = category,
+            };
 
             return View(model);
         }

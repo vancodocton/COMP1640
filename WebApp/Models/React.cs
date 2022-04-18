@@ -7,14 +7,12 @@ namespace WebApp.Models
     {
         public int Id { get; set; }
 
-        // Change UserId is not required to save the reaction after deleted user
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
 
         public int IdeaId { get; set; }
-        public Idea? Idea { get; set; }
+        public Idea Idea { get; set; } = null!;
 
-        [Required]
         public ReactType Type { get; set; }
     }
 

@@ -15,6 +15,6 @@ namespace WebApp.ViewModels
         [Display(Name = "Full Name")]
         public string? FullName { get; set; }
 
-        public IList<string>? Roles { get; set; }
+        public ICollection<string> Roles { get; set; } = null!;
     }
 }

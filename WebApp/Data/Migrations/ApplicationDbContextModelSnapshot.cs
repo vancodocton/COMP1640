@@ -17,7 +17,7 @@ namespace WebApp.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -218,9 +218,6 @@ namespace WebApp.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TermConfirmed")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -322,6 +319,43 @@ namespace WebApp.Data.Migrations
                     b.ToTable("Department");
                 });
 
+            modelBuilder.Entity("WebApp.Models.FileOnFileSystem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("IdeaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UploadTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdeaId");
+
+                    b.ToTable("FileOnFileSystem");
+                });
+
             modelBuilder.Entity("WebApp.Models.Idea", b =>
                 {
                     b.Property<int>("Id")
@@ -357,7 +391,6 @@ namespace WebApp.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -431,7 +464,7 @@ namespace WebApp.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("WebApp.Models.ApplicationUser", null)
-                        .WithMany()
+                        .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -450,7 +483,8 @@ namespace WebApp.Data.Migrations
                 {
                     b.HasOne("WebApp.Models.Department", "Department")
                         .WithMany("Users")
-                        .HasForeignKey("DepartmentId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Department");
                 });
@@ -464,12 +498,24 @@ namespace WebApp.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("WebApp.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Idea");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApp.Models.FileOnFileSystem", b =>
+                {
+                    b.HasOne("WebApp.Models.Idea", "Idea")
+                        .WithMany("FileOnFileSystems")
+                        .HasForeignKey("IdeaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Idea");
                 });
 
             modelBuilder.Entity("WebApp.Models.Idea", b =>
@@ -481,10 +527,9 @@ namespace WebApp.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("WebApp.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Ideas")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
 
@@ -501,7 +546,8 @@ namespace WebApp.Data.Migrations
 
                     b.HasOne("WebApp.Models.ApplicationUser", "User")
                         .WithMany("Reacts")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Idea");
 
@@ -510,7 +556,13 @@ namespace WebApp.Data.Migrations
 
             modelBuilder.Entity("WebApp.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Ideas");
+
                     b.Navigation("Reacts");
+
+                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("WebApp.Models.Category", b =>
@@ -526,6 +578,8 @@ namespace WebApp.Data.Migrations
             modelBuilder.Entity("WebApp.Models.Idea", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("FileOnFileSystems");
 
                     b.Navigation("Reacts");
                 });

@@ -37,7 +37,7 @@ namespace WebApp.Areas.Forum.Controllers
             var model = new CreateIdeaViewModel()
             {
                 Categories = await context.Category
-                    .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                    .Where(c => c.DueDate == null || DateTime.UtcNow <= c.DueDate)
                     .Select(c => new SelectListItem()
                     {
                         Value = c.Id.ToString(),
@@ -61,7 +61,7 @@ namespace WebApp.Areas.Forum.Controllers
                 {
                     ModelState.AddModelError(nameof(model.CategoryId), "The selected category has been deleted or does not exist. Please choose another idea.");
                 }
-                else if (DateTime.Now > category.DueDate)
+                else if (DateTime.UtcNow > category.DueDate)
                 {
                     ModelState.AddModelError("", $"The due date of the category '{category.Name}' is over. Cannot submit idea. Please choose another idea.");
                 }
@@ -78,6 +78,41 @@ namespace WebApp.Areas.Forum.Controllers
                         IsIncognito = model.IsIncognito,
                     };
 
+                    if (model.Documents != null)
+                    {
+                        idea.FileOnFileSystems = new List<FileOnFileSystem>();
+
+                        foreach (var file in model.Documents)
+                        {
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + $"\\Files\\{category.Id}\\");
+
+                            bool basePathExists = Directory.Exists(basePath);
+                            if (!basePathExists) Directory.CreateDirectory(basePath);
+
+                            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var filePath = Path.Combine(basePath, Path.GetRandomFileName());
+                            var extension = Path.GetExtension(file.FileName);
+
+                            if (!System.IO.File.Exists(filePath))
+                            {
+                                using (var stream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await file.CopyToAsync(stream);
+                                }
+                                var fileModel = new FileOnFileSystem
+                                {
+                                    FileType = file.ContentType,
+                                    Extension = extension,
+                                    Name = fileName,
+                                    FilePath = filePath,
+
+                                };
+
+                                idea.FileOnFileSystems.Add(fileModel);
+                            }
+                        }
+                    }
+
                     await context.Idea.AddAsync(idea);
                     var count = await context.SaveChangesAsync();
 
@@ -85,7 +120,7 @@ namespace WebApp.Areas.Forum.Controllers
                         .Where(c => c.DepartmentId == user.DepartmentId)
                         .ToList();
 
-                    var url = Url.ActionLink("Idea", "Forum", new { id = idea.Id });
+                    var url = Url.ActionLink("Index", "Idea", new { area = "Forum", id = idea.Id });
 
                     foreach (var coor in coors)
                     {
@@ -98,7 +133,7 @@ namespace WebApp.Areas.Forum.Controllers
             }
 
             model.Categories = await context.Category
-                .Where(c => c.DueDate == null || DateTime.Now <= c.DueDate)
+                .Where(c => c.DueDate == null || DateTime.UtcNow <= c.DueDate)
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
@@ -106,6 +141,23 @@ namespace WebApp.Areas.Forum.Controllers
                 }).ToListAsync();
 
             return View(model);
+        }
+        public async Task<IActionResult?> DownloadFileFromFileSystem(int id)
+        {
+            var file = await context.FileOnFileSystem
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (file == null)
+                return NotFound();
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(file.FilePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, file.FileType, file.Name + file.Extension);
         }
 
         [HttpGet]
@@ -116,6 +168,7 @@ namespace WebApp.Areas.Forum.Controllers
             var model = await context.Idea
                 .Include(i => i.Category)
                 .Include(i => i.User)
+                .Include(i => i.FileOnFileSystems)
                 .Select(i => new Idea()
                 {
                     Id = i.Id,
@@ -130,7 +183,8 @@ namespace WebApp.Areas.Forum.Controllers
                     {
                         Id = i.UserId,
                         UserName = i.User!.UserName,
-                    }
+                    },
+                    FileOnFileSystems = i.FileOnFileSystems
                 }).FirstOrDefaultAsync(i => i.Id == id);
 
             if (model == null) return BadRequest();
@@ -152,7 +206,7 @@ namespace WebApp.Areas.Forum.Controllers
                 .ToListAsync();
 
             var user = await userManager.GetUserAsync(User);
-            { 
+            {
                 ViewData["UserId"] = user.Id;
             }
             {
@@ -160,29 +214,39 @@ namespace WebApp.Areas.Forum.Controllers
                     .SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
                 ViewData["UserDepartmentId"] = department?.Id;
             }
-            
+
             return View(model);
         }
 
 
         [HttpGet]
         [Authorize(Roles = Role.Coordinator)]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var user = await userManager
+                .GetUserAsync(User);
+
+            var department = await context.Department
+                .FirstAsync(d => d.Id == user.DepartmentId);
+
             var idea = await context.Idea
-                .Include(i => i.Category)
                 .Include(i => i.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(i => i.Category)
+                .Include(i => i.FileOnFileSystems)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
             if (idea == null)
             {
                 return NotFound();
             }
 
-            return View(idea);
+            if (idea.User.DepartmentId == department.Id && (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate))
+            {
+                return View(idea);
+            }
+            else
+                return Unauthorized();
+
         }
 
         [HttpPost, ActionName("Delete")]
@@ -190,29 +254,44 @@ namespace WebApp.Areas.Forum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-
-            var user = await userManager.GetUserAsync(User);
-
-            var department = await context.Department.SingleOrDefaultAsync(d => d.Id == user.DepartmentId);
-
-            var idea = await context.Idea.Include(i => i.User).SingleOrDefaultAsync(i => i.Id == id);
+            var idea = await context.Idea
+                .Include(i => i.User)
+                .Include(i => i.Category)
+                .Include(i => i.FileOnFileSystems)
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (idea == null)
             {
                 return RedirectToAction(nameof(Index), "Home");
             }
 
-            if (idea.User.DepartmentId == department.Id)
+            var user = await userManager.GetUserAsync(User);
+
+            var department = await context.Department
+                .FirstAsync(d => d.Id == user.DepartmentId);
+
+            if (idea.User == null
+                || (idea.User.DepartmentId == department.Id
+                    && (idea.Category.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)))
             {
+                var files = await context.FileOnFileSystem
+                .Where(x => x.IdeaId == idea.Id)
+                .ToListAsync();
                 context.Idea.Remove(idea);
-                await context.SaveChangesAsync();
+                var result = await context.SaveChangesAsync();
+                foreach (var file in files)
+                {
+                    if (System.IO.File.Exists(file.FilePath))
+                    {
+                        System.IO.File.Delete(file.FilePath);
+                    }
+                }
             }
             else
             {
                 ModelState.AddModelError("", "Cannot delete idea of staff belonging to other departments");
                 return View("Delete", idea);
-            }    
-            //var idea = await context.Idea.FindAsync(id);
+            }
 
             return RedirectToAction(nameof(Index), "Home");
         }

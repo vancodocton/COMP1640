@@ -19,9 +19,15 @@ namespace WebApp.Models
         public Department? Department { get; set; }
 
         [ValidateNever]
+        public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; } = null!;
+
+        [ValidateNever]
         public ICollection<React> Reacts { get; set; } = null!;
 
-        [Required]
-        public bool TermConfirmed { get; set; } = false;
+        [ValidateNever]
+        public ICollection<Idea> Ideas { get; set; } = null!;
+
+        [ValidateNever]
+        public ICollection<Comment> Comments { get; set; } = null!;
     }
 }

@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Encodings.Web;
 using WebApp.Data;
-using WebApp.Hubs;
 using WebApp.Models;
-using WebApp.Models.Hubs;
+using WebApp.Services.Hubs;
+using WebApp.ViewModels.IdeaInteractHub;
 
 namespace WebApp.Areas.Forum.Controllers
 {
@@ -39,12 +39,12 @@ namespace WebApp.Areas.Forum.Controllers
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(Comment request)
+        public async Task<IActionResult> Add(IdeaComment request)
         {
             if (!User.IsInRole(Role.Staff))
                 return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff can comment idea.");
 
-            if (request.IdeaId == 0)
+            if (request.IdeaId == null)
                 return StatusCode(StatusCodes.Status400BadRequest, "IdeaId cannot be null.");
 
             if (string.IsNullOrWhiteSpace(request.Content))
@@ -82,12 +82,12 @@ namespace WebApp.Areas.Forum.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, "Idea is deleted or not existed.");
             }
 
-            if (DateTime.Now > idea.Category.FinalDueDate)
+            if (DateTime.UtcNow > idea.Category.FinalDueDate)
                 return StatusCode(StatusCodes.Status400BadRequest, "Cannot comment idea becaufe its final due date is over.");
 
             var comment = new Comment()
             {
-                IdeaId = request.IdeaId,
+                IdeaId = request.IdeaId.Value,
                 UserId = user.Id,
                 Content = request.Content,
             };
@@ -99,7 +99,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             if (user.Id != idea.UserId)
             {
-                var ideaUrl = Url.ActionLink("Index", "Idea", new { id = idea.Id });
+                var ideaUrl = Url.ActionLink("Index", "Idea", new { area = "Forum", id = idea.Id });
 
                 if (ideaUrl != null && idea.User!.EmailConfirmed)
                 {
@@ -149,6 +149,7 @@ namespace WebApp.Areas.Forum.Controllers
 
             var cmt = await dbContext.Comment
                 .Include(c => c.Idea)
+                .ThenInclude(i => i.Category)
                 .SingleOrDefaultAsync(i => i.Id == id);
 
             if (cmt == null)
@@ -156,7 +157,11 @@ namespace WebApp.Areas.Forum.Controllers
 
             var user = await userManager.GetUserAsync(User);
 
-            if (User.IsInRole(Role.Staff))
+            if (DateTime.UtcNow > cmt.Idea.Category.FinalDueDate)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Cannot delete comment after the final due date");
+            }
+            else if (User.IsInRole(Role.Staff))
             {
                 if (cmt.UserId == user.Id)
                 {
@@ -166,26 +171,20 @@ namespace WebApp.Areas.Forum.Controllers
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of other Staff");
             }
-
             else if (User.IsInRole(Role.Coordinator))
             {
-                var department = await dbContext.Department
-                    .SingleAsync(d => d.Id == user.DepartmentId);
-
                 cmt.User = await userManager.FindByIdAsync(cmt.UserId);
 
-                if (cmt.User.DepartmentId == department.Id)
+                if (cmt.User == null || cmt.User.DepartmentId == user.DepartmentId)
                 {
                     var deletedCmtId = await DeleteConfirmed(cmt);
                     return Ok(deletedCmtId);
                 }
                 else
                     return StatusCode(StatusCodes.Status401Unauthorized, "Can Delete comment of Staff in other department");
-
-
             }
             else
-                return StatusCode(StatusCodes.Status401Unauthorized, "Only Staff or Coordinator can Delete comment");
+                return StatusCode(StatusCodes.Status401Unauthorized, "You have no permission to delete this comment");
 
         }
 
@@ -202,8 +201,8 @@ namespace WebApp.Areas.Forum.Controllers
             await hubContext.Clients.Group($"{cmt.Idea.Id}").RevokeSentComment(new RevokeSentIdeaResponse()
             {
                 CommentId = cmt.Id,
-                CommentOwnerUserName = cmt.User.UserName,
-                RevokerUserName = User.Identity.Name,
+                CommentOwnerUserName = cmt.User?.UserName ?? "Deleted User",
+                RevokerUserName = User.Identity!.Name,
             });
 
             return cmt.Idea.NumComment;

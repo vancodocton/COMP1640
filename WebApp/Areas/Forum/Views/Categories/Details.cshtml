@@ -9,32 +9,60 @@
 
 <div>
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DueDate)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DueDate)
+            @Html.DisplayFor(model => model.DueDateByUserTz)
         </dd>
-                <dt class="col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FinalDueDate)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FinalDueDate)
+            @Html.DisplayFor(model => model.FinalDueDateByUserTz)
+        </dd>
+        <dt class="col-sm-2">
+            Export
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.FinalDueDate == null || Model.FinalDueDate <= DateTime.UtcNow)
+            {
+                <div class="d-flex flex-column">
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Users">
+                        Export Users related to Ideas in category to CSV file
+                    </a>
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Ideas">
+                        Export Ideas in category to CSV file
+                    </a>
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Comments">
+                        Export Comments of Ideas in category to CSV
+                    </a>
+                    <a asp-action="ExportAsCSV" asp-route-id="@Model.Id" asp-route-reportType="Files">
+                        Export Files of Ideas in category to Zip
+                    </a>
+                </div>
+            }
+            else
+            {
+                <p class="text-danger">The final due date is not reached.</p>
+            }
         </dd>
     </dl>
 </div>
+
+
 <div>
     <a class="btn btn-warning btn-sm text-white text-decoration-none" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> or Back to
     <a class="btn btn-success btn-sm text-white text-decoration-none" asp-action="Index">Index</a>

@@ -3,19 +3,21 @@
 
 @{
     ViewData["Title"] = "Index";
+    int i = 0;
 }
 
-<h1>Index Page</h1>
+<h1 class="text-center">List of Categories</h1>
 
 <p>
     <a class="btn btn-outline-primary" asp-action="Create" class="text-white text-decoration-none"><i class="fas fa-plus"></i> Create New</a>
 </p>
 <table class="table">
     <thead>
+        <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th>
+            <th class="descr">
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
@@ -28,26 +30,44 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinalDueDate)
-            </td>
-            <td>
-                <a class="btn btn-outline-warning btn-sm text-black text-decoration-none" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a class="btn btn-outline-success btn-sm text-black text-decoration-none" asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a class="btn btn-outline-danger btn-sm text-black text-decoration-none" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+                { i++; }
+                <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="text-truncate descr">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DueDateByUserTz)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FinalDueDateByUserTz)
+                </td>
+                <td>
+                    <div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle mw" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">
+							Actions
+					</button>
+					<button class="btn btn-primary dropdown-toggle mw-420" type="button" id="actions-dropdown-@i" data-bs-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="dropdown-menu dropdown-menu-end bg-light" aria-labelledby="actions-dropdown-@i">
+						<a class="dropdown-item text-success" asp-action="Edit" asp-route-id="@item.Id">
+							Edit
+						</a>
+						<a class="dropdown-item text-success" asp-action="Details" asp-route-id="@item.Id">
+							Details
+						</a>
+						<a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
+							Delete
+						</a>
+				    </div>   
+                   </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,4 +1,4 @@
-﻿namespace WebApp.Models.Hubs
+﻿namespace WebApp.ViewModels.IdeaInteractHub
 {
     public class IdeaInteractionPermission
     {

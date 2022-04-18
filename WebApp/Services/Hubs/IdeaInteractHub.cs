@@ -4,23 +4,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
 using WebApp.Models;
-using WebApp.Models.Hubs;
+using WebApp.ViewModels.IdeaInteractHub;
 
-namespace WebApp.Hubs
+namespace WebApp.Services.Hubs
 {
-    public interface IIdeaInteractClient
-    {
-        Task ReceiveRegisteredConfirmation(IdeaInteractionPermission permission, IdeaReaction react);
-
-        Task ReceiveInteractionStatus(IdeaIntereactionStatus status);
-
-        Task ReceiveComment(IdeaComment comment);
-
-        Task RevokeSentComment(RevokeSentIdeaResponse response);
-
-        Task ReceiveReaction(IdeaReaction reaction);
-    }
-
     [Authorize]
     public class IdeaInteractHub : Hub<IIdeaInteractClient>
     {
@@ -100,8 +87,8 @@ namespace WebApp.Hubs
                 idea.Category = await dbContext.Category.FirstAsync(c => c.Id == idea.CategoryId);
 
                 permission.IdeaId = idea.Id;
-                permission.IsCommented = idea.Category.FinalDueDate == null || DateTime.Now <= idea.Category.FinalDueDate;
-                permission.IsReacted = true;
+                permission.IsCommented = idea.Category.FinalDueDate == null || DateTime.UtcNow <= idea.Category.FinalDueDate;
+                permission.IsReacted = idea.Category.FinalDueDate == null || DateTime.UtcNow <= idea.Category.FinalDueDate;
             }
 
             return permission;
@@ -127,81 +114,40 @@ namespace WebApp.Hubs
             if (reaction.IdeaId == null)
                 throw new HubException("Request type cannot be null");
 
-            var idea = await dbContext.Idea.FirstAsync(i => i.Id == reaction.IdeaId);
+            var idea = await dbContext.Idea
+                .Include(i => i.Category)
+                .FirstAsync(i => i.Id == reaction.IdeaId);
 
-            var user = await userManager.GetUserAsync(Context.User);
+            if (idea.Category.FinalDueDate == null || DateTime.UtcNow <= idea.Category.FinalDueDate)
+            {
+                var user = await userManager.GetUserAsync(Context.User);
 
-            var react = await dbContext.React
-                .FirstAsync(r => r.UserId == Context.UserIdentifier && r.IdeaId == reaction.IdeaId);
+                var react = await dbContext.React
+                    .FirstAsync(r => r.UserId == Context.UserIdentifier && r.IdeaId == reaction.IdeaId);
 
-            var oldReactType = react.Type;
-            var newReactType = (ReactType)Enum.Parse(typeof(ReactType), reaction.ReactType ?? "Null");
+                var oldReactType = react.Type;
+                var newReactType = (ReactType)Enum.Parse(typeof(ReactType), reaction.ReactType ?? "Null");
 
-            react.Type = newReactType;
+                react.Type = newReactType;
 
-            idea = CountNewReact(idea, newReactType);
-            idea = CountOldReact(idea, oldReactType);
+                idea = CountNewReact(idea, newReactType);
+                idea = CountOldReact(idea, oldReactType);
 
-            dbContext.React.Append(react);
-            dbContext.Idea.Append(idea);
-            await dbContext.SaveChangesAsync();
+                dbContext.React.Append(react);
+                dbContext.Idea.Append(idea);
+                await dbContext.SaveChangesAsync();
 
-            reaction.UserName = Context.User.Identity.Name;
+                reaction.UserName = Context.User.Identity.Name;
 
-            await Clients.User(Context.UserIdentifier!).ReceiveReaction(reaction);
+                await Clients.User(Context.UserIdentifier!).ReceiveReaction(reaction);
 
-            await ReponseIdeaStatusToGroup(idea);
+                await ReponseIdeaStatusToGroup(idea);
+            }
+            else
+            {
+                throw new HubException("Cannot react of idea in category over its final due date.");
+            }
         }
-
-        //private async Task AddReact(Idea idea, IdeaReaction reaction)
-        //{
-        //    if (request.NewReact == null)
-        //        throw new ArgumentNullException(nameof(request.NewReact));
-
-        //    ApplicationUser? user = await userManager.GetUserAsync(Context.User);
-
-        //    var newReact = new React()
-        //    {
-        //        IdeaId = idea.Id,
-        //        UserId = user.Id,
-        //        Type = (ReactType)Enum.Parse(typeof(ReactType), request.NewReact)
-        //    };
-
-        //    idea = CountNewReact(idea, newReact.Type);
-
-        //    dbContext.React.Add(newReact);
-        //    dbContext.Idea.Append(idea);
-        //    await dbContext.SaveChangesAsync();
-        //}
-
-        //private async Task UpdateReact(React react, Idea idea, IdeaReaction reaction)
-        //{
-        //    if (request.NewReact == null)
-        //        throw new ArgumentNullException(nameof(request.NewReact));
-
-        //    var oldReactType = react.Type;
-        //    var newReactType = (ReactType)Enum.Parse(typeof(ReactType), request.NewReact);
-
-        //    react.Type = newReactType;
-
-        //    idea = CountNewReact(idea, newReactType);
-        //    idea = CountOldReact(idea, oldReactType);
-
-        //    dbContext.React.Append(react);
-        //    dbContext.Idea.Append(idea);
-        //    await dbContext.SaveChangesAsync();
-        //}
-
-        //private async Task RemoveReact(React react, Idea idea, IdeaReaction reaction)
-        //{
-        //    idea = CountOldReact(idea, react.Type);
-
-        //    react.Type = ReactType.Null;
-
-        //    dbContext.React.Attach(react);
-        //    dbContext.Idea.Attach(idea);
-        //    await dbContext.SaveChangesAsync();
-        //}
 
         private static Idea CountNewReact(Idea idea, ReactType reactType)
         {

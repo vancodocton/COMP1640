@@ -1,162 +1,218 @@
-﻿@using WebApp.Data
-@model WebApp.ViewModels.ForumViewModel
+﻿@model ForumViewModel
 
 @{
-	ViewData["Title"] = "Forum";
-	Layout = "_ForumLayout";
+    ViewData["Title"] = "Forum";
+    Layout = "_ForumLayout";
 }
 
 @section Aside{
-<nav class="navbar navbar-expand-md navbar-dark">
-	<div class="container-fluid flex-md-column">
-		<div class="d-sm-flex d-md-block">
-			<div class="nav-item pb-2 pe-2">
-				<a asp-action="Create" asp-controller="Idea" asp-area="Forum" class="btn btn-outline-primary">
-					<span>Add New Idea</span>
-					<i class="fa-solid fa-plus"></i>
-				</a>
-			</div>
-			<div class="nav-item pb-2">
-				<a id="cid-" class="btn btn-outline-primary" asp-action="Index" asp-route-sort="@Model.Sort">All ideas</a>
-			</div>
-		</div>
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarleft"
-				aria-controls="navbarleft" aria-expanded="false" aria-label="Toggle navigation">
-			Category <span class="navbar-toggler-icon"></span>
-		</button>
-		<aside class="collapse navbar-collapse mt-3" id="navbarleft">
-			<ul class="navbar-nav nav-pills flex-column">
-				@foreach (var category in Model.Categories)
-				{
-				<li class="nav-item">
-					<a id="cid-@category.Id" class="nav-link" asp-action="Index" asp-route-cid="@category.Id" asp-route-sort="@Model.Sort">@category.Name</a>
-				</li>
-				}
-			</ul>
-		</aside>
-	</div>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark h-100">
+    <div class="container-fluid flex-md-column align-self-start">
+        <div class="nav-item">
+            <a class="btn btn-success text-center @(User.IsInRole(Role.Staff) ? "": "disabled")" aria-disabled="@(User.IsInRole(Role.Staff) ? "false": "true")"
+               asp-action="Create"
+               asp-controller="Idea" asp-area="Forum">
+                <span>Add New Idea</span>
+                <i class="fa-solid fa-plus"></i>
+            </a>
+        </div>
+        <button class="btn btn-success d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarleft"
+                aria-controls="navbarleft" aria-expanded="false" aria-label="Categories Toggle navigation">
+            <span>Categories</span>
+        </button>
+        <div class="navbar-collapse collapse w-100" id="navbarleft">
+            <div class="navbar-nav nav-pills flex-column w-100">
+                <div class="nav-item mt-2">
+                    <a id="cid-" class="nav-link"
+                       asp-action="Index"
+                       asp-route-order="@Model.Search.Order"
+                       asp-route-DpmtId="@Model.Search.DepartmentId">
+                        All Categories
+                    </a>
+                </div>
+                @foreach (var category in Model.Search.Categories)
+                {
+                <div class="nav-item" style="max-width:100%">
+                    <a class="nav-link text-truncate" id="cid-@category.Id"
+                       asp-action="Index"
+                       asp-route-cid="@category.Id"
+                       asp-route-order="@Model.Search.Order"
+                       asp-route-DpmtId="@Model.Search.DepartmentId">
+                        @Html.Encode(category.Name)
+                    </a>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
 </nav>
 }
 
+@if (Model.Category != null)
+{
+    <div class="card mb-2 text-white bg-success text-center">
+        <partial name="_CardCategory" for="Category" />
+    </div>
+}
+
 <nav class="pb-2">
-	<form asp-action="Index" method="get" id="sort-form">
-		<input id="cid" name="cid" value="@Model.CategoryId" type="hidden" />
-		<div class="d-inline-flex">
-			<select class="form-select" aria-label="Select to sort by" asp-for="Sort">
-				<option value="lastest">Lastest</option>
-				<option value="popular">Popular</option>
-				<option value="topview">Top View</option>
-			</select>
-			<a type="reset" class="btn btn-danger" asp-action="Index">Reset</a>
-		</div>
-	</form>
+    <form asp-action="Index" method="get" id="sort-form">
+        <input type="hidden" asp-for="Search.CategoryId" name="cid" />
+        <div class="d-flex flex-row align-items-center">
+            @if (User.IsInRole(Role.Staff))
+            {
+                <div class="me-2">
+                    <a class="btn btn-outline-primary"
+                   asp-action="Create"
+                   asp-controller="Idea" asp-area="Forum">
+                        <span>Add New Idea</span>
+                        <i class="fa-solid fa-plus"></i>
+                    </a>
+                </div>
+            }
+            <div class="me-2">
+                <select class="form-select" asp-for="Search.Order" name="order" aria-label="Select to sort order">
+                    <option value="lastest">Lastest</option>
+                    <option value="popular">Popular</option>
+                    <option value="topview">Top View</option>
+                </select>
+            </div>
+            @if (User.IsInRole(Role.Manager) || User.IsInRole(Role.Coordinator))
+            {
+                <div class="me-2">
+                    <select class="form-select" aria-label="Select department"
+                        asp-for="Search.DepartmentId" name="dpmtId"
+                        asp-items="Model.Search.Departments">
+                    </select>
+                </div>
+            }
+            <a class="btn btn-danger" asp-action="Index" asp-route-cid="@Model.Search.CategoryId">Reset</a>
+        </div>
+    </form>
 </nav>
 
 @if (Model.Ideas.Count != 0)
 {
-	foreach (var idea in Model.Ideas)
-	{
-		<div class="card mb-3">
-			<div class="card-header">
-				<a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId" asp-route-sort="@Model.Sort">@idea.Category?.Name</a>
-			</div>
-			<div class="card-body">
-				<h5 class="card-title">
-					<a class="text-decoration-none" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
-						@Html.DisplayFor(modelItem => idea.Title)
-					</a>
-				</h5>
-				<p class="card-text">
-					@Html.DisplayFor(modelItem => idea.Content)
-				</p>
-			</div>
-			<div class="card-footer">
-				<div class="d-flex justify-content-end">
+    foreach (var idea in Model.Ideas)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                <a class="text-decoration-none" asp-action="Index" asp-route-cid="@idea.CategoryId" asp-route-order="@Model.Search.Order">@idea.Category?.Name</a>
+            </div>
+            <dic class="card-body">
+                <h5 class="card-title">
+                    <a class="text-decoration-none" asp-controller="Idea" asp-action="Index" asp-route-id="@idea.Id">
+                        @Html.DisplayFor(modelItem => idea.Title)
+                    </a>
+                </h5>
+                <p class="card-text">
+                    @Html.DisplayFor(modelItem => idea.Content)
+                </p>
+            </dic>
+            <div class="card-footer">
+                <div class="d-flex flex-wrap justify-content-end">
+                    <div class="text-truncate fw-bold">
+                        @if (idea.Category!.FinalDueDate == null || DateTime.UtcNow < idea.Category.FinalDueDate)
+                        {
+                            @if (User.IsInRole(Role.Coordinator) && Model.User.DepartmentId == idea.User?.DepartmentId)
+                            {
+                                <a class="btn btn-sm btn-white text-danger rounded-3 px-2" asp-controller="Idea" asp-action="Delete" asp-route-id="@idea.Id">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            }
+                        }
 
-					@if (User.IsInRole(Role.Coordinator))
-					{
-						@if (idea.User.DepartmentId == (int)ViewData["UserDepartmentId"])
-						{
-							<a asp-controller="idea" asp-action="Delete" asp-route-id="@idea.Id"
-			   class="btn btn-sm btn-white text-danger rounded-3 px-2">
-								<i class="fa-solid fa-trash"></i>
-							</a>
-						}
-					}
+                        <span class="px-2 ">
+                            @if (idea.UserId == null)
+                            {
+                                <i class="fa-solid fa-user"></i> @("Deleted_User")
+                            }
+                            else
+                            {
+                                if (User.IsInRole(Role.Staff))
+                                {
+                                    <i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User!.UserName ? " (Me)" : "")
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-user"></i> @(idea.User!.UserName + (idea.IsIncognito ? " (Anonymous idea)" : ""))
+                                }
+                            }
+                        </span>
+                    </div>
+                    <div>
+                        <span class="px-2">
+                            <i class="fa-regular fa-comments"></i> @idea.NumComment
+                        </span>
+                        <span class="px-2">
+                            <i class="fa-solid fa-eye"></i> @idea.NumView
+                        </span>
+                        <span class="px-2">
+                            <i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp
+                        </span>
+                        <span class="px-2">
+                            <i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                @if (idea.Comments.Count != 0)
+                {
+                    <h5 class="pt-2">Last comments</h5>
+                    foreach (var cmt in idea.Comments)
+                    {
+                        <div class="#">
+                            <b>@(cmt.User?.UserName ?? "Deleted_User")</b>: <i>@cmt.Content</i>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
 
-					<span class="px-2">
-						@if (User.IsInRole(Role.Staff))
-						{
-							<i class="fa-solid fa-user"></i> @(!idea.IsIncognito ? idea.User!.UserName : "Anonymous user") @(User.Identity?.Name == idea.User?.UserName ? "(Me)" : "")
-						}
-						else
-						{
-							<i class="fa-solid fa-user"></i> @(idea.User!.UserName)
-						}
-					</span>
-					<span class="px-2">
-						<i class="fa-regular fa-comments"></i> @idea.NumComment
-					</span>
-					<span class="px-2">
-						<i class="fa-solid fa-eye"></i> @idea.NumView
-					</span>
-					<span class="px-2">
-						<i class="fa-regular fa-thumbs-up"></i> @idea.ThumbUp
-					</span>
-					<span class="px-2">
-						<i class="fa-regular fa-thumbs-down"></i> @idea.ThumbDown
-					</span>
-				</div>
-				<div class="container rounded-3 border-primary border-3 bg-white">
-					@if (idea.Comments.Count != 0)
-					{
-						<h6>Last comments</h6>
-						foreach (var cmt in idea.Comments)
-						{
-							<div class="#">
-								<b>"@cmt.Content" </b> by
-								<b>@(cmt.User?.UserName ?? "Deleted_User")</b>
-							</div>
-						}
-					}
-				</div>
-			</div>
-		</div>
-	}
+    var prevDisabled = !Model.Ideas.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Ideas.HasNextPage ? "disabled" : "";
 
-	var prevDisabled = !Model.Ideas.HasPreviousPage ? "disabled" : "";
-	var nextDisabled = !Model.Ideas.HasNextPage ? "disabled" : "";
-
-	<div aria-label="Page navigation">
-		<ul class="pagination justify-content-center">
-			<li class="page-item @prevDisabled">
-				<a class="page-link" asp-route-page="@(Model.Page - 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Previous</a>
-			</li>
-			<li class="page-item @nextDisabled">
-				<a class="page-link" asp-route-page="@(Model.Page + 1)" asp-route-cid="@Model.CategoryId" asp-route-sort="@Model.Sort">Next</a>
-			</li>
-			@*<form asp-action="Index" method="get" id="page" asp-route-sort="@Model.Sort" asp-route-cid="@Model.CategoryId">
-				<div class="page-item input-group">
-				<label class="input-group-text" asp-for="Page"></label>
-				<input class="form-control" style="flex: 0 1 4rem;" asp-for="Page" />
-				</div>
-				</form>*@
-		</ul>
-	</div>
+    <div aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @prevDisabled">
+                <a class="page-link"
+               asp-route-cid="@Model.Search.CategoryId"
+               asp-route-order="@Model.Search.Order"
+               asp-route-DpmtId="@Model.Search.DepartmentId"
+               asp-route-page="@(Model.Search.Page - 1)">
+                    Previous
+                </a>
+            </li>
+            <li class="page-item @nextDisabled">
+                <a class="page-link"
+               asp-route-cid="@Model.Search.CategoryId"
+               asp-route-order="@Model.Search.Order"
+               asp-route-DpmtId="@Model.Search.DepartmentId"
+               asp-route-page="@(Model.Search.Page + 1)">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </div>
 }
 else
 {
-	<span class="text-danger">No idea in this category</span>
+    <div class="alert alert-danger" role="alert">
+        No idea.
+    </div>
 }
 
 @section Scripts{
 <partial name="_ValidationScriptsPartial" />
 
 <script type='text/javascript'>
-	$('#sort-form').change(function(event) {
-	   document.forms['sort-form'].submit();
-	});
+    $('#sort-form').change(function(event) {
+       document.forms['sort-form'].submit();
+    });
 
-	//$('#page').sumbit()
+    const category = '#cid-' + "@Model.Category?.Id";
+    $(category).addClass("active");
 </script>
 }

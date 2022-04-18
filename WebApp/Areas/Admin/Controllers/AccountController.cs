@@ -14,16 +14,16 @@ using WebApp.ViewModels;
 
 namespace WebApp.Areas.Admin.Controllers
 {
-    [Authorize(Roles = Role.Admin)]
     [Area("Admin")]
+    [Authorize(Roles = Role.Admin)]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
         private readonly IEmailSender _emailSender;
+        private readonly List<string> _createdRoles;
 
-        private List<string> _createdRoles;
         public AccountController(
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
@@ -39,27 +39,29 @@ namespace WebApp.Areas.Admin.Controllers
             _createdRoles = new List<string>() { Role.Coordinator, Role.Staff };
         }
 
-        // GET: AccountController
-        public async Task<ActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var idea = await _context.Idea.FirstOrDefaultAsync(i => i.Id == 1);
+            var roles = _roleManager.Roles.ToDictionary(r => r.Id, r => r.Name);
 
-            var model = await _userManager.Users
+            var users = await _userManager.Users
+                .Include(u => u.UserRoles)
+                .OrderBy(u => u.UserRoles.First().RoleId)
                 .Select(u => new UserViewModel()
                 {
                     Id = u.Id,
                     UserName = u.UserName,
                     Email = u.Email,
                     FullName = u.FullName,
-                    //Roles = _userManager.GetRolesAsync(u).Result
+                    Roles = u.UserRoles.Select(ur => roles[ur.RoleId]).ToList()
                 })
                 .ToListAsync();
 
-            return View(model);
+            return View(users);
         }
 
         [HttpGet]
-        public async Task<ActionResult> Create()
+        public async Task<IActionResult> Create()
         {
             var model = new AccountCreateViewModel()
             {
@@ -69,7 +71,6 @@ namespace WebApp.Areas.Admin.Controllers
             return View(model);
         }
 
-        // POST: AccountController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AccountCreateViewModel model)
@@ -87,12 +88,10 @@ namespace WebApp.Areas.Admin.Controllers
                         Address = model.Address,
                         FullName = model.FullName,
                         BirthDate = model.BirthDate,
-                        //EmailConfirmed = true,
                         DepartmentId = model.DepartmentId,
                     };
 
                     var createAccountResult = await _userManager.CreateAsync(user, model.Input.Password);
-
 
                     if (createAccountResult.Succeeded)
                     {
@@ -108,11 +107,11 @@ namespace WebApp.Areas.Admin.Controllers
                             var callbackUrl = Url.Action(
                                 action: "ConfirmEmail",
                                 controller: "Account",
-                                new { area = "Identity", userId = user.Id,  code, returnUrl = "/Identity/Account/Login" },
+                                new { area = "Identity", userId = user.Id, code, returnUrl = "/Identity/Account/Login" },
                                 protocol: "https");
 
                             await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? "")}'>clicking here</a>.");
 
                             return RedirectToAction(nameof(Index));
                         }
@@ -132,19 +131,19 @@ namespace WebApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult ResetPwd(string? id)
+        public async Task<IActionResult> ResetPwd(string? id)
         {
             var model = new RegisterModel.InputModel();
 
             if (!string.IsNullOrEmpty(id))
-                model.Email = id;
+                model.Email = (await _userManager.FindByIdAsync(id))?.Email;
 
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ResetPwd(RegisterModel.InputModel model)
+        public async Task<IActionResult> ResetPwd(RegisterModel.InputModel model)
         {
             if (ModelState.IsValid)
             {
@@ -169,7 +168,6 @@ namespace WebApp.Areas.Admin.Controllers
                     else
                         AddErrors(resetPwdResult.Errors);
                 }
-
             }
 
             return View(model);
@@ -243,13 +241,9 @@ namespace WebApp.Areas.Admin.Controllers
 
 
         [HttpGet]
-        public ActionResult Delete(string? id)
+        public async Task<IActionResult> Delete(string id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var user = _context.Users.Find(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -259,35 +253,74 @@ namespace WebApp.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(ApplicationUser model)
+        public async Task<IActionResult> DeleteConfirmed([FromForm(Name = "Id")] string id, [FromForm(Name = "isDeleteAll")] bool isDeleteAll)
         {
-            if (ModelState.IsValid)
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+                return RedirectToAction(nameof(Index));
+
+            if (await _userManager.IsInRoleAsync(user, Role.Admin) || await _userManager.IsInRoleAsync(user, Role.Manager))
             {
-                var user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user == null)
-                    ModelState.AddModelError("Id", "User does not exist.");
-                else if (await _userManager.IsInRoleAsync(user, Role.Admin) || await _userManager.IsInRoleAsync(user, Role.Manager))
-                {
-                    ModelState.AddModelError("", "Permission denies. Cannot delete this account password");
-                }
-                else
-                {
-                    var code = await _userManager.DeleteAsync(user);
-
-
-                    if (code.Succeeded)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                        AddErrors(code.Errors);
-                }
+                ModelState.AddModelError("", "Permission denies. Cannot delete this account.");
 
             }
+            else
+            {
+                if (isDeleteAll)
+                {
+                    var modifyIdeasComments = await _context.Idea
+                        .Include(i => i.Comments.Where(c => c.UserId == id))
+                        .Where(i => i.Comments.Any(r => r.UserId == id && i.Comments.Count > 0))
+                        .ToListAsync();
 
-            return View(model);
+                    var modifyIdeasReacts = await _context.Idea
+                        .Include(i => i.Reacts.Where(c => c.UserId == id))
+                        .Where(i => i.Reacts.Any(r => r.UserId == id && i.Reacts.Count > 0))
+                        .ToListAsync();
+
+                    foreach (var idea in modifyIdeasComments)
+                    {
+                        idea.NumComment -= idea.Comments.Count;
+                        idea.Comments.Clear();
+                    }
+
+                    foreach (var idea in modifyIdeasReacts)
+                    {
+                        idea.ThumbUp -= idea.Reacts
+                            .Where(r => r.Type == ReactType.ThumbUp)
+                            .Count();
+                        idea.ThumbDown -= idea.Reacts
+                            .Where(r => r.Type == ReactType.ThumbDown)
+                            .Count();
+                        idea.NumView -= idea.Reacts.Count;
+                        idea.Reacts.Clear();
+                    }
+
+                    var deletedIdeas = await _context.Idea
+                        .Where(i => i.UserId == id)
+                        .ToListAsync();
+
+                    _context.Idea.RemoveRange(deletedIdeas);
+                    //await _context.SaveChangesAsync();
+                }
+
+                var code = await _userManager.DeleteAsync(user);
+
+                if (code.Succeeded)
+                {
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    AddErrors(code.Errors);
+                //return RedirectToAction(nameof(Index));
+            }
+
+            return View(nameof(Delete), user);
         }
 
 

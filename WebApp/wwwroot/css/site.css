@@ -17,60 +17,68 @@ html {
 body {
     width: auto;
     height: auto;
-    /*margin-bottom: 300px;
-    background-image: url("~/img/Colorful.png");
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);*/ 
     background-color: #D3D3D3;
     margin: auto;
-    
 }
 
 .body-background {
     height: auto;
     width: auto;
-    /*background-image: linear-gradient(to right top, #be2b45, #c9005e, #c40087, #a300bd, #0812f8);*/
     background-size: cover;
-    margin-bottom: 0;
-    min-height:595px;
+    min-height: 80vh;
 }
 
 .form-input {
     width: 700px;
 }
-.form-login{
-    display:block;
+
+.form-login {
+    display: block;
     width: 500px;
-    height:100px;
-    margin:auto;
+    height: 100px;
+    margin: auto;
 }
+
 .form-floating {
-    /*display: block;*/
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 .form-control {
-    height: 45px;
     border-radius: 10px
 }
 
-.form-control:focus {
+    .form-control:focus {
         box-shadow: none
-}
+    }
 
 .btn-signup {
     height: 50px;
     border-radius: 10px
 }
 
-#add-button, #reset-pwd-button {
-    text-decoration: none;
-    color: white;
+.mw-420 {
+    display: none;
 }
 
-#return-index-button {
+.descr {
+    max-width: 300px;
+}
+
+@media only screen and (max-width : 420px) {
+    .dpm, .descr {
+        display: none;
+    }
+
+    .mw {
+        display: none;
+    }
+
+    .mw-420 {
+        display: block;
+    }
+}
+
+.txtlink {
     text-decoration: none;
-    color: white;
+    font-size: 14px;
 }

@@ -6,21 +6,20 @@ namespace WebApp.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        public string UserId { get; set; } = null!;
+        public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
+
+        public int CategoryId { get; set; }
+        public Category Category { get; set; } = null!;
+
+        public ICollection<FileOnFileSystem> FileOnFileSystems { get; set; } = null!;
 
         public bool IsIncognito { get; set; } = false;
 
-        [Required]
-        public string? Title { get; set; }
+        public string Title { get; set; } = null!;
 
-        [Required]
-        public string? Content { get; set; }
-
-        [Required]
-        public int CategoryId { get; set; }
-        public Category? Category { get; set; }
+        [DataType(DataType.MultilineText)]
+        public string Content { get; set; } = null!;
 
         public ICollection<React> Reacts { get; set; } = null!;
 

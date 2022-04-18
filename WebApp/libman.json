@@ -47,8 +47,8 @@
     },
     {
       "provider": "unpkg",
-      "library": "@microsoft/signalr@latest",
-      "destination": "wwwroot/js/signalr/",
+      "library": "@microsoft/signalr@6.0.3",
+      "destination": "wwwroot/lib/signalr/",
       "files": [
         "dist/browser/signalr.js",
         "dist/browser/signalr.js.map",
@@ -60,6 +60,19 @@
       "provider": "jsdelivr",
       "library": "@fortawesome/fontawesome-free@6.0.0",
       "destination": "wwwroot/lib/fortawesome/fontawesome-free/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "chart.js@3.7.1",
+      "destination": "wwwroot/lib/chart.js/",
+      "files": [
+        "dist/chart.min.js",
+        "dist/chart.js",
+        "dist/chunks/helpers.segment.js",
+        "LICENSE.md",
+        "package.json",
+        "README.md"
+      ]
     }
   ]
 }

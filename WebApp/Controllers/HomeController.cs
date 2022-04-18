@@ -23,12 +23,12 @@ namespace WebApp.Controllers
 
             if (User.IsInRole(Role.Admin))
             {
-                return RedirectToAction("Index", "Home", new { area = "Admin" });
+                return RedirectToAction("Index", "Account", new { area = "Admin" });
             }
 
-            if(User.IsInRole(Role.Manager))
+            if (User.IsInRole(Role.Manager))
             {
-                return RedirectToAction("Index", "Categories", new { area = "Forum" });
+                return RedirectToAction("Index", "Home", new { area = "Forum" });
             }
 
             if (User.IsInRole(Role.Coordinator))
@@ -36,11 +36,6 @@ namespace WebApp.Controllers
                 return RedirectToAction("Index", "Home", new { area = "Forum" });
             }
 
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
             return View();
         }
 

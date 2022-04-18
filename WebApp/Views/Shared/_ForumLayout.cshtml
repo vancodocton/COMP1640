@@ -1,21 +1,16 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "_Layout.cshtml";
 }
-<div class="row">
-    <div class="col-lg-3 col-md-4 bg-dark">
+<div class="row mt-2">
+    <div class="col-xl-3 col-lg-4 col-md-4 mb-2">
         @await RenderSectionAsync("Aside", required: true)
     </div>
 
-    <div class="col-lg-9 col-md-8">
+    <div class="col-xl-9 col-lg-8 col-md-8 mb-2">
         @RenderBody()
     </div>
 </div>
 
 @section Scripts{
-<script type="text/javascript">
-    //const params = new URLSearchParams(window.location.search);
-    const category = '#cid-' + '@ViewData["cid"]';
-    $(category).addClass("active");
-</script>
 @await RenderSectionAsync("Scripts", required: false)
 }
