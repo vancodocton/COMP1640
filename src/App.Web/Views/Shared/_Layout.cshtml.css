@@ -1,0 +1,29 @@
+﻿.border-top {
+    border: 1px solid #e5e5e5;
+    /*background-color: red;*/
+    display: block;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+.footer-ds {
+    vertical-align: bottom;
+    display: block;
+    background-color: grey;
+    height: 50px;
+    width: 100%;
+    line-height: 60px;
+    color: white;
+    border: 1px solid red !important;
+}
+
+.footer .content {
+    color: white;
+}

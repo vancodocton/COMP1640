@@ -1,0 +1,36 @@
+﻿@model App.Web.Areas.Identity.Pages.Account.RegisterModel.InputModel
+@{
+    ViewData["Title"] = "ResetPwd";
+}
+
+<a class="btn btn-success" asp-area="Admin" asp-controller="Account" asp-action="Index" id="return-index-button">Home</a>
+
+<form id="resetPwdForm" asp-area="Admin" asp-action="ResetPwd" method="post">
+    <h2 style="text-align: center">Reset user account password</h2>
+    <hr />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+        <div class="form-input p-3 text-center py-4" style="margin-bottom: 80px"> 
+    <div class="form-floating">
+        <input asp-for="Email" value="@Model.Email" class="form-control" autocomplete="username" aria-required="true" />
+        <label asp-for="Email"></label>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-floating">
+        <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" />
+        <label asp-for="Password">New Password</label>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-floating">
+        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+        <label asp-for="ConfirmPassword">Confirm New Password</label>
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <button id="resetPwdSubmit" type="submit" class="w-100 btn btn-lg btn-danger">Reset</button>
+    </div></div>
+</form>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}
+

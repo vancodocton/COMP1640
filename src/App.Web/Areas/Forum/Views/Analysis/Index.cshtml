@@ -1,0 +1,113 @@
+﻿@using App.Web.Data
+@model IEnumerable<App.Web.ViewModels.StatisticalAnalysisViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    int i = 0;
+}
+
+<h3 class="text-center">Statistical Analysis Page</h3>
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <a href="#" class="txtlink" data-bs-toggle="modal" data-bs-target="#Modal">
+                    Details
+                </a>
+
+                <!-- Modal -->
+                <div class="modal fade bd-example-modal-lg" id="Modal" role="dialog" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ModalLabel">Contribution details table</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="table-responsive-lg">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">NO</th>
+                                                        <th scope="col">Username</th>
+                                                        @if (User.IsInRole(Role.Manager))
+                                                        {
+                                                            <th scope="col">Department</th>
+                                                        }
+                                                        <th scope="col">Idea</th>
+                                                        <th scope="col">React</th>
+                                                        <th scope="col">Comment</th>
+                                                        <th scope="col">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var user in Model)
+                                                    {
+                                                        <tr>
+                                                            <th scope="row">@(++i)</th>
+                                                            <td>@user.Email</td>
+                                                            @if (User.IsInRole(Role.Manager))
+                                                            {
+                                                                <td>@user.DepartmentName</td>
+                                                            }
+                                                            <td>@user.ideaCount</td>
+                                                            <td>@user.reactCount</td>
+                                                            <td>@user.commentCount</td>
+                                                            <td>
+                                                                <a class="btn btn-primary text-nowrap" type="button" href="mailto:@user.Email">Send Mail</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <a href="#" class="txtlink">
+                    Details
+                </a>
+            </div>
+            <div class="card-body">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<partial name="_ChartJsScriptsPartial" />
+<script type="text/javascript" >
+    var datasets = @Json.Serialize(Model
+        .Where(i => i.DepartmentName is not null)
+        .GroupBy(i => i.DepartmentName)
+        .Select(x => new DepartmentStaticalViewModel
+        {
+            Label = x.Key,
+            CountIdea = x.Sum(u => u.ideaCount),
+            CountComment = x.Sum(u => u.commentCount),
+            CountReact = x.Sum(u => u.reactCount),
+        })
+    );
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
+<script type="text/javascript" src="~/js/mychart.js"></script>
+<script type="text/javascript" src="~/js/piechart.js"></script>
+}

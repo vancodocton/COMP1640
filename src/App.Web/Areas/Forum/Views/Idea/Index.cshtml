@@ -1,0 +1,137 @@
+﻿@model App.Web.Models.Idea
+
+@{
+    ViewData["Title"] = "Idea";
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-success mb-2">Home</a>
+
+<div class="card mb-3" id="idea-@Model.Id">
+    <div class="card-header">
+        <partial name="_CardCategory" for="Category" />
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">
+            @Html.DisplayFor(modelItem => Model.Title)
+        </h5>
+        <p class="card-text">
+            @Html.DisplayFor(modelItem => Model.Content)
+        </p>
+
+        <div class="list-group">
+            @if (Model.FileOnFileSystems != null && Model.FileOnFileSystems.Count != 0)
+                @foreach (var file in Model.FileOnFileSystems)
+                {
+                    @*<a class="list-group-item">*@
+                    <a asp-controller="Idea" asp-action="DownloadFileFromFileSystem" asp-route-id="@file.Id">@($"{file.Name}{file.Extension}")</a>
+
+                }
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="d-flex flex-wrap">
+            <div>
+                <form id="react-form" class="btn-group" role="group" aria-label="React button group @Model.Id">
+                    <input type="checkbox" class="btn-check" name="react" id="ThumbUp" autocomplete="off" data-checked="Thumbed Up" data-unchecked="Thumb Up" data-loading-text="Loading">
+                    <label class="btn btn-outline-primary" for="ThumbUp">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                        <span id="countthumbup">@Model.ThumbUp</span>
+                    </label>
+
+                    <input type="checkbox" class="btn-check" name="react" id="ThumbDown" autocomplete="off" data-checked="Thumbed Down" data-unchecked="Thumb Down" data-loading-text="Loading">
+                    <label class="btn btn-outline-danger" for="ThumbDown">
+                        <i class="fa-regular fa-thumbs-down"></i>
+                        <span id="countthumbdown">@Model.ThumbDown</span>
+                    </label>
+                </form>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-end align-items-center">
+                <span class="px-2">
+                    <i class="fa-solid fa-user"></i> @(Model.UserId == null ? "Deleted_User" : $"{(Model.IsIncognito ? "Anonymous User" : Model.User!.UserName)}{(User.Identity?.Name == Model.User?.UserName ? " (Me)" : "")}")
+                </span>
+
+                <span class="px-2">
+                    <i class="fa-solid fa-comments"></i>
+                    <span id="countcomment">@Model.NumComment</span>
+                </span>
+
+                <span class="px-2">
+                    <i class="fa-solid fa-eye"></i>
+                    <span id="countview">@Model.NumView</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container-fluid">
+        <form id="comment-form">
+            <div class="input-group">
+                <input asp-for="Id" name="IdeaId" hidden />
+                <span class="input-group-text">COMMENT</span>
+                <input id="comment" placeholder="Type comment..." type="text" class="form-control" aria-label="new comment" required>
+                <input type="submit" id="sendComment" class="btn btn-primary" value="Send">
+            </div>
+        </form>
+        <h5 class="h5">List of previous comments</h5>
+        <div id="commentsList">
+
+            @if (Model.Comments == null)
+            {
+                <div class="text-danger">Comments isn't loaded</div>
+            }
+            else foreach (var cmt in Model.Comments)
+                {
+                    <div id="cmt-@cmt.Id" class="card mb-1">
+                        <div class="card-body bg-light">
+                            <div class="d-flex flex-wrap">
+                                <p class="text-truncate pe-1">
+                                    <i class="fa-solid fa-user"> </i>
+                                    <b>@(cmt.User?.UserName ?? "Deleted_User")</b>
+                                </p>
+                                <p>
+                                    @cmt.Content
+                                    @if (Model.Category.FinalDueDate == null || DateTime.UtcNow < Model.Category.FinalDueDate)
+                                    {
+                                        @if (cmt.User?.UserName == User.Identity!.Name)
+                                        {
+                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(@cmt.Id)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        }
+                                        else if (User.IsInRole(App.Web.Data.Role.Coordinator) 
+                                            && (cmt.UserId == null || cmt.User?.DepartmentId == (int)(ViewData["UserDepartmentId"] ?? 0)))
+                                        {
+                                            <button class="btn btn-sm btn-white text-danger rounded-3 px-2" onclick="deleteComment(@cmt.Id)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        }
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<environment include="Development">
+    <script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+</environment>
+<environment include="Staging,Production">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.3/signalr.min.js"
+            asp-fallback-src="~/lib/signalr/dist/browser/signalr.min.js"
+            asp-fallback-test="window.signalR"
+            integrity="sha512-tjVd2CQVR1kY0h9MKM7PzmX9viGDUoYkPt1EBfPHVMskwwZ1d7gPGmWOrvZIidBKqNyZdDl4PUVFVVXNQJ3L+Q=="
+            crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+</environment>
+<script src="~/js/staff_idea_interact.js"></script>
+<script type="text/javascript">
+    userName = "@Html.Raw(User.Identity?.Name!)";
+    const ideaId = @Model.Id;
+    userInteractIdea(ideaId);
+</script>
+}
