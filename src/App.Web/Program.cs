@@ -2,7 +2,7 @@ using App.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.Services;
 using App.Web.Services.Hubs;
 

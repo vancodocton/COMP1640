@@ -18,6 +18,11 @@
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.161" />
     <PackageReference Include="SendGrid" Version="9.27.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\App.Core\App.Core.csproj" />
+    <ProjectReference Include="..\App.Infrastructure\App.Infrastructure.csproj" />
+  </ItemGroup>
 	
   <Target Name="RemoveIdentityAssets"> 
 	<ItemGroup> 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using App.Web.Data;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.ViewModels.IdeaInteractHub;
 
 namespace App.Web.Services.Hubs

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using App.Web.Data;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.ViewModels;
 
 namespace App.Web.Areas.Forum.Controllers

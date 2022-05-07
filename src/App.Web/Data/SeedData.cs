@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using App.Web.Models;
+using App.Core.Entities;
 
 namespace App.Web.Data
 {

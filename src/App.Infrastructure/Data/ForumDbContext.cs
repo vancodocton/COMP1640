@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using App.Core.Entities;
 
-namespace App.Web.Data
+namespace App.Infrastructure.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ForumDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ForumDbContext(DbContextOptions<ForumDbContext> options)
             : base(options)
         {
         }

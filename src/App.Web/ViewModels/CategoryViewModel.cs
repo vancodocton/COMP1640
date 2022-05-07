@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using App.Web.Models;
+using App.Core.Entities;
 
 namespace App.Web.ViewModels
 {
     public class CategoryViewModel
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
 
         public string? Description { get; set; }
 

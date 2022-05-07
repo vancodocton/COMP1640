@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Encodings.Web;
 using App.Web.Data;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.Services.Hubs;
 using App.Web.ViewModels.IdeaInteractHub;
 

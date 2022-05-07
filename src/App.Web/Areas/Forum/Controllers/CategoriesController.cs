@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 using App.Web.Data;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.ViewModels;
 
 namespace App.Web.Areas.Forum.Controllers

@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using App.Web.Areas.Identity.Pages.Account;
 using App.Web.Data;
-using App.Web.Models;
+using App.Core.Entities;
 using App.Web.ViewModels;
 
 namespace App.Web.Areas.Admin.Controllers

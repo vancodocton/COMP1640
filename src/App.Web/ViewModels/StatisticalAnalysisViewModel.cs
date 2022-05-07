@@ -1,4 +1,4 @@
-﻿using App.Web.Models;
+﻿using App.Core.Entities;
 
 namespace App.Web.ViewModels
 {
